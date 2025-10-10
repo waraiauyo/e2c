@@ -29,6 +29,14 @@ export async function updateSession(request: NextRequest) {
         }
     );
 
+    // Handle auth code exchange for password reset
+    if (request.nextUrl.searchParams.has("code")) {
+        const code = request.nextUrl.searchParams.get("code");
+        if (code) {
+            await supabase.auth.exchangeCodeForSession(code);
+        }
+    }
+
     // Do not run code between createServerClient and
     // supabase.auth.getUser(). A simple mistake could make it very hard to debug
     // issues with users being randomly logged out.
@@ -42,11 +50,27 @@ export async function updateSession(request: NextRequest) {
     if (
         !user &&
         !request.nextUrl.pathname.startsWith("/login") &&
-        !request.nextUrl.pathname.startsWith("/register")
+        !request.nextUrl.pathname.startsWith("/register") &&
+        !request.nextUrl.pathname.startsWith("/forgot-password") &&
+        !request.nextUrl.pathname.startsWith("/reset-password")
     ) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone();
         url.pathname = "/login";
+
+        return NextResponse.redirect(url);
+    }
+
+    if (
+        user &&
+        (request.nextUrl.pathname.startsWith("/login") ||
+            request.nextUrl.pathname.startsWith("/register") ||
+            request.nextUrl.pathname.startsWith("/forgot-password") ||
+            request.nextUrl.pathname.startsWith("/reset-password"))
+    ) {
+        // user is logged in, redirect to home page
+        const url = request.nextUrl.clone();
+        url.pathname = "/";
 
         return NextResponse.redirect(url);
     }

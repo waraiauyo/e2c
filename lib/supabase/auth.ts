@@ -139,7 +139,8 @@ export async function sendPasswordResetEmail(
 
         return {
             success: true,
-            message: "Un email de réinitialisation a été envoyé à votre adresse.",
+            message:
+                "Un email de réinitialisation a été envoyé à votre adresse.",
         };
     } catch (err) {
         return {

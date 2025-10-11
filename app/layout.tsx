@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProviders";
 import MainWrapper from "@/components/wrappers/MainWrapper";
 import { Toaster } from "@/components/ui/sonner";
+import StoreProvider from "@/lib/redux/provider/StoreProvider";
 
 export const metadata: Metadata = {
     title: "E2C",
@@ -17,14 +18,16 @@ export default function RootLayout({
     return (
         <html lang="fr" suppressHydrationWarning>
             <body>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                >
-                    <MainWrapper>{children}</MainWrapper>
-                    <Toaster />
-                </ThemeProvider>
+                <StoreProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                    >
+                        <MainWrapper>{children}</MainWrapper>
+                        <Toaster />
+                    </ThemeProvider>
+                </StoreProvider>
             </body>
         </html>
     );

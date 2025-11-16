@@ -32,6 +32,7 @@ export async function updateSession(request: NextRequest) {
     // Handle auth code exchange for password reset
     if (request.nextUrl.searchParams.has("code")) {
         const code = request.nextUrl.searchParams.get("code");
+
         if (code) {
             await supabase.auth.exchangeCodeForSession(code);
         }
@@ -51,8 +52,7 @@ export async function updateSession(request: NextRequest) {
         !user &&
         !request.nextUrl.pathname.startsWith("/login") &&
         !request.nextUrl.pathname.startsWith("/register") &&
-        !request.nextUrl.pathname.startsWith("/forgot-password") &&
-        !request.nextUrl.pathname.startsWith("/reset-password")
+        !request.nextUrl.pathname.startsWith("/forgot-password")
     ) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone();
@@ -65,8 +65,7 @@ export async function updateSession(request: NextRequest) {
         user &&
         (request.nextUrl.pathname.startsWith("/login") ||
             request.nextUrl.pathname.startsWith("/register") ||
-            request.nextUrl.pathname.startsWith("/forgot-password") ||
-            request.nextUrl.pathname.startsWith("/reset-password"))
+            request.nextUrl.pathname.startsWith("/forgot-password"))
     ) {
         // user is logged in, redirect to home page
         const url = request.nextUrl.clone();

@@ -126,6 +126,23 @@ export async function sendPasswordResetEmail(
     const supabase = await createClient();
 
     try {
+        // Vérifier si un utilisateur existe avec cet email
+        const { data: users, error: queryError } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("email", email)
+            .single();
+
+        if (queryError || !users) {
+            // Pour des raisons de sécurité, on renvoie le même message
+            // que si l'email existait (évite l'énumération des utilisateurs)
+            return {
+                success: true,
+                message:
+                    "Un email de réinitialisation a été envoyé à votre adresse.",
+            };
+        }
+
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
         });

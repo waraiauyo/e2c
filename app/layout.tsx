@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProviders";
 import MainWrapper from "@/components/wrappers/MainWrapper";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/shadcn/sonner";
 import StoreProvider from "@/lib/redux/provider/StoreProvider";
 
 export const metadata: Metadata = {

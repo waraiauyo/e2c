@@ -1,15 +1,15 @@
 "use client"; //PAGE DE TEST TOUT SERA CHANGÉ
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/shadcn/card";
+import { Separator } from "@/components/shadcn/separator";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchCurrentUser, logoutUser } from "@/lib/redux/features/userSlice";

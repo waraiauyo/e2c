@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 import {
     Card,
     CardContent,
@@ -11,8 +11,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@/components/shadcn/card";
+import { Input } from "@/components/shadcn/input";
 import {
     Form,
     FormControl,
@@ -20,7 +20,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
+} from "@/components/shadcn/form";
 import { useState } from "react";
 import { login } from "@/lib/supabase/auth";
 import { useRouter } from "next/navigation";

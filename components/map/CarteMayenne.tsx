@@ -26,18 +26,20 @@ function MapController({ borderData }: { borderData: Feature<Polygon> | null }) 
     const geoJsonLayer = L.geoJSON(borderData);
     const bounds = geoJsonLayer.getBounds();
 
-    map.fitBounds(bounds, { padding: [1, 1] });
+
+    map.fitBounds(bounds, { padding: [20, 20] });
 
     const paddedBounds = bounds.pad(0.1); 
     map.setMaxBounds(paddedBounds);
 
-    map.setMinZoom(10); 
+    const optimalZoom = map.getBoundsZoom(bounds);
+    
+    map.setMinZoom(optimalZoom);
 
   }, [borderData, map]);
 
   return null;
 }
-
 export default function CarteMayenne() {
   const [mayenneBorder, setMayenneBorder] = useState<Feature<Polygon> | null>(null);
   const [worldMask, setWorldMask] = useState<Feature | null>(null);

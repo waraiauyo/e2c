@@ -1,11 +1,8 @@
 {
     "mcpServers": {
-        "shadcn": {
-            "command": "npx",
-            "args": ["shadcn@latest", "mcp"]
-        },
         "supabase": {
-            "url": "https://mcp.supabase.com/mcp?project_ref=nuwofzihsbsrymfsdwho"
+            "type": "http",
+            "url": "https://mcp.supabase.com/mcp?project_ref=nuwofzihsbsrymfsdwho&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
         }
     }
 }

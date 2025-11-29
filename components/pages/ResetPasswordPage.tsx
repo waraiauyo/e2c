@@ -118,11 +118,11 @@ export default function ResetPasswordPage() {
                                 )}
                             />
                             <Button
-                                loading={loading}
+                                disabled={loading}
                                 type="submit"
                                 className="w-full"
                             >
-                                Réinitialiser le mot de passe
+                                {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
                             </Button>
                         </form>
                     </Form>

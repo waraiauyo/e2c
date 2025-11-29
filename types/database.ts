@@ -4,7 +4,7 @@
  * These types represent the database schema for CLAS-related tables
  */
 
-export type AccountType = 'coordinator' | 'animator';
+export type AccountType = 'admin' | 'coordinator' | 'animator';
 export type TeamRole = 'coordinator' | 'animator';
 
 export interface Profile {

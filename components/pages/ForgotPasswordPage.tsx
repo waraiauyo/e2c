@@ -97,11 +97,11 @@ export default function ForgotPasswordPage() {
                                     )}
                                 />
                                 <Button
-                                    loading={loading}
+                                    disabled={loading}
                                     type="submit"
                                     className="w-full"
                                 >
-                                    Envoyer le lien
+                                    {loading ? "Envoi en cours..." : "Envoyer le lien"}
                                 </Button>
                             </form>
                         </Form>

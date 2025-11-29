@@ -122,11 +122,11 @@ export default function LoginPage() {
                             </div>
                             <CardFooter className="flex-col gap-2 px-0 pt-6">
                                 <Button
-                                    loading={loading}
+                                    disabled={loading}
                                     type="submit"
                                     className="w-full"
                                 >
-                                    Se connecter
+                                    {loading ? "Connexion..." : "Se connecter"}
                                 </Button>
                             </CardFooter>
                         </form>

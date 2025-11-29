@@ -1,14 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import type { Profile } from "@/types/database";
 
-export interface UserProfile {
-    id: string;
-    first_name: string;
-    last_name: string;
-    avatar_url?: string;
-    created_at: string;
-}
+export type UserProfile = Profile;
 
 export interface GetProfileResult {
     profile: UserProfile | null;

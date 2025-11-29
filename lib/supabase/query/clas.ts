@@ -464,3 +464,71 @@ export async function getUserClas(
         };
     }
 }
+
+export interface ClasWithRole {
+    id: string;
+    name: string;
+    role: string;
+}
+
+export interface GetUserClasWithRolesResult {
+    clas: ClasWithRole[] | null;
+    error: string | null;
+}
+
+/**
+ * Get CLAS where a specific user is a team member, with their role in each CLAS
+ */
+export async function getUserClasWithRoles(
+    userId: string
+): Promise<GetUserClasWithRolesResult> {
+    const supabase = await createClient();
+
+    try {
+        // Get CLAS with roles via join
+        const { data, error } = await supabase
+            .from("clas_team_members")
+            .select(`
+                role,
+                clas:clas(id, name)
+            `)
+            .eq("profile_id", userId)
+            .order("clas(name)");
+
+        if (error) {
+            return {
+                clas: null,
+                error: error.message,
+            };
+        }
+
+        if (!data || data.length === 0) {
+            return {
+                clas: [],
+                error: null,
+            };
+        }
+
+        // Transform data to ClasWithRole format
+        const clasWithRoles = data
+            .filter((item: any) => item.clas !== null)
+            .map((item: any) => ({
+                id: item.clas.id,
+                name: item.clas.name,
+                role: item.role,
+            }));
+
+        return {
+            clas: clasWithRoles,
+            error: null,
+        };
+    } catch (err) {
+        return {
+            clas: null,
+            error:
+                err instanceof Error
+                    ? err.message
+                    : "Une erreur est survenue lors de la récupération des CLAS de l'utilisateur.",
+        };
+    }
+}

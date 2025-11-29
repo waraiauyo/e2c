@@ -9,7 +9,7 @@ export default function StoreProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const storeRef = useRef<AppStore>();
+    const storeRef = useRef<AppStore | undefined>(undefined);
 
     if (!storeRef.current) {
         // Crée l'instance du store la première fois que ce composant est rendu

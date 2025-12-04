@@ -4,8 +4,8 @@
  * These types represent the database schema for CLAS-related tables
  */
 
-export type AccountType = 'admin' | 'coordinator' | 'animator';
-export type TeamRole = 'coordinator' | 'animator';
+export type AccountType = "admin" | "coordinator" | "animator";
+export type TeamRole = "coordinator" | "animator";
 
 export interface Profile {
     id: string;
@@ -56,17 +56,24 @@ export interface ClasRawContact {
     updated_at: string;
 }
 
-// Database insert types (without generated fields)
-export type ClasInsert = Omit<Clas, 'id' | 'created_at' | 'updated_at'>;
-export type ClasTeamMemberInsert = Omit<ClasTeamMember, 'id' | 'created_at' | 'updated_at'>;
-export type ClasRawContactInsert = Omit<ClasRawContact, 'id' | 'created_at' | 'updated_at'>;
+export type ClasInsert = Omit<Clas, "id" | "created_at" | "updated_at">;
+export type ClasTeamMemberInsert = Omit<
+    ClasTeamMember,
+    "id" | "created_at" | "updated_at"
+>;
+export type ClasRawContactInsert = Omit<
+    ClasRawContact,
+    "id" | "created_at" | "updated_at"
+>;
 
-// Database update types (all fields optional except id)
 export type ClasUpdate = Partial<ClasInsert> & { id: string };
-export type ClasTeamMemberUpdate = Partial<ClasTeamMemberInsert> & { id: string };
-export type ClasRawContactUpdate = Partial<ClasRawContactInsert> & { id: string };
+export type ClasTeamMemberUpdate = Partial<ClasTeamMemberInsert> & {
+    id: string;
+};
+export type ClasRawContactUpdate = Partial<ClasRawContactInsert> & {
+    id: string;
+};
 
-// Extended types with relations
 export interface ClasWithTeam extends Clas {
     team_members: ClasTeamMember[];
     raw_contacts: ClasRawContact[];

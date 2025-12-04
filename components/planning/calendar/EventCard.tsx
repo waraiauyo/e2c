@@ -1,11 +1,20 @@
 "use client";
 
 import { formatTime, formatTimeRange } from "@/lib/planning/utils/dateUtils";
-import { getEventColorBgLightClass, getEventColorBorderClass, getEventColorTextClass } from "@/lib/planning/utils/eventUtils";
+import {
+    getEventColorBgLightClass,
+    getEventColorBorderClass,
+    getEventColorTextClass,
+} from "@/lib/planning/utils/eventUtils";
 import type { Event } from "@/lib/planning/types";
 import { Badge } from "@/components/shadcn/badge";
 import { Avatar, AvatarFallback } from "@/components/shadcn/avatar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn/tooltip";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/shadcn/tooltip";
 import { MapPin, Clock, Users } from "lucide-react";
 
 interface EventCardProps {
@@ -15,7 +24,12 @@ interface EventCardProps {
     compact?: boolean; // Mode compact pour affichage dans grille horaire
 }
 
-export function EventCard({ event, onClick, className = "", compact = false }: EventCardProps) {
+export function EventCard({
+    event,
+    onClick,
+    className = "",
+    compact = false,
+}: EventCardProps) {
     const bgClass = getEventColorBgLightClass(event.color);
     const borderClass = getEventColorBorderClass(event.color);
     const textClass = getEventColorTextClass(event.color);
@@ -33,7 +47,11 @@ export function EventCard({ event, onClick, className = "", compact = false }: E
             );
         }
         if (event.status === "cancelled") {
-            return <Badge variant="destructive" className="text-xs">Annulé</Badge>;
+            return (
+                <Badge variant="destructive" className="text-xs">
+                    Annulé
+                </Badge>
+            );
         }
         return null;
     };
@@ -80,7 +98,12 @@ export function EventCard({ event, onClick, className = "", compact = false }: E
                                 {event.all_day ? (
                                     <span>Toute la journée</span>
                                 ) : (
-                                    <span>{formatTimeRange(event.start_time, event.end_time)}</span>
+                                    <span>
+                                        {formatTimeRange(
+                                            event.start_time,
+                                            event.end_time
+                                        )}
+                                    </span>
                                 )}
                             </div>
                             {event.location && (
@@ -110,7 +133,9 @@ export function EventCard({ event, onClick, className = "", compact = false }: E
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                        <h3 className={`font-semibold text-base truncate ${textClass}`}>
+                        <h3
+                            className={`font-semibold text-base truncate ${textClass}`}
+                        >
                             {event.title}
                         </h3>
                         {statusBadge()}
@@ -133,14 +158,21 @@ export function EventCard({ event, onClick, className = "", compact = false }: E
                             {event.all_day ? (
                                 <span>Toute la journée</span>
                             ) : (
-                                <span>{formatTimeRange(event.start_time, event.end_time)}</span>
+                                <span>
+                                    {formatTimeRange(
+                                        event.start_time,
+                                        event.end_time
+                                    )}
+                                </span>
                             )}
                         </div>
 
                         {event.location && (
                             <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 opacity-70" />
-                                <span className="truncate">{event.location}</span>
+                                <span className="truncate">
+                                    {event.location}
+                                </span>
                             </div>
                         )}
                     </div>

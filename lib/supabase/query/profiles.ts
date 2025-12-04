@@ -90,3 +90,26 @@ export async function getCurrentUserProfile(): Promise<GetProfileResult> {
         };
     }
 }
+
+/**
+ * Récupère tous les utilisateurs (pour sélection de participants)
+ */
+export async function getAllUsers(): Promise<UserProfile[]> {
+    const supabase = await createClient();
+
+    try {
+        const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .order("first_name", { ascending: true });
+
+        if (error) {
+            throw new Error(`Erreur lors de la récupération des utilisateurs: ${error.message}`);
+        }
+
+        return data as UserProfile[];
+    } catch (err) {
+        console.error("Error fetching users:", err);
+        return [];
+    }
+}

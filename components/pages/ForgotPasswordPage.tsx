@@ -101,7 +101,9 @@ export default function ForgotPasswordPage() {
                                     type="submit"
                                     className="w-full"
                                 >
-                                    {loading ? "Envoi en cours..." : "Envoyer le lien"}
+                                    {loading
+                                        ? "Envoi en cours..."
+                                        : "Envoyer le lien"}
                                 </Button>
                             </form>
                         </Form>

@@ -1,8 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { format, isSameMonth, isToday, startOfDay, endOfDay, isWithinInterval } from "date-fns";
-import { fr } from "date-fns/locale";
+import {
+    format,
+    isSameMonth,
+    isToday,
+    startOfDay,
+    endOfDay,
+    isWithinInterval,
+} from "date-fns";
 import { getMonthDays, getMonthName } from "@/lib/planning/utils/dateUtils";
 import type { Event } from "@/lib/planning/types";
 import { cn } from "@/lib/utils";
@@ -16,7 +22,12 @@ interface MonthViewProps {
     onDayClick: (date: Date) => void;
 }
 
-export function MonthView({ currentDate, events, onEventClick, onDayClick }: MonthViewProps) {
+export function MonthView({
+    currentDate,
+    events,
+    onEventClick,
+    onDayClick,
+}: MonthViewProps) {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -36,9 +47,16 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Mon
                 const dayStart = startOfDay(day);
                 const dayEnd = endOfDay(day);
 
-                const eventIntersects = isWithinInterval(eventStart, { start: dayStart, end: dayEnd }) ||
-                                        isWithinInterval(eventEnd, { start: dayStart, end: dayEnd }) ||
-                                        (eventStart <= dayStart && eventEnd >= dayEnd);
+                const eventIntersects =
+                    isWithinInterval(eventStart, {
+                        start: dayStart,
+                        end: dayEnd,
+                    }) ||
+                    isWithinInterval(eventEnd, {
+                        start: dayStart,
+                        end: dayEnd,
+                    }) ||
+                    (eventStart <= dayStart && eventEnd >= dayEnd);
 
                 if (eventIntersects) {
                     const dateKey = format(day, "yyyy-MM-dd");
@@ -86,32 +104,40 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Mon
             <div className="flex-1 overflow-hidden flex flex-col">
                 {/* En-têtes des jours de la semaine */}
                 <div className="grid grid-cols-7 border-b bg-muted/30">
-                    {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
-                        <div
-                            key={day}
-                            className="text-center py-2 text-sm font-medium text-muted-foreground border-r last:border-r-0"
-                        >
-                            {day}
-                        </div>
-                    ))}
+                    {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(
+                        (day) => (
+                            <div
+                                key={day}
+                                className="text-center py-2 text-sm font-medium text-muted-foreground border-r last:border-r-0"
+                            >
+                                {day}
+                            </div>
+                        )
+                    )}
                 </div>
 
                 {/* Grille des jours */}
                 <div className="flex-1 overflow-y-auto">
                     <div className="grid grid-cols-7 auto-rows-fr min-h-full">
                         {monthDays.map((day, index) => {
-                            const isCurrentMonth = isSameMonth(day, currentDate);
+                            const isCurrentMonth = isSameMonth(
+                                day,
+                                currentDate
+                            );
                             const isTodayDate = isToday(day);
                             const eventCount = getEventCount(day);
-                            const badgeVariant = getCountBadgeVariant(eventCount);
+                            const badgeVariant =
+                                getCountBadgeVariant(eventCount);
 
                             return (
                                 <div
                                     key={index}
                                     className={cn(
                                         "border-r border-b last:border-r-0 p-2 min-h-[100px] cursor-pointer hover:bg-accent/50 transition-colors",
-                                        !isCurrentMonth && "bg-muted/20 text-muted-foreground",
-                                        isTodayDate && "bg-primary/5 ring-2 ring-primary/20 ring-inset"
+                                        !isCurrentMonth &&
+                                            "bg-muted/20 text-muted-foreground",
+                                        isTodayDate &&
+                                            "bg-primary/5 ring-2 ring-primary/20 ring-inset"
                                     )}
                                     onClick={() => handleDayClick(day)}
                                 >
@@ -120,7 +146,8 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Mon
                                         <div
                                             className={cn(
                                                 "flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium",
-                                                isTodayDate && "bg-primary text-primary-foreground"
+                                                isTodayDate &&
+                                                    "bg-primary text-primary-foreground"
                                             )}
                                         >
                                             {format(day, "d")}
@@ -128,7 +155,10 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Mon
 
                                         {/* Badge du nombre d'événements */}
                                         {eventCount > 0 && badgeVariant && (
-                                            <Badge variant={badgeVariant} className="text-xs px-2">
+                                            <Badge
+                                                variant={badgeVariant}
+                                                className="text-xs px-2"
+                                            >
                                                 {eventCount}
                                             </Badge>
                                         )}
@@ -166,15 +196,21 @@ export function MonthView({ currentDate, events, onEventClick, onDayClick }: Mon
                         <span>Aujourd'hui</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">1</Badge>
+                        <Badge variant="secondary" className="text-xs">
+                            1
+                        </Badge>
                         <span>1 événement</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Badge variant="default" className="text-xs">2-3</Badge>
+                        <Badge variant="default" className="text-xs">
+                            2-3
+                        </Badge>
                         <span>2-3 événements</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Badge variant="destructive" className="text-xs">4+</Badge>
+                        <Badge variant="destructive" className="text-xs">
+                            4+
+                        </Badge>
                         <span>4+ événements</span>
                     </div>
                 </div>

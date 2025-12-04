@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { Event, EventParticipant, EventReminder, EventWithDetails, EventFilters } from "@/lib/planning/types";
+import type { Event, EventParticipant, EventParticipantWithProfile, EventReminder, EventWithDetails, EventFilters } from "@/lib/planning/types";
 
 /**
  * Queries Supabase pour la gestion des événements
@@ -298,7 +298,7 @@ export async function duplicateEvent(id: string): Promise<Event> {
 /**
  * Récupère les participants d'un événement
  */
-export async function getEventParticipants(eventId: string): Promise<EventParticipant[]> {
+export async function getEventParticipants(eventId: string): Promise<EventParticipantWithProfile[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -319,7 +319,40 @@ export async function getEventParticipants(eventId: string): Promise<EventPartic
         throw new Error(`Erreur lors de la récupération des participants: ${error.message}`);
     }
 
-    return data as EventParticipant[];
+    return data as EventParticipantWithProfile[];
+}
+
+/**
+ * Récupère le nombre de participants pour plusieurs événements en une seule requête
+ * Optimisation pour éviter le problème N+1
+ */
+export async function getBatchEventParticipantCounts(
+    eventIds: string[]
+): Promise<Map<string, number>> {
+    if (eventIds.length === 0) {
+        return new Map();
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("event_participants")
+        .select("event_id")
+        .in("event_id", eventIds);
+
+    if (error) {
+        console.error("Erreur lors du comptage des participants:", error);
+        return new Map();
+    }
+
+    // Grouper par event_id et compter
+    const counts = new Map<string, number>();
+    data.forEach((participant) => {
+        const current = counts.get(participant.event_id) || 0;
+        counts.set(participant.event_id, current + 1);
+    });
+
+    return counts;
 }
 
 /**

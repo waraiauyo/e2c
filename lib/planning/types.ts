@@ -40,6 +40,16 @@ export interface EventParticipant {
     created_at: string;
 }
 
+export interface EventParticipantWithProfile extends EventParticipant {
+    profile?: {
+        id: string;
+        email: string;
+        first_name: string | null;
+        last_name: string | null;
+        avatar_url: string | null;
+    };
+}
+
 export interface EventReminder {
     id: string;
     event_id: string;

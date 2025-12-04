@@ -1,13 +1,22 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { format, isToday, isTomorrow, isYesterday, startOfDay, addDays, addMonths, differenceInCalendarDays } from "date-fns";
+import { useState, useMemo, useEffect } from "react";
+import {
+    format,
+    isToday,
+    isTomorrow,
+    isYesterday,
+    startOfDay,
+    addMonths,
+    differenceInCalendarDays,
+} from "date-fns";
 import { fr } from "date-fns/locale";
 import { Input } from "@/components/shadcn/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn/tabs";
-import { Search, Calendar, Clock, MapPin, Tag } from "lucide-react";
+import { Search, Calendar, Clock, MapPin, Tag, Users } from "lucide-react";
 import type { Event } from "@/lib/planning/types";
 import { Badge } from "@/components/shadcn/badge";
+import { getBatchEventParticipantCounts } from "@/lib/supabase/query/events";
 
 interface AgendaViewProps {
     events: Event[];
@@ -18,9 +27,16 @@ interface AgendaViewProps {
 
 type TimeFilter = "7d" | "30d" | "3m" | "all";
 
-export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProps) {
+export function AgendaView({
+    events,
+    currentDate,
+    onEventClick,
+}: AgendaViewProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [timeFilter, setTimeFilter] = useState<TimeFilter>("30d");
+    const [participantCounts, setParticipantCounts] = useState<
+        Map<string, number>
+    >(new Map());
 
     // Filtrer les événements par période
     const filteredByTime = useMemo(() => {
@@ -73,18 +89,39 @@ export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProp
         });
 
         // Trier les groupes par date
-        const sortedGroups = Array.from(groups.entries()).sort(([dateA], [dateB]) => {
-            return dateA.localeCompare(dateB);
-        });
+        const sortedGroups = Array.from(groups.entries()).sort(
+            ([dateA], [dateB]) => {
+                return dateA.localeCompare(dateB);
+            }
+        );
 
         // Trier les événements dans chaque groupe par heure
         sortedGroups.forEach(([, eventsList]) => {
             eventsList.sort((a, b) => {
-                return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+                return (
+                    new Date(a.start_time).getTime() -
+                    new Date(b.start_time).getTime()
+                );
             });
         });
 
         return sortedGroups;
+    }, [filteredEvents]);
+
+    // Charger les participants pour les événements visibles (optimisé avec batch query)
+    useEffect(() => {
+        async function loadParticipants() {
+            if (filteredEvents.length === 0) {
+                setParticipantCounts(new Map());
+                return;
+            }
+
+            const eventIds = filteredEvents.map((event) => event.id);
+            const counts = await getBatchEventParticipantCounts(eventIds);
+            setParticipantCounts(counts);
+        }
+
+        loadParticipants();
     }, [filteredEvents]);
 
     // Formater l'en-tête de date
@@ -144,7 +181,12 @@ export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProp
                 </div>
 
                 {/* Filtre temporel */}
-                <Tabs value={timeFilter} onValueChange={(value) => setTimeFilter(value as TimeFilter)}>
+                <Tabs
+                    value={timeFilter}
+                    onValueChange={(value) =>
+                        setTimeFilter(value as TimeFilter)
+                    }
+                >
                     <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="7d">7 jours</TabsTrigger>
                         <TabsTrigger value="30d">30 jours</TabsTrigger>
@@ -155,7 +197,9 @@ export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProp
 
                 {/* Compteur de résultats */}
                 <div className="text-sm text-muted-foreground">
-                    {filteredEvents.length} événement{filteredEvents.length > 1 ? "s" : ""} trouvé{filteredEvents.length > 1 ? "s" : ""}
+                    {filteredEvents.length} événement
+                    {filteredEvents.length > 1 ? "s" : ""} trouvé
+                    {filteredEvents.length > 1 ? "s" : ""}
                 </div>
             </div>
 
@@ -168,7 +212,9 @@ export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProp
                             Aucun événement trouvé
                         </p>
                         <p className="text-sm text-muted-foreground">
-                            {searchQuery ? "Essayez une autre recherche" : "Créez votre premier événement"}
+                            {searchQuery
+                                ? "Essayez une autre recherche"
+                                : "Créez votre premier événement"}
                         </p>
                     </div>
                 ) : (
@@ -190,8 +236,11 @@ export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProp
                                             onClick={() => onEventClick(event)}
                                             className="group relative p-4 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
                                             style={{
-                                                borderLeftColor: event.color || undefined,
-                                                borderLeftWidth: event.color ? "4px" : undefined,
+                                                borderLeftColor:
+                                                    event.color || undefined,
+                                                borderLeftWidth: event.color
+                                                    ? "4px"
+                                                    : undefined,
                                             }}
                                         >
                                             {/* Titre et statut */}
@@ -205,22 +254,53 @@ export function AgendaView({ events, currentDate, onEventClick }: AgendaViewProp
                                             {/* Heure */}
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                                                 <Clock className="h-4 w-4" />
-                                                <span>{formatEventTime(event)}</span>
+                                                <span>
+                                                    {formatEventTime(event)}
+                                                </span>
                                             </div>
 
                                             {/* Lieu */}
                                             {event.location && (
                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                                                     <MapPin className="h-4 w-4" />
-                                                    <span className="line-clamp-1">{event.location}</span>
+                                                    <span className="line-clamp-1">
+                                                        {event.location}
+                                                    </span>
                                                 </div>
                                             )}
 
                                             {/* Type (Personnel/CLAS) */}
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Tag className="h-4 w-4" />
-                                                <span className="capitalize">{event.owner_type === "personal" ? "Personnel" : "CLAS"}</span>
+                                                <span className="capitalize">
+                                                    {event.owner_type ===
+                                                    "personal"
+                                                        ? "Personnel"
+                                                        : "CLAS"}
+                                                </span>
                                             </div>
+
+                                            {/* Participants */}
+                                            {participantCounts.get(event.id) !==
+                                                undefined &&
+                                                participantCounts.get(
+                                                    event.id
+                                                )! > 0 && (
+                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                        <Users className="h-4 w-4" />
+                                                        <span>
+                                                            {participantCounts.get(
+                                                                event.id
+                                                            )}{" "}
+                                                            participant
+                                                            {participantCounts.get(
+                                                                event.id
+                                                            )! > 1
+                                                                ? "s"
+                                                                : ""}
+                                                        </span>
+                                                    </div>
+                                                )}
 
                                             {/* Description */}
                                             {event.description && (

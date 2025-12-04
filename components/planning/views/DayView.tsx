@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { format, startOfDay, endOfDay, isWithinInterval, isSameDay } from "date-fns";
+import {
+    format,
+    startOfDay,
+    endOfDay,
+    isWithinInterval,
+    isSameDay,
+} from "date-fns";
 import { fr } from "date-fns/locale";
 import { Clock } from "lucide-react";
 import type { Event } from "@/lib/planning/types";
@@ -14,7 +20,12 @@ interface DayViewProps {
     onTimeSlotClick: (date: Date, hour: number) => void;
 }
 
-export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: DayViewProps) {
+export function DayView({
+    currentDate,
+    events,
+    onEventClick,
+    onTimeSlotClick,
+}: DayViewProps) {
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     // Filtrer les événements du jour sélectionné
@@ -27,9 +38,14 @@ export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: 
             const eventEnd = new Date(event.end_time);
 
             // Inclure si l'événement intersecte avec le jour
-            return isWithinInterval(eventStart, { start: dayStart, end: dayEnd }) ||
-                   isWithinInterval(eventEnd, { start: dayStart, end: dayEnd }) ||
-                   (eventStart <= dayStart && eventEnd >= dayEnd);
+            return (
+                isWithinInterval(eventStart, {
+                    start: dayStart,
+                    end: dayEnd,
+                }) ||
+                isWithinInterval(eventEnd, { start: dayStart, end: dayEnd }) ||
+                (eventStart <= dayStart && eventEnd >= dayEnd)
+            );
         });
     }, [events, currentDate]);
 
@@ -45,7 +61,8 @@ export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: 
         const displayEnd = eventEnd > dayEnd ? dayEnd : eventEnd;
 
         // Calculer la position en pourcentage (0-100% sur 24h)
-        const startMinutes = displayStart.getHours() * 60 + displayStart.getMinutes();
+        const startMinutes =
+            displayStart.getHours() * 60 + displayStart.getMinutes();
         const endMinutes = displayEnd.getHours() * 60 + displayEnd.getMinutes();
 
         const top = (startMinutes / (24 * 60)) * 100;
@@ -108,7 +125,10 @@ export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: 
                         <div
                             key={hour}
                             className="absolute w-full border-b border-border/50"
-                            style={{ top: `${(hour / 24) * 100}%`, height: `${100 / 24}%` }}
+                            style={{
+                                top: `${(hour / 24) * 100}%`,
+                                height: `${100 / 24}%`,
+                            }}
                         >
                             <div className="flex h-full">
                                 {/* Colonne heure */}
@@ -121,7 +141,9 @@ export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: 
                                 {/* Zone cliquable pour créer un événement */}
                                 <div
                                     className="flex-1 hover:bg-accent/30 cursor-pointer transition-colors border-l border-border/50"
-                                    onClick={() => onTimeSlotClick(currentDate, hour)}
+                                    onClick={() =>
+                                        onTimeSlotClick(currentDate, hour)
+                                    }
                                 />
                             </div>
                         </div>
@@ -138,8 +160,11 @@ export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: 
                                         className="absolute left-4 right-4 rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer pointer-events-auto overflow-hidden"
                                         style={{
                                             ...style,
-                                            borderLeftColor: event.color || "#3b82f6",
-                                            backgroundColor: event.color ? `${event.color}15` : "hsl(var(--primary) / 0.1)",
+                                            borderLeftColor:
+                                                event.color || "#3b82f6",
+                                            backgroundColor: event.color
+                                                ? `${event.color}15`
+                                                : "hsl(var(--primary) / 0.1)",
                                         }}
                                         onClick={() => onEventClick(event)}
                                     >
@@ -152,16 +177,24 @@ export function DayView({ currentDate, events, onEventClick, onTimeSlotClick }: 
                                             {/* Heure */}
                                             <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                                                 <Clock className="h-3 w-3" />
-                                                <span>{formatEventTime(event)}</span>
+                                                <span>
+                                                    {formatEventTime(event)}
+                                                </span>
                                             </div>
 
                                             {/* Statut */}
                                             {event.status !== "confirmed" && (
-                                                <div className={cn(
-                                                    "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium",
-                                                    getStatusColor(event.status)
-                                                )}>
-                                                    {event.status === "pending" ? "En attente" : "Annulé"}
+                                                <div
+                                                    className={cn(
+                                                        "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium",
+                                                        getStatusColor(
+                                                            event.status
+                                                        )
+                                                    )}
+                                                >
+                                                    {event.status === "pending"
+                                                        ? "En attente"
+                                                        : "Annulé"}
                                                 </div>
                                             )}
 

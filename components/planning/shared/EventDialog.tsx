@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/shadcn/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/shadcn/dialog";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -40,7 +46,8 @@ export function EventDialog({
     filterContext,
     onSuccess,
 }: EventDialogProps) {
-    const { create, update, remove, isLoading, isDeleting } = useEventMutations();
+    const { create, update, remove, isLoading, isDeleting } =
+        useEventMutations();
     const [showDeleteAlert, setShowDeleteAlert] = useState(false);
     const { profile, user } = useAppSelector((state) => state.user);
 
@@ -91,7 +98,8 @@ export function EventDialog({
                     owner_id: data.owner_id,
                     status: data.status,
                 },
-                data.participant_ids
+                data.participant_ids,
+                userId
             );
 
             if (result) {
@@ -102,9 +110,13 @@ export function EventDialog({
     };
 
     const handleDelete = async () => {
-        if (!event) return;
+        if (!event || !userId) return;
 
-        const success = await remove(event.id);
+        const success = await remove(event.id, "instance", userId, {
+            title: event.title,
+            start_time: event.start_time,
+        });
+
         if (success) {
             setShowDeleteAlert(false);
             onOpenChange(false);
@@ -118,7 +130,9 @@ export function EventDialog({
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            {mode === "create" ? "Créer un événement" : "Modifier l'événement"}
+                            {mode === "create"
+                                ? "Créer un événement"
+                                : "Modifier l'événement"}
                         </DialogTitle>
                         <DialogDescription>
                             {mode === "create"
@@ -156,16 +170,22 @@ export function EventDialog({
             </Dialog>
 
             {/* Alert Dialog de confirmation de suppression */}
-            <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+            <AlertDialog
+                open={showDeleteAlert}
+                onOpenChange={setShowDeleteAlert}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Cette action est irréversible. L'événement "{event?.title}" sera définitivement supprimé.
+                            Cette action est irréversible. L'événement "
+                            {event?.title}" sera définitivement supprimé.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isDeleting}>
+                            Annuler
+                        </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
                             disabled={isDeleting}

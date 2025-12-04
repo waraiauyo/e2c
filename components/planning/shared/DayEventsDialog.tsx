@@ -1,14 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/shadcn/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/shadcn/dialog";
 import { Button } from "@/components/shadcn/button";
 import { Badge } from "@/components/shadcn/badge";
-import { Calendar, Clock, MapPin, Tag, Plus } from "lucide-react";
+import { Calendar, Clock, MapPin, Tag, Plus, Users } from "lucide-react";
 import type { Event } from "@/lib/planning/types";
-import { cn } from "@/lib/utils";
+import { getBatchEventParticipantCounts } from "@/lib/supabase/query/events";
 
 interface DayEventsDialogProps {
     open: boolean;
@@ -27,6 +32,10 @@ export function DayEventsDialog({
     onEventClick,
     onCreateEvent,
 }: DayEventsDialogProps) {
+    const [participantCounts, setParticipantCounts] = useState<
+        Map<string, number>
+    >(new Map());
+
     // Filtrer les événements du jour
     const dayEvents = useMemo(() => {
         const dayStart = startOfDay(date);
@@ -36,16 +45,40 @@ export function DayEventsDialog({
             const eventStart = new Date(event.start_time);
             const eventEnd = new Date(event.end_time);
 
-            return isWithinInterval(eventStart, { start: dayStart, end: dayEnd }) ||
-                   isWithinInterval(eventEnd, { start: dayStart, end: dayEnd }) ||
-                   (eventStart <= dayStart && eventEnd >= dayEnd);
+            return (
+                isWithinInterval(eventStart, {
+                    start: dayStart,
+                    end: dayEnd,
+                }) ||
+                isWithinInterval(eventEnd, { start: dayStart, end: dayEnd }) ||
+                (eventStart <= dayStart && eventEnd >= dayEnd)
+            );
         });
 
         // Trier par heure de début
         return filtered.sort((a, b) => {
-            return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+            return (
+                new Date(a.start_time).getTime() -
+                new Date(b.start_time).getTime()
+            );
         });
     }, [date, events]);
+
+    // Charger les participants pour les événements du jour (optimisé avec batch query)
+    useEffect(() => {
+        async function loadParticipants() {
+            if (!open || dayEvents.length === 0) {
+                setParticipantCounts(new Map());
+                return;
+            }
+
+            const eventIds = dayEvents.map((event) => event.id);
+            const counts = await getBatchEventParticipantCounts(eventIds);
+            setParticipantCounts(counts);
+        }
+
+        loadParticipants();
+    }, [open, dayEvents]);
 
     // Formater l'heure de l'événement
     const formatEventTime = (event: Event) => {
@@ -120,7 +153,8 @@ export function DayEventsDialog({
                     ) : (
                         <div className="space-y-3 py-4">
                             <div className="text-sm text-muted-foreground px-1 mb-4">
-                                {dayEvents.length} événement{dayEvents.length > 1 ? "s" : ""}
+                                {dayEvents.length} événement
+                                {dayEvents.length > 1 ? "s" : ""}
                             </div>
 
                             {dayEvents.map((event) => (
@@ -129,8 +163,11 @@ export function DayEventsDialog({
                                     onClick={() => handleEventClick(event)}
                                     className="group relative p-4 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
                                     style={{
-                                        borderLeftColor: event.color || undefined,
-                                        borderLeftWidth: event.color ? "4px" : undefined,
+                                        borderLeftColor:
+                                            event.color || undefined,
+                                        borderLeftWidth: event.color
+                                            ? "4px"
+                                            : undefined,
                                     }}
                                 >
                                     {/* Titre et statut */}
@@ -151,15 +188,42 @@ export function DayEventsDialog({
                                     {event.location && (
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                                             <MapPin className="h-4 w-4" />
-                                            <span className="line-clamp-1">{event.location}</span>
+                                            <span className="line-clamp-1">
+                                                {event.location}
+                                            </span>
                                         </div>
                                     )}
 
                                     {/* Type (Personnel/CLAS) */}
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Tag className="h-4 w-4" />
-                                        <span className="capitalize">{event.owner_type === "personal" ? "Personnel" : "CLAS"}</span>
+                                        <span className="capitalize">
+                                            {event.owner_type === "personal"
+                                                ? "Personnel"
+                                                : "CLAS"}
+                                        </span>
                                     </div>
+
+                                    {/* Participants */}
+                                    {participantCounts.get(event.id) !==
+                                        undefined &&
+                                        participantCounts.get(event.id)! >
+                                            0 && (
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <Users className="h-4 w-4" />
+                                                <span>
+                                                    {participantCounts.get(
+                                                        event.id
+                                                    )}{" "}
+                                                    participant
+                                                    {participantCounts.get(
+                                                        event.id
+                                                    )! > 1
+                                                        ? "s"
+                                                        : ""}
+                                                </span>
+                                            </div>
+                                        )}
 
                                     {/* Description */}
                                     {event.description && (

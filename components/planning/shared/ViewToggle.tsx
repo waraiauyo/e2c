@@ -12,7 +12,12 @@ interface ViewToggleProps {
 }
 
 export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
-    const views: { type: ViewType; label: string; icon: typeof Calendar; disabled?: boolean }[] = [
+    const views: {
+        type: ViewType;
+        label: string;
+        icon: typeof Calendar;
+        disabled?: boolean;
+    }[] = [
         { type: "day", label: "Jour", icon: Calendar },
         { type: "week", label: "Semaine", icon: CalendarDays },
         { type: "month", label: "Mois", icon: CalendarRange },
@@ -30,7 +35,9 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
                         key={view.type}
                         variant={isActive ? "default" : "ghost"}
                         size="sm"
-                        onClick={() => !view.disabled && onViewChange(view.type)}
+                        onClick={() =>
+                            !view.disabled && onViewChange(view.type)
+                        }
                         disabled={view.disabled}
                         className={cn(
                             "gap-2",

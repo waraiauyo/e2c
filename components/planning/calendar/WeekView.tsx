@@ -2,8 +2,12 @@
 
 import { useMemo } from "react";
 import { EventCard } from "./EventCard";
-import { getWeekDays, formatDateShort, getWeekdayName, isToday, isSameDay } from "@/lib/planning/utils/dateUtils";
-import { getEventsForDay, eventsOverlap } from "@/lib/planning/utils/eventUtils";
+import {
+    getWeekDays,
+    getWeekdayName,
+    isToday,
+    isSameDay,
+} from "@/lib/planning/utils/dateUtils";
 import type { Event } from "@/lib/planning/types";
 import { ScrollArea } from "@/components/shadcn/scroll-area";
 import { cn } from "@/lib/utils";
@@ -19,7 +23,10 @@ interface WeekViewProps {
 const HOUR_HEIGHT = 60; // Hauteur de chaque heure en pixels
 const START_HOUR = 7;
 const END_HOUR = 22;
-const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => START_HOUR + i);
+const HOURS = Array.from(
+    { length: END_HOUR - START_HOUR + 1 },
+    (_, i) => START_HOUR + i
+);
 
 // Interface pour un segment d'événement (portion d'un événement sur un jour donné)
 interface EventSegment extends Event {
@@ -30,7 +37,12 @@ interface EventSegment extends Event {
     isLastSegment: boolean;
 }
 
-export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }: WeekViewProps) {
+export function WeekView({
+    currentDate,
+    events,
+    onEventClick,
+    onTimeSlotClick,
+}: WeekViewProps) {
     const weekDays = useMemo(() => getWeekDays(currentDate), [currentDate]);
 
     // Map des événements pour lookup O(1)
@@ -58,8 +70,12 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
                 // Vérifier si l'événement touche ce jour
                 if (eventStart <= dayEnd && eventEnd >= dayStart) {
                     // Calculer le début et la fin du segment pour ce jour
-                    const segmentStart = new Date(Math.max(eventStart.getTime(), dayStart.getTime()));
-                    const segmentEnd = new Date(Math.min(eventEnd.getTime(), dayEnd.getTime()));
+                    const segmentStart = new Date(
+                        Math.max(eventStart.getTime(), dayStart.getTime())
+                    );
+                    const segmentEnd = new Date(
+                        Math.min(eventEnd.getTime(), dayEnd.getTime())
+                    );
 
                     // Créer le segment
                     segments.push({
@@ -92,7 +108,9 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
     }, [weekDays, splitEventIntoSegments]);
 
     // Calculer la position et la hauteur d'un segment dans la grille
-    const getEventPosition = (segment: EventSegment): { top: number; height: number } | null => {
+    const getEventPosition = (
+        segment: EventSegment
+    ): { top: number; height: number } | null => {
         // Utiliser les dates du segment (portion de l'événement pour ce jour)
         const start = segment.segmentStart;
         const end = segment.segmentEnd;
@@ -129,8 +147,8 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
 
     // Calculer le layout des segments qui se chevauchent (côte à côte)
     const calculateEventLayout = (daySegments: EventSegment[]) => {
-        const sortedSegments = [...daySegments].sort((a, b) =>
-            a.segmentStart.getTime() - b.segmentStart.getTime()
+        const sortedSegments = [...daySegments].sort(
+            (a, b) => a.segmentStart.getTime() - b.segmentStart.getTime()
         );
 
         const columns: EventSegment[][] = [];
@@ -214,7 +232,12 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
 
             {/* Grille horaire */}
             <ScrollArea className="flex-1 h-full">
-                <div className="flex relative pb-20" style={{ minHeight: `${(HOURS.length + 1) * HOUR_HEIGHT}px` }}>
+                <div
+                    className="flex relative pb-20"
+                    style={{
+                        minHeight: `${(HOURS.length + 1) * HOUR_HEIGHT}px`,
+                    }}
+                >
                     {/* Colonne des heures */}
                     <div className="w-20 flex-shrink-0 border-r">
                         {HOURS.map((hour) => (
@@ -249,9 +272,19 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
                                         className="h-[60px] border-b hover:bg-accent/50 cursor-pointer transition-colors"
                                         onClick={() => {
                                             if (onTimeSlotClick) {
-                                                const clickedDate = new Date(day);
-                                                clickedDate.setHours(hour, 0, 0, 0);
-                                                onTimeSlotClick(clickedDate, hour);
+                                                const clickedDate = new Date(
+                                                    day
+                                                );
+                                                clickedDate.setHours(
+                                                    hour,
+                                                    0,
+                                                    0,
+                                                    0
+                                                );
+                                                onTimeSlotClick(
+                                                    clickedDate,
+                                                    hour
+                                                );
                                             }
                                         }}
                                     />
@@ -265,10 +298,14 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
                                     if (!position) return null;
 
                                     const { top, height } = position;
-                                    const layout = eventLayout.get(segment.id) || { width: 100, left: 0 };
+                                    const layout = eventLayout.get(
+                                        segment.id
+                                    ) || { width: 100, left: 0 };
 
                                     // Retrouver l'événement original pour le clic (lookup O(1))
-                                    const originalEvent = eventsMap.get(segment.originalEventId);
+                                    const originalEvent = eventsMap.get(
+                                        segment.originalEventId
+                                    );
 
                                     return (
                                         <div
@@ -283,7 +320,12 @@ export function WeekView({ currentDate, events, onEventClick, onTimeSlotClick }:
                                         >
                                             <EventCard
                                                 event={segment}
-                                                onClick={() => originalEvent && onEventClick?.(originalEvent)}
+                                                onClick={() =>
+                                                    originalEvent &&
+                                                    onEventClick?.(
+                                                        originalEvent
+                                                    )
+                                                }
                                                 compact
                                                 className="h-full"
                                             />

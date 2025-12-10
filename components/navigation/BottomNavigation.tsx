@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Map, Calendar, FolderOpen, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/shadcn/avatar";
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/shadcn/avatar";
 import { useAppSelector } from "@/lib/redux/hooks";
 
 const navItems = [
@@ -19,12 +23,12 @@ const navItems = [
         icon: Calendar,
     },
     {
-        href: "/ressources",
+        href: "/resources",
         label: "Ressources",
         icon: FolderOpen,
     },
     {
-        href: "/communaute",
+        href: "/community",
         label: "Communauté",
         icon: Users,
     },
@@ -36,13 +40,16 @@ export default function BottomNavigation() {
 
     const isActive = (href: string) => {
         if (href === "/") return pathname === "/";
+
         return pathname.startsWith(href);
     };
 
     const getInitials = () => {
         if (!profile) return "?";
+
         const first = profile.first_name?.charAt(0) || "";
         const last = profile.last_name?.charAt(0) || "";
+
         return (first + last).toUpperCase() || "U";
     };
 
@@ -92,7 +99,11 @@ export default function BottomNavigation() {
                             alt="Avatar"
                         />
                         <AvatarFallback className="text-[10px]">
-                            {profile ? getInitials() : <User className="h-4 w-4" />}
+                            {profile ? (
+                                getInitials()
+                            ) : (
+                                <User className="h-4 w-4" />
+                            )}
                         </AvatarFallback>
                     </Avatar>
                     <span className="text-xs font-medium">Profil</span>

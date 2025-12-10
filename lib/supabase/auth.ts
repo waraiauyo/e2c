@@ -206,3 +206,93 @@ export async function updatePassword(
         };
     }
 }
+
+export interface UpdateEmailResult {
+    success: boolean;
+    message: string;
+}
+
+/**
+ * Update user email (requires email verification)
+ * Supabase sends confirmation email automatically
+ */
+export async function updateEmail(
+    newEmail: string
+): Promise<UpdateEmailResult> {
+    const supabase = await createClient();
+
+    try {
+        // Get current user
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+            return {
+                success: false,
+                message: "Utilisateur non connecté.",
+            };
+        }
+
+        // Check if email already exists
+        const { data: existingProfile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("email", newEmail)
+            .single();
+
+        if (existingProfile) {
+            return {
+                success: false,
+                message: "Cette adresse email est déjà utilisée.",
+            };
+        }
+
+        // Update email (Supabase sends verification email)
+        const { error } = await supabase.auth.updateUser(
+            {
+                email: newEmail,
+            },
+            {
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/profil`,
+            }
+        );
+
+        if (error) {
+            return {
+                success: false,
+                message: error.message,
+            };
+        }
+
+        // Also update email in profiles table
+        const { error: profileError } = await supabase
+            .from("profiles")
+            .update({
+                email: newEmail,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", user.id);
+
+        if (profileError) {
+            return {
+                success: false,
+                message: profileError.message,
+            };
+        }
+
+        return {
+            success: true,
+            message:
+                "Un email de confirmation a été envoyé à votre nouvelle adresse.",
+        };
+    } catch (err) {
+        return {
+            success: false,
+            message:
+                err instanceof Error
+                    ? err.message
+                    : "Une erreur est survenue lors de la mise à jour.",
+        };
+    }
+}

@@ -15,8 +15,7 @@ import {
     type ViewType,
 } from "@/components/planning/shared/ViewToggle";
 import { useEvents } from "@/lib/planning/hooks/useEvents";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { fetchCurrentUser } from "@/lib/redux/features/userSlice";
+import { useAppSelector } from "@/lib/redux/hooks";
 import { Button } from "@/components/shadcn/button";
 import {
     Calendar,
@@ -35,7 +34,6 @@ import {
 import type { Event } from "@/lib/planning/types";
 
 export default function PlanningPage() {
-    const dispatch = useAppDispatch();
     const { isLoading: userLoading } = useAppSelector((state) => state.user);
 
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -47,11 +45,6 @@ export default function PlanningPage() {
     const [filterContext, setFilterContext] = useState<FilterContext | null>(
         null
     );
-
-    // Charger l'utilisateur au démarrage
-    useEffect(() => {
-        dispatch(fetchCurrentUser());
-    }, [dispatch]);
 
     // Charger la vue depuis localStorage
     useEffect(() => {

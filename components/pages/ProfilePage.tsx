@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
-import { setProfile } from "@/lib/redux/features/userSlice";
+import { setProfile, logoutUser } from "@/lib/redux/features/userSlice";
 import {
     getUserClasWithRoles,
     type ClasWithRole,
@@ -40,7 +40,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, Camera, Mail, User, Building2, X } from "lucide-react";
+import {
+    Loader2,
+    Camera,
+    Mail,
+    User,
+    Building2,
+    X,
+    LogOut,
+} from "lucide-react";
+import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 
 const emailFormSchema = z.object({
     email: z
@@ -63,6 +72,7 @@ export default function ProfilePage() {
 
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const [updatingEmail, setUpdatingEmail] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
     const [userClas, setUserClas] = useState<ClasWithRole[]>([]);
     const [loadingClas, setLoadingClas] = useState(true);
     const [emailMessage, setEmailMessage] = useState<{
@@ -202,6 +212,19 @@ export default function ProfilePage() {
         }
     };
 
+    const handleLogout = async () => {
+        setLoggingOut(true);
+
+        try {
+            await dispatch(logoutUser()).unwrap();
+            toast.success("Déconnexion réussie.");
+            router.push("/login");
+        } catch {
+            toast.error("Une erreur est survenue lors de la déconnexion.");
+            setLoggingOut(false);
+        }
+    };
+
     const getInitials = () => {
         if (!profile) return "?";
         const first = profile.first_name?.charAt(0) || "";
@@ -218,15 +241,13 @@ export default function ProfilePage() {
         return labels[accountType] || accountType;
     };
 
-    return (
+    return userLoading || !profile ? (
+        <div className="flex items-center justify-center w-full h-full">
+            <LoadingSpinner size="lg" />
+        </div>
+    ) : (
         <div className="flex flex-col items-center p-6 space-y-6">
-            {userLoading || !profile ? (
-                <div className="flex items-center justify-center min-h-screen w-full">
-                    <Loader2 className="animate-spin h-8 w-8" />
-                </div>
-            ) : (
-                <>
-                    {emailMessage && (
+            {emailMessage && (
                         <div
                             className={`w-full max-w-4xl rounded-lg border p-4 ${
                                 emailMessage.type === "success"
@@ -460,8 +481,35 @@ export default function ProfilePage() {
                             </div>
                         </CardContent>
                     </Card>
-                </>
-            )}
-        </div>
+
+                    <Card className="w-full max-w-4xl">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <LogOut className="h-5 w-5" />
+                                Déconnexion
+                            </CardTitle>
+                            <CardDescription>
+                                Déconnectez-vous de votre compte
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button
+                                onClick={handleLogout}
+                                disabled={loggingOut}
+                                variant="outline"
+                                className="w-full"
+                            >
+                                {loggingOut ? (
+                                    <LoadingSpinner />
+                                ) : (
+                                    <>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        Se déconnecter
+                                    </>
+                                )}
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
     );
 }

@@ -85,10 +85,10 @@ export default function BottomNavigation() {
                 })}
 
                 <Link
-                    href="/profil"
+                    href="/profile"
                     className={cn(
                         "flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors",
-                        isActive("/profil")
+                        isActive("/profile")
                             ? "text-primary"
                             : "text-muted-foreground hover:text-foreground"
                     )}

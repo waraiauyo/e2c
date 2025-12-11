@@ -17,14 +17,8 @@ import {
 import { useEvents } from "@/lib/planning/hooks/useEvents";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { Button } from "@/components/shadcn/button";
-import {
-    Calendar,
-    ChevronLeft,
-    ChevronRight,
-    Loader,
-    Loader2,
-    Plus,
-} from "lucide-react";
+import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import {
     addWeeks,
     addDays,
@@ -249,11 +243,7 @@ export default function PlanningPage() {
                 {/* Calendar area */}
                 <main className="flex-1 overflow-hidden">
                     {isLoading || userLoading ? (
-                        <div className="flex items-center justify-center h-full">
-                            <div className="text-center">
-                                <Loader2 className="animate-spin mx-auto " />
-                            </div>
-                        </div>
+                        <LoadingSpinner size="lg" />
                     ) : (
                         <>
                             {currentView === "day" && (

@@ -21,11 +21,11 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/shadcn/form";
-import { useState } from "react";
-import { login } from "@/lib/supabase/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { loginUser } from "@/lib/redux/features/userSlice";
 
 const loginFormSchema = z.object({
     email: z
@@ -38,8 +38,9 @@ const loginFormSchema = z.object({
 type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 export default function LoginPage() {
-    const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    const { isLoading } = useAppSelector((state) => state.user);
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginFormSchema),
@@ -49,18 +50,19 @@ export default function LoginPage() {
         },
     });
 
-    const onSubmit = (values: LoginFormValues) => {
-        setLoading(true);
-
-        login(values.email, values.password)
-            .then((res) => {
-                if (res.success) {
-                    router.push("/");
-                } else {
-                    toast.error(res.message);
-                }
-            })
-            .finally(() => setLoading(false));
+    const onSubmit = async (values: LoginFormValues) => {
+        try {
+            await dispatch(
+                loginUser({ email: values.email, password: values.password })
+            ).unwrap();
+            router.push("/");
+        } catch (error) {
+            toast.error(
+                typeof error === "string"
+                    ? error
+                    : "Une erreur est survenue lors de la connexion."
+            );
+        }
     };
 
     return (
@@ -122,11 +124,11 @@ export default function LoginPage() {
                             </div>
                             <CardFooter className="flex-col gap-2 px-0 pt-6">
                                 <Button
-                                    disabled={loading}
+                                    disabled={isLoading}
                                     type="submit"
                                     className="w-full"
                                 >
-                                    {loading ? "Connexion..." : "Se connecter"}
+                                    {isLoading ? "Connexion..." : "Se connecter"}
                                 </Button>
                             </CardFooter>
                         </form>

@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
 import "./globals.css";
+
+import type { Metadata } from "next";
+
 import { ThemeProvider } from "@/components/providers/ThemeProviders";
 import MainWrapper from "@/components/wrappers/MainWrapper";
 import { Toaster } from "@/components/shadcn/sonner";

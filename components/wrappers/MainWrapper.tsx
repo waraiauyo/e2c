@@ -21,6 +21,13 @@ export default function MainWrapper({
     const hasLoadedUser = useRef(false);
     const isAuthPage = authRoutes.some((route) => pathname.startsWith(route));
 
+    // Reset le ref quand on est sur une page d'auth (après logout)
+    useEffect(() => {
+        if (isAuthPage) {
+            hasLoadedUser.current = false;
+        }
+    }, [isAuthPage]);
+
     // Charger l'utilisateur une seule fois au démarrage
     useEffect(() => {
         if (!isAuthPage && !hasLoadedUser.current && !user) {

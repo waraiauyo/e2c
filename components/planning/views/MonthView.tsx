@@ -186,36 +186,6 @@ export function MonthView({
                 </div>
             </div>
 
-            {/* Légende */}
-            <div className="border-t bg-background p-3">
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium">
-                            {format(new Date(), "d")}
-                        </div>
-                        <span>Aujourd'hui</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                            1
-                        </Badge>
-                        <span>1 événement</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Badge variant="default" className="text-xs">
-                            2-3
-                        </Badge>
-                        <span>2-3 événements</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Badge variant="destructive" className="text-xs">
-                            4+
-                        </Badge>
-                        <span>4+ événements</span>
-                    </div>
-                </div>
-            </div>
-
             {/* Dialog pour afficher les événements du jour */}
             {selectedDate && (
                 <DayEventsDialog

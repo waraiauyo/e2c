@@ -1,28 +1,28 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { MapsSidebar } from "@/components/map/MapsSidebar";
+import { MapSidebar } from "@/components/map/MapSidebar";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 
-const DynamicCarteMayenne = dynamic(
-    () => import("@/components/map/CarteMayenne"),
+const DynamicMapMayenne = dynamic(
+    () => import("@/components/map/MapMayenne"),
     {
         ssr: false,
         loading: () => <LoadingSpinner size="lg" />,
     }
 );
 
-export default function MapsPage() {
+export default function MapPage() {
     return (
         <div className="flex h-full overflow-hidden">
             {/* Sidebar avec filtres */}
             <aside className="w-80 border-r bg-muted/10">
-                <MapsSidebar />
+                <MapSidebar />
             </aside>
 
             {/* Map area */}
             <main className="flex-1 overflow-hidden">
-                <DynamicCarteMayenne />
+                <DynamicMapMayenne />
             </main>
         </div>
     );

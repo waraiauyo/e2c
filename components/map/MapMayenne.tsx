@@ -25,7 +25,7 @@ L.Marker.prototype.options.icon = L.icon({
     iconAnchor: [12, 41],
 });
 
-export default function CarteMayenne() {
+export default function MapMayenne() {
     const dispatch = useAppDispatch();
     const mapMarkers = useAppSelector(selectClasForMap);
     const status = useAppSelector(selectClasStatus);

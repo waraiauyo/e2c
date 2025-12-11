@@ -17,7 +17,7 @@ import {
     SelectValue,
 } from "@/components/shadcn/select";
 
-export function MapsSidebar() {
+export function MapSidebar() {
     const dispatch = useAppDispatch();
     const filters = useAppSelector(selectClasFilters);
 

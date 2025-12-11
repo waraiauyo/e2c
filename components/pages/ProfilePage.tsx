@@ -257,7 +257,7 @@ export default function ProfilePage() {
                         >
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex items-start gap-3">
-                                    <Mail className="h-5 w-5 mt-0.5 shrink-0" />
+                                    <Mail className="h-5 w-5 mt-1 shrink-0" />
                                     <p className="text-sm font-medium">
                                         {emailMessage.text}
                                     </p>
@@ -344,7 +344,7 @@ export default function ProfilePage() {
                         <CardContent className="space-y-4">
                             <div>
                                 <Label>Nom complet</Label>
-                                <div className="mt-1.5 text-sm">
+                                <div className="mt-2 text-sm">
                                     {profile.first_name && profile.last_name
                                         ? `${profile.first_name} ${profile.last_name}`
                                         : profile.first_name ||
@@ -357,7 +357,7 @@ export default function ProfilePage() {
 
                             <div>
                                 <Label>Type de compte</Label>
-                                <div className="mt-1.5">
+                                <div className="mt-2">
                                     <Badge
                                         variant="secondary"
                                         className="text-sm"
@@ -426,7 +426,7 @@ export default function ProfilePage() {
                             <div className="space-y-4">
                                 <div>
                                     <Label>Email actuel</Label>
-                                    <div className="mt-1.5 text-sm text-muted-foreground">
+                                    <div className="mt-2 text-sm text-muted-foreground">
                                         {user?.email}
                                     </div>
                                 </div>

@@ -55,7 +55,7 @@ export default function BottomNavigation() {
 
     return (
         <nav className="shrink-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex h-16 items-center justify-around px-2">
+            <div className="flex h-16 items-center justify-around px-4">
                 {navItems.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.href);

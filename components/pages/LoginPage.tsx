@@ -122,7 +122,7 @@ export default function LoginPage() {
                                     )}
                                 />
                             </div>
-                            <CardFooter className="flex-col gap-2 px-0 pt-6">
+                            <CardFooter className="flex-col gap-4 px-0 pt-6">
                                 <Button
                                     disabled={isLoading}
                                     type="submit"

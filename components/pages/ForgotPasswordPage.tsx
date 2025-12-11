@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
                             </p>
                         </div>
                     )}
-                    <div className="mt-4">
+                    <div className="pt-4 mt-4 border-t">
                         <Link
                             href="/login"
                             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"

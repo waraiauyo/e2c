@@ -217,7 +217,7 @@ export default function PlanningPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <ViewToggle
                             currentView={currentView}
                             onViewChange={setCurrentView}
@@ -233,7 +233,7 @@ export default function PlanningPage() {
             {/* Main content */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar avec filtres */}
-                <aside className="w-64 border-r bg-muted/10">
+                <aside className="w-80 border-r bg-muted/10">
                     <FilterSidebar
                         selectedContext={filterContext}
                         onContextChange={setFilterContext}

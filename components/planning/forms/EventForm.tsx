@@ -529,12 +529,8 @@ export function EventForm({
                     )}
                 />
 
-                {/* Participants - Visible uniquement pour les coordinateurs et créateurs */}
-                {(isCoordinator ||
-                    mode === "create" ||
-                    (mode === "edit" &&
-                        event?.owner_type === "personal" &&
-                        event?.owner_id === userId)) && (
+                {/* Participants - Visible pour création et édition */}
+                {(mode === "create" || mode === "edit") && (
                     <FormField
                         control={form.control}
                         name="participant_ids"

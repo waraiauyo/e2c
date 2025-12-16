@@ -13,7 +13,9 @@ export interface Profile {
     first_name: string | null;
     last_name: string | null;
     avatar_url: string | null;
+    phone: string | null;
     account_type: AccountType;
+    clas_id: string | null;
     created_at: string;
     updated_at: string | null;
 }

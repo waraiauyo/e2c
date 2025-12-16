@@ -14,7 +14,7 @@ import { useAppSelector } from "@/lib/redux/hooks";
 const navItems = [
     {
         href: "/map",
-        label: "Map",
+        label: "Carte",
         icon: Map,
     },
     {

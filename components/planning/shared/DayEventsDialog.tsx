@@ -123,7 +123,7 @@ export function DayEventsDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-                <DialogHeader>
+                <DialogHeader className="flex-shrink-0">
                     <DialogTitle className="flex items-center gap-2">
                         <Calendar className="h-5 w-5" />
                         {format(date, "EEEE d MMMM yyyy", { locale: fr })}
@@ -131,7 +131,7 @@ export function DayEventsDialog({
                 </DialogHeader>
 
                 {/* Bouton créer un événement */}
-                <div className="pb-4 border-b">
+                <div className="pb-4 border-b flex-shrink-0">
                     <Button onClick={handleCreateClick} className="w-full">
                         <Plus className="h-4 w-4 mr-2" />
                         Créer un événement ce jour

@@ -9,7 +9,7 @@ import {
     type ClasWithRole,
 } from "@/lib/supabase/query/clas";
 import { uploadAvatar } from "@/lib/supabase/actions/storage";
-import { updateAvatarUrl } from "@/lib/supabase/actions/profiles";
+import { updateAvatarUrl, updatePhone } from "@/lib/supabase/actions/profiles";
 import { updateEmail } from "@/lib/supabase/auth";
 import {
     Card,
@@ -48,6 +48,7 @@ import {
     Building2,
     X,
     LogOut,
+    Phone,
 } from "lucide-react";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 
@@ -58,7 +59,15 @@ const emailFormSchema = z.object({
         .email({ message: "Email invalide." }),
 });
 
+const phoneFormSchema = z.object({
+    phone: z
+        .string()
+        .min(1, { message: "Le numéro de téléphone est requis." })
+        .regex(/^[0-9\s\-\+\.]+$/, { message: "Numéro de téléphone invalide." }),
+});
+
 type EmailFormValues = z.infer<typeof emailFormSchema>;
+type PhoneFormValues = z.infer<typeof phoneFormSchema>;
 
 export default function ProfilePage() {
     const dispatch = useAppDispatch();
@@ -72,6 +81,7 @@ export default function ProfilePage() {
 
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const [updatingEmail, setUpdatingEmail] = useState(false);
+    const [updatingPhone, setUpdatingPhone] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
     const [userClas, setUserClas] = useState<ClasWithRole[]>([]);
     const [loadingClas, setLoadingClas] = useState(true);
@@ -84,6 +94,11 @@ export default function ProfilePage() {
     const emailForm = useForm<EmailFormValues>({
         resolver: zodResolver(emailFormSchema),
         defaultValues: { email: "" },
+    });
+
+    const phoneForm = useForm<PhoneFormValues>({
+        resolver: zodResolver(phoneFormSchema),
+        defaultValues: { phone: profile?.phone || "" },
     });
 
     // Handle URL messages from email verification
@@ -209,6 +224,39 @@ export default function ProfilePage() {
             toast.error("Une erreur est survenue lors de la mise à jour.");
         } finally {
             setUpdatingEmail(false);
+        }
+    };
+
+    const onPhoneSubmit = async (values: PhoneFormValues) => {
+        if (!user) return;
+
+        if (values.phone === profile?.phone) {
+            toast.error("Veuillez entrer un nouveau numéro de téléphone.");
+            return;
+        }
+
+        setUpdatingPhone(true);
+
+        try {
+            const result = await updatePhone(user.id, values.phone);
+
+            if (!result.success) {
+                toast.error(result.message);
+                return;
+            }
+
+            dispatch(
+                setProfile({
+                    ...profile!,
+                    phone: values.phone,
+                })
+            );
+
+            toast.success(result.message);
+        } catch {
+            toast.error("Une erreur est survenue lors de la mise à jour.");
+        } finally {
+            setUpdatingPhone(false);
         }
     };
 
@@ -407,6 +455,76 @@ export default function ProfilePage() {
                                         </p>
                                     )}
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full max-w-4xl">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Phone className="h-5 w-5" />
+                                Numéro de téléphone
+                            </CardTitle>
+                            <CardDescription>
+                                Modifiez votre numéro de téléphone
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label>Téléphone actuel</Label>
+                                    <div className="mt-2 text-sm text-muted-foreground">
+                                        {profile.phone || "Non renseigné"}
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                <Form {...phoneForm}>
+                                    <form
+                                        onSubmit={phoneForm.handleSubmit(
+                                            onPhoneSubmit
+                                        )}
+                                        className="space-y-4"
+                                    >
+                                        <FormField
+                                            control={phoneForm.control}
+                                            name="phone"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Nouveau numéro
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="tel"
+                                                            placeholder="06 12 34 56 78"
+                                                            disabled={
+                                                                updatingPhone
+                                                            }
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <Button
+                                            type="submit"
+                                            disabled={updatingPhone}
+                                            className="w-full"
+                                        >
+                                            {updatingPhone ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Modification...
+                                                </>
+                                            ) : (
+                                                "Modifier le téléphone"
+                                            )}
+                                        </Button>
+                                    </form>
+                                </Form>
                             </div>
                         </CardContent>
                     </Card>

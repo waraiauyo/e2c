@@ -28,7 +28,7 @@ const clasSlice = createSlice({
         setSearchQuery: (state, action: PayloadAction<string>) => {
             state.filters.searchQuery = action.payload;
         },
-        setLevelFilter: (state, action: PayloadAction<ClasFilters["level"]>) => {
+        setLevelFilter: (state, action: PayloadAction<string>) => {
             state.filters.level = action.payload;
         },
         setAllophoneFilter: (state, action: PayloadAction<ClasFilters["allophone"]>) => {

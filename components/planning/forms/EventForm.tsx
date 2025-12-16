@@ -18,13 +18,21 @@ import {
     SelectValue,
 } from "@/components/shadcn/select";
 import { Switch } from "@/components/shadcn/switch";
-import { Checkbox } from "@/components/shadcn/checkbox";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/shadcn/popover";
 import { Badge } from "@/components/shadcn/badge";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/shadcn/command";
+import { Check } from "lucide-react";
 import {
     Form,
     FormControl,
@@ -37,7 +45,6 @@ import {
 import {
     Calendar as CalendarIcon,
     Clock,
-    Search,
     Users,
     X,
 } from "lucide-react";
@@ -583,236 +590,135 @@ export function EventForm({
                                         className="w-[400px] p-0"
                                         align="start"
                                     >
-                                        {/* Champ de recherche */}
-                                        <div className="p-3 border-b">
-                                            <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                <Input
-                                                    placeholder="Rechercher un participant..."
-                                                    value={participantSearch}
-                                                    onChange={(e) =>
-                                                        setParticipantSearch(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="pl-9"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="max-h-[300px] overflow-y-auto p-4">
-                                            {/* Badges des participants sélectionnés */}
-                                            {field.value &&
-                                                field.value.length > 0 && (
-                                                    <div className="mb-4 flex flex-wrap gap-2">
-                                                        {field.value.map(
-                                                            (participantId) => {
-                                                                const participant =
-                                                                    allUsers.find(
-                                                                        (u) =>
-                                                                            u.id ===
-                                                                            participantId
-                                                                    );
-                                                                if (
-                                                                    !participant
-                                                                )
-                                                                    return null;
-                                                                return (
-                                                                    <Badge
-                                                                        key={
-                                                                            participantId
-                                                                        }
-                                                                        variant="secondary"
-                                                                        className="gap-1"
-                                                                    >
-                                                                        {participant.first_name &&
-                                                                        participant.last_name
-                                                                            ? `${participant.first_name} ${participant.last_name}`
-                                                                            : participant.email}
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={(
-                                                                                e
-                                                                            ) => {
-                                                                                e.preventDefault();
-                                                                                field.onChange(
-                                                                                    field.value?.filter(
-                                                                                        (
-                                                                                            id
-                                                                                        ) =>
-                                                                                            id !==
-                                                                                            participantId
-                                                                                    ) ||
-                                                                                        []
-                                                                                );
-                                                                            }}
-                                                                            className="ml-1 hover:bg-muted rounded-full p-0.5"
-                                                                        >
-                                                                            <X className="h-3 w-3 cursor-pointer" />
-                                                                        </button>
-                                                                    </Badge>
-                                                                );
-                                                            }
-                                                        )}
-                                                    </div>
-                                                )}
+                                        <Command shouldFilter={false}>
+                                            <CommandInput
+                                                placeholder="Rechercher un participant..."
+                                                value={participantSearch}
+                                                onValueChange={setParticipantSearch}
+                                            />
 
-                                            {/* Liste des utilisateurs */}
-                                            <div className="space-y-2">
-                                                {allUsers
-                                                    .filter(
-                                                        (u) => u.id !== userId
-                                                    ) // Ne pas afficher l'utilisateur actuel
-                                                    .filter((user) => {
-                                                        if (
-                                                            !participantSearch.trim()
-                                                        )
-                                                            return true;
-                                                        const searchLower =
-                                                            participantSearch.toLowerCase();
-                                                        const fullName =
-                                                            `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
-                                                        const email = (
-                                                            user.email || ""
-                                                        ).toLowerCase();
-                                                        return (
-                                                            fullName.includes(
-                                                                searchLower
-                                                            ) ||
-                                                            email.includes(
-                                                                searchLower
-                                                            )
-                                                        );
-                                                    })
-                                                    .map((user) => {
-                                                        const isSelected =
-                                                            field.value?.includes(
-                                                                user.id
+                                            {/* Badges des participants sélectionnés */}
+                                            {field.value && field.value.length > 0 && (
+                                                <div className="px-3 py-2 border-b bg-muted/30">
+                                                    <div className="text-xs font-medium text-muted-foreground mb-2">
+                                                        Sélectionnés ({field.value.length})
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {field.value.map((participantId) => {
+                                                            const participant = allUsers.find(
+                                                                (u) => u.id === participantId
                                                             );
-                                                        return (
-                                                            <div
-                                                                key={user.id}
-                                                                className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent cursor-pointer"
-                                                                onClick={() => {
-                                                                    const currentValues =
-                                                                        field.value ||
-                                                                        [];
-                                                                    if (
-                                                                        isSelected
-                                                                    ) {
-                                                                        field.onChange(
-                                                                            currentValues.filter(
-                                                                                (
-                                                                                    id
-                                                                                ) =>
-                                                                                    id !==
-                                                                                    user.id
-                                                                            )
-                                                                        );
-                                                                    } else {
-                                                                        field.onChange(
-                                                                            [
-                                                                                ...currentValues,
-                                                                                user.id,
-                                                                            ]
-                                                                        );
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <Checkbox
-                                                                    checked={
-                                                                        isSelected
-                                                                    }
-                                                                    onCheckedChange={(
-                                                                        checked
-                                                                    ) => {
-                                                                        const currentValues =
-                                                                            field.value ||
-                                                                            [];
-                                                                        if (
-                                                                            checked
-                                                                        ) {
+                                                            if (!participant) return null;
+                                                            return (
+                                                                <Badge
+                                                                    key={participantId}
+                                                                    variant="secondary"
+                                                                    className="gap-1 text-xs"
+                                                                >
+                                                                    {participant.first_name &&
+                                                                    participant.last_name
+                                                                        ? `${participant.first_name} ${participant.last_name}`
+                                                                        : participant.email}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
                                                                             field.onChange(
-                                                                                [
-                                                                                    ...currentValues,
-                                                                                    user.id,
-                                                                                ]
+                                                                                field.value?.filter(
+                                                                                    (id) => id !== participantId
+                                                                                ) || []
+                                                                            );
+                                                                        }}
+                                                                        className="ml-1 hover:text-destructive rounded-full"
+                                                                    >
+                                                                        <X className="h-3 w-3" />
+                                                                    </button>
+                                                                </Badge>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <CommandList
+                                                className="max-h-[240px] overscroll-contain"
+                                                onWheel={(e) => e.stopPropagation()}
+                                                onTouchMove={(e) => e.stopPropagation()}
+                                            >
+                                                <CommandEmpty>
+                                                    <div className="py-4">
+                                                        <Users className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {participantSearch.trim()
+                                                                ? "Aucun utilisateur trouvé"
+                                                                : "Aucun utilisateur disponible"}
+                                                        </p>
+                                                    </div>
+                                                </CommandEmpty>
+                                                <CommandGroup>
+                                                    {allUsers
+                                                        .filter((u) => u.id !== userId)
+                                                        .filter((user) => {
+                                                            if (!participantSearch.trim()) return true;
+                                                            const searchLower = participantSearch.toLowerCase();
+                                                            const fullName = `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
+                                                            const email = (user.email || "").toLowerCase();
+                                                            return fullName.includes(searchLower) || email.includes(searchLower);
+                                                        })
+                                                        .map((user) => {
+                                                            const isSelected = field.value?.includes(user.id);
+                                                            return (
+                                                                <CommandItem
+                                                                    key={user.id}
+                                                                    value={user.id}
+                                                                    onSelect={() => {
+                                                                        const currentValues = field.value || [];
+                                                                        if (isSelected) {
+                                                                            field.onChange(
+                                                                                currentValues.filter((id) => id !== user.id)
                                                                             );
                                                                         } else {
-                                                                            field.onChange(
-                                                                                currentValues.filter(
-                                                                                    (
-                                                                                        id
-                                                                                    ) =>
-                                                                                        id !==
-                                                                                        user.id
-                                                                                )
-                                                                            );
+                                                                            field.onChange([...currentValues, user.id]);
                                                                         }
                                                                     }}
-                                                                />
-                                                                <div className="flex-1">
-                                                                    <div className="font-medium text-sm">
-                                                                        {user.first_name &&
-                                                                        user.last_name
-                                                                            ? `${user.first_name} ${user.last_name}`
-                                                                            : user.email}
+                                                                    className="cursor-pointer"
+                                                                >
+                                                                    <div className={cn(
+                                                                        "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                                                        isSelected
+                                                                            ? "bg-primary text-primary-foreground"
+                                                                            : "opacity-50"
+                                                                    )}>
+                                                                        {isSelected && <Check className="h-3 w-3" />}
                                                                     </div>
-                                                                    {user.first_name &&
-                                                                        user.last_name && (
+                                                                    <div className="flex-1 ml-2">
+                                                                        <div className="font-medium text-sm">
+                                                                            {user.first_name && user.last_name
+                                                                                ? `${user.first_name} ${user.last_name}`
+                                                                                : user.email}
+                                                                        </div>
+                                                                        {user.first_name && user.last_name && (
                                                                             <div className="text-xs text-muted-foreground">
-                                                                                {
-                                                                                    user.email
-                                                                                }
+                                                                                {user.email}
                                                                             </div>
                                                                         )}
+                                                                    </div>
                                                                     {user.account_type && (
-                                                                        <div className="text-xs text-muted-foreground">
-                                                                            {user.account_type ===
-                                                                            "admin"
-                                                                                ? "Administrateur"
-                                                                                : user.account_type ===
-                                                                                    "coordinator"
-                                                                                  ? "Coordinateur"
-                                                                                  : "Animateur"}
-                                                                        </div>
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            {user.account_type === "admin"
+                                                                                ? "Admin"
+                                                                                : user.account_type === "coordinator"
+                                                                                  ? "Coord."
+                                                                                  : "Anim."}
+                                                                        </span>
                                                                     )}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                {allUsers
-                                                    .filter(
-                                                        (u) => u.id !== userId
-                                                    )
-                                                    .filter((user) => {
-                                                        if (
-                                                            !participantSearch.trim()
-                                                        )
-                                                            return true;
-                                                        const searchLower =
-                                                            participantSearch.toLowerCase();
-                                                        const fullName =
-                                                            `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
-                                                        const email = (
-                                                            user.email || ""
-                                                        ).toLowerCase();
-                                                        return (
-                                                            fullName.includes(
-                                                                searchLower
-                                                            ) ||
-                                                            email.includes(
-                                                                searchLower
-                                                            )
-                                                        );
-                                                    }).length === 0 && (
-                                                    <p className="text-sm text-muted-foreground text-center py-4">
-                                                        {participantSearch.trim()
-                                                            ? "Aucun utilisateur trouvé pour cette recherche"
-                                                            : "Aucun autre utilisateur disponible"}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
+                                                                </CommandItem>
+                                                            );
+                                                        })}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
                                     </PopoverContent>
                                 </Popover>
                                 <FormMessage />

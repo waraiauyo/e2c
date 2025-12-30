@@ -11,8 +11,9 @@ import {
 } from "@/components/shadcn/dialog";
 import { Button } from "@/components/shadcn/button";
 import { Badge } from "@/components/shadcn/badge";
-import { Calendar, Clock, MapPin, Tag, Plus, Users } from "lucide-react";
-import type { Event } from "@/lib/planning/types";
+import { Calendar, Clock, MapPin, Plus, Users } from "lucide-react";
+import type { Event, TargetRole } from "@/lib/planning/types";
+import { getEventColor, ROLE_LABELS, ROLE_COLORS } from "@/lib/planning/types";
 import { getBatchEventParticipantCounts } from "@/lib/supabase/query/events";
 
 interface DayEventsDialogProps {
@@ -163,11 +164,8 @@ export function DayEventsDialog({
                                     onClick={() => handleEventClick(event)}
                                     className="group relative p-4 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
                                     style={{
-                                        borderLeftColor:
-                                            event.color || undefined,
-                                        borderLeftWidth: event.color
-                                            ? "4px"
-                                            : undefined,
+                                        borderLeftColor: getEventColor(event.target_roles),
+                                        borderLeftWidth: "4px",
                                     }}
                                 >
                                     {/* Titre et statut */}
@@ -176,6 +174,23 @@ export function DayEventsDialog({
                                             {event.title}
                                         </h4>
                                         {getStatusBadge(event.status)}
+                                    </div>
+
+                                    {/* Badges des rôles */}
+                                    <div className="flex flex-wrap gap-1 mb-2">
+                                        {event.target_roles.map((role) => (
+                                            <span
+                                                key={role}
+                                                className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                                style={{
+                                                    backgroundColor: `${ROLE_COLORS[role]}20`,
+                                                    color: ROLE_COLORS[role],
+                                                    border: `1px solid ${ROLE_COLORS[role]}40`,
+                                                }}
+                                            >
+                                                {ROLE_LABELS[role]}
+                                            </span>
+                                        ))}
                                     </div>
 
                                     {/* Heure */}
@@ -193,16 +208,6 @@ export function DayEventsDialog({
                                             </span>
                                         </div>
                                     )}
-
-                                    {/* Type (Personnel/CLAS) */}
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <Tag className="h-4 w-4" />
-                                        <span className="capitalize">
-                                            {event.owner_type === "personal"
-                                                ? "Personnel"
-                                                : "CLAS"}
-                                        </span>
-                                    </div>
 
                                     {/* Participants */}
                                     {participantCounts.get(event.id) !==

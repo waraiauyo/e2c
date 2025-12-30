@@ -8,9 +8,9 @@ import {
 } from "./templates";
 import { getEventParticipants } from "@/lib/supabase/query/events";
 import { getUserProfile } from "@/lib/supabase/query/profiles";
-import { getClasById } from "@/lib/supabase/query/clas";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { type TargetRole, ROLE_LABELS } from "@/lib/planning/types";
 
 interface EventEmailData {
     title: string;
@@ -19,21 +19,15 @@ interface EventEmailData {
     start_time: string;
     end_time: string;
     all_day: boolean;
-    owner_type: "personal" | "clas";
-    owner_id: string;
+    target_roles: TargetRole[];
 }
 
 /**
- * Récupère le nom du CLAS si l'événement est de type CLAS
+ * Formate les rôles cibles en texte lisible
  */
-async function getClasName(clasId: string): Promise<string | undefined> {
-    try {
-        const result = await getClasById(clasId);
-        return result.clas?.name;
-    } catch (error) {
-        console.error("Erreur lors de la récupération du CLAS:", error);
-        return undefined;
-    }
+function formatTargetRoles(roles: TargetRole[]): string {
+    if (roles.length === 3) return "Tous les rôles";
+    return roles.map(r => ROLE_LABELS[r]).join(", ");
 }
 
 /**
@@ -72,16 +66,11 @@ export async function sendEventCreatedNotification(
                 ? `${creator.first_name} ${creator.last_name}`
                 : creator.email;
 
-        // Récupérer le nom du CLAS si nécessaire
-        const clasName =
-            eventData.owner_type === "clas"
-                ? await getClasName(eventData.owner_id)
-                : undefined;
-
         // Préparer les données de l'événement pour le template
+        const roleLabels = formatTargetRoles(eventData.target_roles);
         const eventForTemplate = {
             ...eventData,
-            clasName,
+            roleLabels,
         };
 
         // Envoyer les emails SÉQUENTIELLEMENT avec délai pour éviter le rate limiting
@@ -255,16 +244,11 @@ export async function sendEventUpdatedNotification(
                 ? `${updater.first_name} ${updater.last_name}`
                 : updater.email;
 
-        // Récupérer le nom du CLAS si nécessaire
-        const clasName =
-            eventData.owner_type === "clas"
-                ? await getClasName(eventData.owner_id)
-                : undefined;
-
         // Préparer les données de l'événement pour le template
+        const roleLabels = formatTargetRoles(eventData.target_roles);
         const eventForTemplate = {
             ...eventData,
-            clasName,
+            roleLabels,
         };
 
         // Envoyer les emails SÉQUENTIELLEMENT avec délai pour éviter le rate limiting

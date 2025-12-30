@@ -55,8 +55,7 @@ export function useEventMutations() {
                             start_time: newEvent.start_time,
                             end_time: newEvent.end_time,
                             all_day: newEvent.all_day,
-                            owner_type: newEvent.owner_type,
-                            owner_id: newEvent.owner_id,
+                            target_roles: newEvent.target_roles,
                         },
                         eventData.created_by
                     );
@@ -114,8 +113,7 @@ export function useEventMutations() {
                         start_time: updatedEvent.start_time,
                         end_time: updatedEvent.end_time,
                         all_day: updatedEvent.all_day,
-                        owner_type: updatedEvent.owner_type,
-                        owner_id: updatedEvent.owner_id,
+                        target_roles: updatedEvent.target_roles,
                     },
                     updaterId
                 );

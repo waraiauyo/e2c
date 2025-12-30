@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventFormSchema, type EventFormValues } from "@/lib/planning/schemas";
 import { useAppSelector } from "@/lib/redux/hooks";
-import { getAllClas, getUserClasWithRoles } from "@/lib/supabase/query/clas";
 import { getAllUsers, type UserProfile } from "@/lib/supabase/query/profiles";
 import { getEventParticipants } from "@/lib/supabase/query/events";
 import { Button } from "@/components/shadcn/button";
@@ -42,15 +41,14 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/shadcn/form";
-import {
-    Calendar as CalendarIcon,
-    Clock,
-    Users,
-    X,
-} from "lucide-react";
+import { Users, X } from "lucide-react";
 import { format } from "date-fns";
-import type { Event } from "@/lib/planning/types";
-import type { FilterContext } from "@/components/planning/sidebar/FilterSidebar";
+import {
+    type Event,
+    type TargetRole,
+    ROLE_LABELS,
+    ROLE_COLORS,
+} from "@/lib/planning/types";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -58,32 +56,34 @@ interface EventFormProps {
     mode: "create" | "edit";
     event?: Event;
     initialDate?: Date;
-    filterContext?: FilterContext | null;
     onSubmit: (data: EventFormValues) => void;
     onCancel: () => void;
     isLoading?: boolean;
 }
 
+const ALL_ROLES: TargetRole[] = ["animator", "coordinator", "director"];
+
 export function EventForm({
     mode,
     event,
     initialDate,
-    filterContext,
     onSubmit,
     onCancel,
     isLoading,
 }: EventFormProps) {
     const { profile, user } = useAppSelector((state) => state.user);
-    const [userClasList, setUserClasList] = useState<
-        { id: string; name: string; role?: string }[]
-    >([]);
-    const [isLoadingClas, setIsLoadingClas] = useState(false);
     const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const [participantSearch, setParticipantSearch] = useState("");
+    const [roleFilter, setRoleFilter] = useState<
+        "all" | "admin" | "coordinator" | "director" | "animator"
+    >("all");
 
     const isAdmin = profile?.account_type === "admin";
-    const isCoordinator = profile?.account_type === "coordinator" || isAdmin;
+    const isCoordinator =
+        profile?.account_type === "coordinator" ||
+        profile?.account_type === "director" ||
+        isAdmin;
     const userId = user?.id || profile?.id;
 
     // Vérifier que l'utilisateur est connecté
@@ -113,10 +113,8 @@ export function EventForm({
                   start_time: new Date(event.start_time),
                   end_time: new Date(event.end_time),
                   all_day: event.all_day,
-                  owner_type: event.owner_type,
-                  owner_id: event.owner_id,
+                  target_roles: event.target_roles,
                   status: event.status,
-                  color: event.color,
                   participant_ids: [],
               }
             : {
@@ -128,11 +126,9 @@ export function EventForm({
                       ? new Date(initialDate.getTime() + 60 * 60 * 1000)
                       : new Date(Date.now() + 60 * 60 * 1000),
                   all_day: false,
-                  // Pré-remplir selon le filtre sélectionné
-                  owner_type: filterContext?.type || "personal",
-                  owner_id: filterContext?.id || userId,
+                  // Animateurs ne peuvent créer que pour leur rôle
+                  target_roles: isCoordinator ? ["animator"] : ["animator"],
                   status: "confirmed",
-                  color: null,
                   participant_ids: [],
               };
 
@@ -141,36 +137,8 @@ export function EventForm({
         defaultValues,
     });
 
-    const ownerType = form.watch("owner_type");
     const allDay = form.watch("all_day");
-
-    // Charger les CLAS (admin = tous les CLAS, autres = leurs CLAS avec rôles)
-    useEffect(() => {
-        async function loadClas() {
-            if (userId) {
-                setIsLoadingClas(true);
-
-                if (isAdmin) {
-                    // Admin voit TOUS les CLAS du système (sans rôle spécifique)
-                    const result = await getAllClas();
-                    if (result.clas) {
-                        setUserClasList(
-                            result.clas.map((c) => ({ id: c.id, name: c.name }))
-                        );
-                    }
-                } else {
-                    // Coordinator/Animator voient leurs CLAS avec leurs rôles
-                    const result = await getUserClasWithRoles(userId);
-                    if (result.clas) {
-                        setUserClasList(result.clas);
-                    }
-                }
-
-                setIsLoadingClas(false);
-            }
-        }
-        loadClas();
-    }, [userId, isAdmin]);
+    const targetRoles = form.watch("target_roles");
 
     // Charger tous les utilisateurs pour la sélection de participants
     useEffect(() => {
@@ -212,19 +180,29 @@ export function EventForm({
         loadParticipants();
     }, [mode, event?.id, form]);
 
-    // Mettre à jour owner_id quand le type change
+    // Pour les animateurs, forcer target_roles à ["animator"]
     useEffect(() => {
-        if (ownerType === "personal") {
-            form.setValue("owner_id", userId);
-        } else if (
-            ownerType === "clas" &&
-            !isCoordinator &&
-            userClasList.length > 0
-        ) {
-            // Animator : auto-sélectionner son CLAS unique
-            form.setValue("owner_id", userClasList[0].id);
+        if (!isCoordinator) {
+            form.setValue("target_roles", ["animator"]);
         }
-    }, [ownerType, userId, isCoordinator, userClasList, form]);
+    }, [isCoordinator, form]);
+
+    const handleRoleToggle = (role: TargetRole, checked: boolean) => {
+        const current = form.getValues("target_roles") || [];
+        if (checked) {
+            form.setValue("target_roles", [...current, role]);
+        } else {
+            // Ne pas permettre de tout désélectionner
+            const newRoles = current.filter((r) => r !== role);
+            if (newRoles.length > 0) {
+                form.setValue("target_roles", newRoles);
+            }
+        }
+    };
+
+    const selectAllRoles = () => {
+        form.setValue("target_roles", [...ALL_ROLES]);
+    };
 
     return (
         <Form {...form}>
@@ -268,134 +246,147 @@ export function EventForm({
                     )}
                 />
 
-                {/* Type d'événement */}
+                {/* Sélection des rôles cibles */}
                 <FormField
                     control={form.control}
-                    name="owner_type"
+                    name="target_roles"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Type d'événement *</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Sélectionnez un type" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="personal">
-                                        Personnel
-                                    </SelectItem>
-                                    <SelectItem value="clas">CLAS</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <FormLabel>Destinataires *</FormLabel>
+                            {isCoordinator ? (
+                                <>
+                                    <div className="space-y-3">
+                                        {/* Bouton Tous */}
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={selectAllRoles}
+                                            className={cn(
+                                                "w-full",
+                                                field.value?.length === 3 &&
+                                                    "bg-muted"
+                                            )}
+                                        >
+                                            {field.value?.length === 3
+                                                ? "Tous sélectionnés"
+                                                : "Sélectionner tous"}
+                                        </Button>
+
+                                        {/* Checkboxes pour chaque rôle */}
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {ALL_ROLES.map((role) => {
+                                                const isChecked =
+                                                    field.value?.includes(role);
+                                                return (
+                                                    <button
+                                                        key={role}
+                                                        type="button"
+                                                        className={cn(
+                                                            "flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors text-left",
+                                                            isChecked
+                                                                ? "border-primary bg-primary/5"
+                                                                : "border-border hover:bg-muted/50"
+                                                        )}
+                                                        onClick={() =>
+                                                            handleRoleToggle(
+                                                                role,
+                                                                !isChecked
+                                                            )
+                                                        }
+                                                    >
+                                                        <div
+                                                            className={cn(
+                                                                "h-4 w-4 shrink-0 rounded-sm border transition-colors",
+                                                                isChecked
+                                                                    ? "bg-primary border-primary"
+                                                                    : "border-input"
+                                                            )}
+                                                        >
+                                                            {isChecked && (
+                                                                <Check className="h-4 w-4 text-primary-foreground" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div
+                                                                className="w-3 h-3 rounded-full"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        ROLE_COLORS[
+                                                                            role
+                                                                        ],
+                                                                }}
+                                                            />
+                                                            <span className="text-sm font-medium">
+                                                                {
+                                                                    ROLE_LABELS[
+                                                                        role
+                                                                    ]
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                    <FormDescription>
+                                        Sélectionnez les rôles qui verront cet
+                                        événement. La couleur sera définie
+                                        automatiquement.
+                                    </FormDescription>
+                                </>
+                            ) : (
+                                /* Animateur : rôle fixé automatiquement */
+                                <div className="p-3 bg-muted rounded-md">
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="w-3 h-3 rounded-full"
+                                            style={{
+                                                backgroundColor:
+                                                    ROLE_COLORS.animator,
+                                            }}
+                                        />
+                                        <span className="text-sm">
+                                            Cet événement sera visible par les{" "}
+                                            <strong>Animateurs</strong>
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                        En tant qu'animateur, vous ne pouvez
+                                        créer que des événements pour votre
+                                        rôle.
+                                    </p>
+                                </div>
+                            )}
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                {/* Sélection CLAS (si type = clas ET coordinateur) */}
-                {ownerType === "clas" && isCoordinator && (
-                    <FormField
-                        control={form.control}
-                        name="owner_id"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>CLAS *</FormLabel>
-                                <Select
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue
-                                                placeholder={
-                                                    isLoadingClas
-                                                        ? "Chargement..."
-                                                        : "Sélectionnez un CLAS"
-                                                }
-                                            />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {isLoadingClas ? (
-                                            <SelectItem
-                                                value="loading"
-                                                disabled
-                                            >
-                                                Chargement...
-                                            </SelectItem>
-                                        ) : userClasList.length > 0 ? (
-                                            userClasList.map((clas) => (
-                                                <SelectItem
-                                                    key={clas.id}
-                                                    value={clas.id}
-                                                >
-                                                    {clas.name}
-                                                    {clas.role && (
-                                                        <span className="text-muted-foreground ml-2">
-                                                            (
-                                                            {clas.role ===
-                                                            "coordinator"
-                                                                ? "Coordinateur"
-                                                                : "Animateur"}
-                                                            )
-                                                        </span>
-                                                    )}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem
-                                                value="no-clas"
-                                                disabled
-                                            >
-                                                {isAdmin
-                                                    ? "Aucun CLAS dans le système"
-                                                    : "Vous n'êtes coordinateur d'aucun CLAS"}
-                                            </SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                                <FormDescription>
-                                    {isAdmin
-                                        ? "Tous les CLAS du système sont disponibles"
-                                        : "Sélectionnez le CLAS concerné par cet événement"}
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                )}
-
-                {/* Info CLAS pour animator */}
-                {ownerType === "clas" && !isCoordinator && (
-                    <div className="p-3 bg-muted rounded-md">
-                        <p className="text-sm text-muted-foreground">
-                            {isLoadingClas ? (
-                                "Chargement de votre CLAS..."
-                            ) : userClasList.length > 0 ? (
-                                <>
-                                    CLAS :{" "}
-                                    <span className="font-medium text-foreground">
-                                        {userClasList[0].name}
-                                    </span>
-                                    {userClasList[0].role && (
-                                        <span className="ml-2">
-                                            (
-                                            {userClasList[0].role ===
-                                            "coordinator"
-                                                ? "Coordinateur"
-                                                : "Animateur"}
-                                            )
-                                        </span>
-                                    )}
-                                </>
-                            ) : (
-                                "Aucun CLAS associé à votre compte"
-                            )}
-                        </p>
+                {/* Aperçu de la couleur */}
+                {targetRoles && targetRoles.length > 0 && (
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md">
+                        <div
+                            className="w-4 h-4 rounded-full"
+                            style={{
+                                backgroundColor: targetRoles.includes(
+                                    "director"
+                                )
+                                    ? ROLE_COLORS.director
+                                    : targetRoles.includes("coordinator")
+                                      ? ROLE_COLORS.coordinator
+                                      : ROLE_COLORS.animator,
+                            }}
+                        />
+                        <span className="text-sm text-muted-foreground">
+                            Couleur de l'événement :{" "}
+                            {targetRoles.includes("director")
+                                ? "Orange (Directeur)"
+                                : targetRoles.includes("coordinator")
+                                  ? "Vert (Coordinateur)"
+                                  : "Bleu (Animateur)"}
+                        </span>
                     </div>
                 )}
 
@@ -536,7 +527,7 @@ export function EventForm({
                     )}
                 />
 
-                {/* Participants - Visible pour création et édition */}
+                {/* Participants */}
                 {(mode === "create" || mode === "edit") && (
                     <FormField
                         control={form.control}
@@ -594,123 +585,276 @@ export function EventForm({
                                             <CommandInput
                                                 placeholder="Rechercher un participant..."
                                                 value={participantSearch}
-                                                onValueChange={setParticipantSearch}
+                                                onValueChange={
+                                                    setParticipantSearch
+                                                }
                                             />
 
+                                            {/* Filtres par rôle */}
+                                            <div className="flex flex-wrap gap-1 px-3 py-2 border-b">
+                                                {[
+                                                    {
+                                                        value: "all",
+                                                        label: "Tous",
+                                                    },
+                                                    {
+                                                        value: "coordinator",
+                                                        label: "Coord.",
+                                                    },
+                                                    {
+                                                        value: "director",
+                                                        label: "Dir.",
+                                                    },
+                                                    {
+                                                        value: "animator",
+                                                        label: "Anim.",
+                                                    },
+                                                    {
+                                                        value: "admin",
+                                                        label: "Admin",
+                                                    },
+                                                ].map((role) => (
+                                                    <button
+                                                        key={role.value}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setRoleFilter(
+                                                                role.value as typeof roleFilter
+                                                            )
+                                                        }
+                                                        className={cn(
+                                                            "px-2 py-1 text-xs rounded-md transition-colors",
+                                                            roleFilter ===
+                                                                role.value
+                                                                ? "bg-primary text-primary-foreground"
+                                                                : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {role.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+
                                             {/* Badges des participants sélectionnés */}
-                                            {field.value && field.value.length > 0 && (
-                                                <div className="px-3 py-2 border-b bg-muted/30">
-                                                    <div className="text-xs font-medium text-muted-foreground mb-2">
-                                                        Sélectionnés ({field.value.length})
+                                            {field.value &&
+                                                field.value.length > 0 && (
+                                                    <div className="px-3 py-2 border-b bg-muted/30">
+                                                        <div className="text-xs font-medium text-muted-foreground mb-2">
+                                                            Sélectionnés (
+                                                            {field.value.length}
+                                                            )
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {field.value.map(
+                                                                (
+                                                                    participantId
+                                                                ) => {
+                                                                    const participant =
+                                                                        allUsers.find(
+                                                                            (
+                                                                                u
+                                                                            ) =>
+                                                                                u.id ===
+                                                                                participantId
+                                                                        );
+                                                                    if (
+                                                                        !participant
+                                                                    )
+                                                                        return null;
+                                                                    return (
+                                                                        <Badge
+                                                                            key={
+                                                                                participantId
+                                                                            }
+                                                                            variant="secondary"
+                                                                            className="gap-1 text-xs"
+                                                                        >
+                                                                            {participant.first_name &&
+                                                                            participant.last_name
+                                                                                ? `${participant.first_name} ${participant.last_name}`
+                                                                                : participant.email}
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.preventDefault();
+                                                                                    e.stopPropagation();
+                                                                                    field.onChange(
+                                                                                        field.value?.filter(
+                                                                                            (
+                                                                                                id
+                                                                                            ) =>
+                                                                                                id !==
+                                                                                                participantId
+                                                                                        ) ||
+                                                                                            []
+                                                                                    );
+                                                                                }}
+                                                                                className="ml-1 hover:text-destructive rounded-full"
+                                                                            >
+                                                                                <X className="h-3 w-3" />
+                                                                            </button>
+                                                                        </Badge>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {field.value.map((participantId) => {
-                                                            const participant = allUsers.find(
-                                                                (u) => u.id === participantId
-                                                            );
-                                                            if (!participant) return null;
-                                                            return (
-                                                                <Badge
-                                                                    key={participantId}
-                                                                    variant="secondary"
-                                                                    className="gap-1 text-xs"
-                                                                >
-                                                                    {participant.first_name &&
-                                                                    participant.last_name
-                                                                        ? `${participant.first_name} ${participant.last_name}`
-                                                                        : participant.email}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.preventDefault();
-                                                                            e.stopPropagation();
-                                                                            field.onChange(
-                                                                                field.value?.filter(
-                                                                                    (id) => id !== participantId
-                                                                                ) || []
-                                                                            );
-                                                                        }}
-                                                                        className="ml-1 hover:text-destructive rounded-full"
-                                                                    >
-                                                                        <X className="h-3 w-3" />
-                                                                    </button>
-                                                                </Badge>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            )}
+                                                )}
 
                                             <CommandList
                                                 className="max-h-[240px] overscroll-contain"
-                                                onWheel={(e) => e.stopPropagation()}
-                                                onTouchMove={(e) => e.stopPropagation()}
+                                                onWheel={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                                onTouchMove={(e) =>
+                                                    e.stopPropagation()
+                                                }
                                             >
                                                 <CommandEmpty>
                                                     <div className="py-4">
                                                         <Users className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
                                                         <p className="text-sm text-muted-foreground">
-                                                            {participantSearch.trim()
+                                                            {participantSearch.trim() ||
+                                                            roleFilter !== "all"
                                                                 ? "Aucun utilisateur trouvé"
                                                                 : "Aucun utilisateur disponible"}
                                                         </p>
+                                                        {roleFilter !==
+                                                            "all" && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setRoleFilter(
+                                                                        "all"
+                                                                    )
+                                                                }
+                                                                className="text-xs text-primary hover:underline mt-2"
+                                                            >
+                                                                Réinitialiser le
+                                                                filtre
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </CommandEmpty>
                                                 <CommandGroup>
                                                     {allUsers
-                                                        .filter((u) => u.id !== userId)
+                                                        .filter(
+                                                            (u) =>
+                                                                u.id !== userId
+                                                        )
                                                         .filter((user) => {
-                                                            if (!participantSearch.trim()) return true;
-                                                            const searchLower = participantSearch.toLowerCase();
-                                                            const fullName = `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
-                                                            const email = (user.email || "").toLowerCase();
-                                                            return fullName.includes(searchLower) || email.includes(searchLower);
+                                                            // Filtre par rôle
+                                                            if (
+                                                                roleFilter !==
+                                                                    "all" &&
+                                                                user.account_type !==
+                                                                    roleFilter
+                                                            ) {
+                                                                return false;
+                                                            }
+                                                            // Filtre par recherche
+                                                            if (
+                                                                !participantSearch.trim()
+                                                            )
+                                                                return true;
+                                                            const searchLower =
+                                                                participantSearch.toLowerCase();
+                                                            const fullName =
+                                                                `${user.first_name || ""} ${user.last_name || ""}`.toLowerCase();
+                                                            const email = (
+                                                                user.email || ""
+                                                            ).toLowerCase();
+                                                            return (
+                                                                fullName.includes(
+                                                                    searchLower
+                                                                ) ||
+                                                                email.includes(
+                                                                    searchLower
+                                                                )
+                                                            );
                                                         })
                                                         .map((user) => {
-                                                            const isSelected = field.value?.includes(user.id);
+                                                            const isSelected =
+                                                                field.value?.includes(
+                                                                    user.id
+                                                                );
                                                             return (
                                                                 <CommandItem
-                                                                    key={user.id}
-                                                                    value={user.id}
+                                                                    key={
+                                                                        user.id
+                                                                    }
+                                                                    value={
+                                                                        user.id
+                                                                    }
                                                                     onSelect={() => {
-                                                                        const currentValues = field.value || [];
-                                                                        if (isSelected) {
+                                                                        const currentValues =
+                                                                            field.value ||
+                                                                            [];
+                                                                        if (
+                                                                            isSelected
+                                                                        ) {
                                                                             field.onChange(
-                                                                                currentValues.filter((id) => id !== user.id)
+                                                                                currentValues.filter(
+                                                                                    (
+                                                                                        id
+                                                                                    ) =>
+                                                                                        id !==
+                                                                                        user.id
+                                                                                )
                                                                             );
                                                                         } else {
-                                                                            field.onChange([...currentValues, user.id]);
+                                                                            field.onChange(
+                                                                                [
+                                                                                    ...currentValues,
+                                                                                    user.id,
+                                                                                ]
+                                                                            );
                                                                         }
                                                                     }}
                                                                     className="cursor-pointer"
                                                                 >
-                                                                    <div className={cn(
-                                                                        "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                                                        isSelected
-                                                                            ? "bg-primary text-primary-foreground"
-                                                                            : "opacity-50"
-                                                                    )}>
-                                                                        {isSelected && <Check className="h-3 w-3" />}
+                                                                    <div
+                                                                        className={cn(
+                                                                            "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                                                            isSelected
+                                                                                ? "bg-primary text-primary-foreground"
+                                                                                : "opacity-50"
+                                                                        )}
+                                                                    >
+                                                                        {isSelected && (
+                                                                            <Check className="h-3 w-3" />
+                                                                        )}
                                                                     </div>
                                                                     <div className="flex-1 ml-2">
                                                                         <div className="font-medium text-sm">
-                                                                            {user.first_name && user.last_name
+                                                                            {user.first_name &&
+                                                                            user.last_name
                                                                                 ? `${user.first_name} ${user.last_name}`
                                                                                 : user.email}
                                                                         </div>
-                                                                        {user.first_name && user.last_name && (
-                                                                            <div className="text-xs text-muted-foreground">
-                                                                                {user.email}
-                                                                            </div>
-                                                                        )}
+                                                                        {user.first_name &&
+                                                                            user.last_name && (
+                                                                                <div className="text-xs text-muted-foreground">
+                                                                                    {
+                                                                                        user.email
+                                                                                    }
+                                                                                </div>
+                                                                            )}
                                                                     </div>
                                                                     {user.account_type && (
                                                                         <span className="text-xs text-muted-foreground">
-                                                                            {user.account_type === "admin"
+                                                                            {user.account_type ===
+                                                                            "admin"
                                                                                 ? "Admin"
-                                                                                : user.account_type === "coordinator"
+                                                                                : user.account_type ===
+                                                                                    "coordinator"
                                                                                   ? "Coord."
-                                                                                  : "Anim."}
+                                                                                  : user.account_type ===
+                                                                                      "director"
+                                                                                    ? "Dir."
+                                                                                    : "Anim."}
                                                                         </span>
                                                                     )}
                                                                 </CommandItem>

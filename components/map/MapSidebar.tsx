@@ -8,7 +8,6 @@ import {
 } from "@/lib/redux/features/clas/slice";
 import {
     selectClasFilters,
-    selectUniqueLevels,
     selectFilteredClas,
 } from "@/lib/redux/features/clas/selectors";
 import { Label } from "@/components/shadcn/label";
@@ -30,7 +29,6 @@ interface MapSidebarProps {
 export function MapSidebar({ onClasSelect }: MapSidebarProps) {
     const dispatch = useAppDispatch();
     const filters = useAppSelector(selectClasFilters);
-    const uniqueLevels = useAppSelector(selectUniqueLevels);
     const filteredClas = useAppSelector(selectFilteredClas);
 
     return (
@@ -66,11 +64,12 @@ export function MapSidebar({ onClasSelect }: MapSidebarProps) {
                                     <SelectItem value="all">
                                         Tous les niveaux
                                     </SelectItem>
-                                    {uniqueLevels.map((level) => (
-                                        <SelectItem key={level} value={level}>
-                                            {level}
-                                        </SelectItem>
-                                    ))}
+                                    <SelectItem value="primary">
+                                        Primaire
+                                    </SelectItem>
+                                    <SelectItem value="middle_school">
+                                        Collège
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

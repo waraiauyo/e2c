@@ -7,7 +7,24 @@
 // ============================================================================
 
 export type EventStatus = "confirmed" | "pending" | "cancelled";
-export type EventOwnerType = "personal" | "clas";
+
+export type TargetRole = "animator" | "coordinator" | "director";
+
+// ============================================================================
+// Constantes pour les couleurs par rôle
+// ============================================================================
+
+export const ROLE_COLORS: Record<TargetRole, string> = {
+    animator: "#3b82f6",    // Bleu
+    coordinator: "#22c55e", // Vert
+    director: "#f97316",    // Orange
+} as const;
+
+export const ROLE_LABELS: Record<TargetRole, string> = {
+    animator: "Animateur",
+    coordinator: "Coordinateur",
+    director: "Directeur",
+} as const;
 
 // ============================================================================
 // Types de base (correspondant aux tables Supabase)
@@ -18,13 +35,11 @@ export interface Event {
     title: string;
     description: string | null;
     location: string | null;
-    color: string | null;
     start_time: string; // ISO 8601 timestamp
     end_time: string; // ISO 8601 timestamp
     all_day: boolean;
     status: EventStatus;
-    owner_type: EventOwnerType;
-    owner_id: string; // profile_id si personal, clas_id si clas
+    target_roles: TargetRole[];
     recurrence_rule: RecurrenceRule | null;
     recurrence_parent_id: string | null;
     recurrence_exception: boolean;
@@ -80,11 +95,6 @@ export interface EventWithParticipants extends Event {
 }
 
 export interface EventWithDetails extends EventWithParticipants {
-    owner_details?: {
-        id: string;
-        name: string; // CLAS name ou user name
-        type: EventOwnerType;
-    };
     reminders?: EventReminder[];
 }
 
@@ -114,13 +124,11 @@ export interface EventFormData {
     title: string;
     description: string | null;
     location: string | null;
-    color: string | null;
     start_time: Date;
     end_time: Date;
     all_day: boolean;
     status: EventStatus;
-    owner_type: EventOwnerType;
-    owner_id: string;
+    target_roles: TargetRole[];
     recurrence_rule: RecurrenceRule | null;
     participant_ids: string[];
     reminder_minutes: number[]; // Ex: [15, 60] pour 15 min et 1h avant
@@ -140,8 +148,7 @@ export interface EventFormProps {
 export type EventViewMode = "day" | "week" | "month" | "agenda" | "list";
 
 export interface EventFilters {
-    clasIds?: string[]; // Filtrer par CLAS
-    ownerType?: EventOwnerType; // Personal ou CLAS
+    targetRoles?: TargetRole[]; // Filtrer par rôles cibles
     status?: EventStatus[]; // Statuts
     startDate?: Date; // Date de début de la plage
     endDate?: Date; // Date de fin de la plage
@@ -211,23 +218,78 @@ export interface CalendarMonth {
 }
 
 // ============================================================================
-// Types pour les couleurs d'événements
+// Fonctions utilitaires pour les couleurs
 // ============================================================================
 
-export const EVENT_COLORS = {
-    blue: "#3b82f6",
-    green: "#22c55e",
-    yellow: "#eab308",
-    red: "#ef4444",
-    purple: "#a855f7",
-    pink: "#ec4899",
-    orange: "#f97316",
-    teal: "#14b8a6",
-    indigo: "#6366f1",
-    gray: "#6b7280",
-} as const;
+/**
+ * Retourne la couleur d'un événement basée sur ses rôles cibles
+ * Si plusieurs rôles, utilise la priorité: director > coordinator > animator
+ */
+export function getEventColor(targetRoles: TargetRole[]): string {
+    if (targetRoles.includes("director")) return ROLE_COLORS.director;
+    if (targetRoles.includes("coordinator")) return ROLE_COLORS.coordinator;
+    return ROLE_COLORS.animator;
+}
 
-export type EventColor = keyof typeof EVENT_COLORS;
+/**
+ * Retourne le label d'un événement basé sur ses rôles cibles
+ */
+export function getEventRoleLabel(targetRoles: TargetRole[]): string {
+    if (targetRoles.length === 3) return "Tous";
+    return targetRoles.map(r => ROLE_LABELS[r]).join(", ");
+}
+
+// ============================================================================
+// Fonctions utilitaires pour les permissions
+// ============================================================================
+
+type AccountType = "admin" | "coordinator" | "director" | "animator";
+
+/**
+ * Vérifie si un utilisateur peut modifier un événement
+ * - Admins, coordinateurs et directeurs peuvent modifier tous les événements
+ * - Les animateurs ne peuvent modifier que les événements destinés uniquement aux animateurs
+ */
+export function canEditEvent(event: Event, userAccountType: AccountType | undefined): boolean {
+    if (!userAccountType) return false;
+
+    // Admins, coordinateurs et directeurs peuvent tout modifier
+    if (userAccountType === "admin" || userAccountType === "coordinator" || userAccountType === "director") {
+        return true;
+    }
+
+    // Les animateurs ne peuvent modifier que les événements destinés uniquement aux animateurs
+    if (userAccountType === "animator") {
+        return event.target_roles.length === 1 && event.target_roles[0] === "animator";
+    }
+
+    return false;
+}
+
+/**
+ * Vérifie si un utilisateur peut supprimer un événement
+ * Mêmes règles que pour la modification
+ */
+export function canDeleteEvent(event: Event, userAccountType: AccountType | undefined): boolean {
+    return canEditEvent(event, userAccountType);
+}
+
+/**
+ * Retourne un message expliquant pourquoi l'utilisateur ne peut pas modifier l'événement
+ */
+export function getPermissionDeniedReason(event: Event, userAccountType: AccountType | undefined): string | null {
+    if (canEditEvent(event, userAccountType)) return null;
+
+    if (userAccountType === "animator") {
+        const otherRoles = event.target_roles.filter(r => r !== "animator");
+        if (otherRoles.length > 0) {
+            const roleNames = otherRoles.map(r => ROLE_LABELS[r]).join(" et ");
+            return `Cet événement est destiné aux ${roleNames}. Seuls les coordinateurs et directeurs peuvent le modifier.`;
+        }
+    }
+
+    return "Vous n'avez pas les permissions nécessaires pour modifier cet événement.";
+}
 
 // ============================================================================
 // Types pour l'export

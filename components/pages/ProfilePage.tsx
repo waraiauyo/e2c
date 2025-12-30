@@ -10,7 +10,7 @@ import {
 } from "@/lib/supabase/query/clas";
 import { uploadAvatar } from "@/lib/supabase/actions/storage";
 import { updateAvatarUrl, updatePhone } from "@/lib/supabase/actions/profiles";
-import { updateEmail } from "@/lib/supabase/auth";
+import { updateEmail, updatePassword } from "@/lib/supabase/auth";
 import {
     Card,
     CardContent,
@@ -49,6 +49,7 @@ import {
     X,
     LogOut,
     Phone,
+    Lock,
 } from "lucide-react";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 
@@ -66,8 +67,21 @@ const phoneFormSchema = z.object({
         .regex(/^[0-9\s\-\+\.]+$/, { message: "Numéro de téléphone invalide." }),
 });
 
+const passwordFormSchema = z
+    .object({
+        password: z
+            .string()
+            .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." }),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Les mots de passe ne correspondent pas.",
+        path: ["confirmPassword"],
+    });
+
 type EmailFormValues = z.infer<typeof emailFormSchema>;
 type PhoneFormValues = z.infer<typeof phoneFormSchema>;
+type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 
 export default function ProfilePage() {
     const dispatch = useAppDispatch();
@@ -82,6 +96,7 @@ export default function ProfilePage() {
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const [updatingEmail, setUpdatingEmail] = useState(false);
     const [updatingPhone, setUpdatingPhone] = useState(false);
+    const [updatingPassword, setUpdatingPassword] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
     const [userClas, setUserClas] = useState<ClasWithRole[]>([]);
     const [loadingClas, setLoadingClas] = useState(true);
@@ -99,6 +114,14 @@ export default function ProfilePage() {
     const phoneForm = useForm<PhoneFormValues>({
         resolver: zodResolver(phoneFormSchema),
         defaultValues: { phone: profile?.phone || "" },
+    });
+
+    const passwordForm = useForm<PasswordFormValues>({
+        resolver: zodResolver(passwordFormSchema),
+        defaultValues: {
+            password: "",
+            confirmPassword: "",
+        },
     });
 
     // Handle URL messages from email verification
@@ -260,6 +283,26 @@ export default function ProfilePage() {
         }
     };
 
+    const onPasswordSubmit = async (values: PasswordFormValues) => {
+        setUpdatingPassword(true);
+
+        try {
+            const result = await updatePassword(values.password);
+
+            if (!result.success) {
+                toast.error(result.message);
+                return;
+            }
+
+            toast.success(result.message);
+            passwordForm.reset();
+        } catch {
+            toast.error("Une erreur est survenue lors de la mise à jour.");
+        } finally {
+            setUpdatingPassword(false);
+        }
+    };
+
     const handleLogout = async () => {
         setLoggingOut(true);
 
@@ -283,6 +326,7 @@ export default function ProfilePage() {
     const getAccountTypeLabel = (accountType: string) => {
         const labels: Record<string, string> = {
             coordinator: "Coordinateur",
+            director: "Directeur",
             animator: "Animateur",
             admin: "Administrateur",
         };
@@ -445,7 +489,9 @@ export default function ProfilePage() {
                                                 >
                                                     {clas.role === "coordinator"
                                                         ? "Coordinateur"
-                                                        : "Animateur"}
+                                                        : clas.role === "director"
+                                                          ? "Directeur"
+                                                          : "Animateur"}
                                                 </Badge>
                                             </div>
                                         ))
@@ -597,6 +643,83 @@ export default function ProfilePage() {
                                     </form>
                                 </Form>
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="w-full max-w-4xl">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Lock className="h-5 w-5" />
+                                Modifier le mot de passe
+                            </CardTitle>
+                            <CardDescription>
+                                Changez votre mot de passe de connexion
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Form {...passwordForm}>
+                                <form
+                                    onSubmit={passwordForm.handleSubmit(
+                                        onPasswordSubmit
+                                    )}
+                                    className="space-y-4"
+                                >
+                                    <FormField
+                                        control={passwordForm.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Nouveau mot de passe
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        disabled={updatingPassword}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={passwordForm.control}
+                                        name="confirmPassword"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Confirmer le mot de passe
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        disabled={updatingPassword}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        disabled={updatingPassword}
+                                        className="w-full"
+                                    >
+                                        {updatingPassword ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Modification...
+                                            </>
+                                        ) : (
+                                            "Modifier le mot de passe"
+                                        )}
+                                    </Button>
+                                </form>
+                            </Form>
                         </CardContent>
                     </Card>
 

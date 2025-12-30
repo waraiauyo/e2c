@@ -27,11 +27,6 @@ const navItems = [
         label: "Ressources",
         icon: FolderOpen,
     },
-    {
-        href: "/community",
-        label: "Communauté",
-        icon: Users,
-    },
 ];
 
 export default function BottomNavigation() {

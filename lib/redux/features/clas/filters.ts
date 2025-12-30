@@ -14,7 +14,7 @@ export const filterByName = (query: string): ClasFilterFn => (clas) => {
 
 export const filterByLevel = (level: string): ClasFilterFn => (clas) => {
   if (level === "all") return true;
-  return clas.grade_levels === level;
+  return clas.grade_level === level;
 };
 
 export const filterByAllophone = (option: string): ClasFilterFn => (clas) => {

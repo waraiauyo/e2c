@@ -10,7 +10,8 @@ import {
 } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Clock } from "lucide-react";
-import type { Event } from "@/lib/planning/types";
+import type { Event, TargetRole } from "@/lib/planning/types";
+import { getEventColor, ROLE_LABELS, ROLE_COLORS } from "@/lib/planning/types";
 import { cn } from "@/lib/utils";
 
 interface DayViewProps {
@@ -160,11 +161,8 @@ export function DayView({
                                         className="absolute left-4 right-4 rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer pointer-events-auto overflow-hidden"
                                         style={{
                                             ...style,
-                                            borderLeftColor:
-                                                event.color || "#3b82f6",
-                                            backgroundColor: event.color
-                                                ? `${event.color}15`
-                                                : "hsl(var(--primary) / 0.1)",
+                                            borderLeftColor: getEventColor(event.target_roles),
+                                            backgroundColor: `${getEventColor(event.target_roles)}15`,
                                         }}
                                         onClick={() => onEventClick(event)}
                                     >
@@ -172,6 +170,22 @@ export function DayView({
                                             {/* Titre */}
                                             <div className="font-medium text-sm line-clamp-1 mb-1">
                                                 {event.title}
+                                            </div>
+
+                                            {/* Badges des rôles (compact) */}
+                                            <div className="flex flex-wrap gap-0.5 mb-1">
+                                                {event.target_roles.map((role) => (
+                                                    <span
+                                                        key={role}
+                                                        className="inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium"
+                                                        style={{
+                                                            backgroundColor: `${ROLE_COLORS[role]}25`,
+                                                            color: ROLE_COLORS[role],
+                                                        }}
+                                                    >
+                                                        {ROLE_LABELS[role]}
+                                                    </span>
+                                                ))}
                                             </div>
 
                                             {/* Heure */}

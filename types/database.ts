@@ -4,8 +4,9 @@
  * These types represent the database schema for CLAS-related tables
  */
 
-export type AccountType = "admin" | "coordinator" | "animator";
-export type TeamRole = "coordinator" | "animator";
+export type AccountType = "admin" | "coordinator" | "director" | "animator";
+export type TeamRole = "coordinator" | "director" | "animator";
+export type GradeLevel = "primary" | "middle_school";
 
 export interface Profile {
     id: string;
@@ -27,10 +28,14 @@ export interface Clas {
     latitude: number | null;
     longitude: number | null;
     public_description: string | null;
-    grade_levels: string | null;
+    grade_level: GradeLevel;
     capacity: string | null;
     allophone_count: string | null;
     schedule: string | null;
+    current_project: string | null;
+    volunteer_count: number | null;
+    website_url: string | null;
+    logo_url: string | null;
     created_at: string;
     updated_at: string;
 }

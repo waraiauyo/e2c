@@ -6,7 +6,8 @@ import {
     getEventColorBorderClass,
     getEventColorTextClass,
 } from "@/lib/planning/utils/eventUtils";
-import type { Event } from "@/lib/planning/types";
+import type { Event, TargetRole } from "@/lib/planning/types";
+import { ROLE_LABELS, ROLE_COLORS } from "@/lib/planning/types";
 import { Badge } from "@/components/shadcn/badge";
 import { Avatar, AvatarFallback } from "@/components/shadcn/avatar";
 import {
@@ -30,9 +31,9 @@ export function EventCard({
     className = "",
     compact = false,
 }: EventCardProps) {
-    const bgClass = getEventColorBgLightClass(event.color);
-    const borderClass = getEventColorBorderClass(event.color);
-    const textClass = getEventColorTextClass(event.color);
+    const bgClass = getEventColorBgLightClass(event);
+    const borderClass = getEventColorBorderClass(event);
+    const textClass = getEventColorTextClass(event);
 
     // Badge de statut
     const statusBadge = () => {
@@ -55,6 +56,29 @@ export function EventCard({
         }
         return null;
     };
+
+    // Badges des rôles cibles
+    const roleBadges = (size: "sm" | "default" = "default") => (
+        <div className={`flex flex-wrap gap-1 ${size === "sm" ? "gap-0.5" : ""}`}>
+            {event.target_roles.map((role) => (
+                <span
+                    key={role}
+                    className={`inline-flex items-center rounded-full font-medium ${
+                        size === "sm"
+                            ? "px-1.5 py-0.5 text-[10px]"
+                            : "px-2 py-0.5 text-xs"
+                    }`}
+                    style={{
+                        backgroundColor: `${ROLE_COLORS[role]}20`,
+                        color: ROLE_COLORS[role],
+                        border: `1px solid ${ROLE_COLORS[role]}40`,
+                    }}
+                >
+                    {ROLE_LABELS[role]}
+                </span>
+            ))}
+        </div>
+    );
 
     // Mode compact (pour grille horaire)
     if (compact) {
@@ -88,6 +112,7 @@ export function EventCard({
                     <TooltipContent side="right" className="max-w-xs">
                         <div className="space-y-2">
                             <p className="font-semibold">{event.title}</p>
+                            {roleBadges("sm")}
                             {event.description && (
                                 <p className="text-sm text-muted-foreground">
                                     {event.description}
@@ -139,11 +164,11 @@ export function EventCard({
                             {event.title}
                         </h3>
                         {statusBadge()}
-                        {event.owner_type === "personal" && (
-                            <Badge variant="secondary" className="text-xs">
-                                Personnel
-                            </Badge>
-                        )}
+                    </div>
+
+                    {/* Badges des rôles */}
+                    <div className="mb-3">
+                        {roleBadges()}
                     </div>
 
                     {event.description && (

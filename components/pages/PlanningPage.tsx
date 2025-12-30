@@ -6,10 +6,7 @@ import { DayView } from "@/components/planning/views/DayView";
 import { MonthView } from "@/components/planning/views/MonthView";
 import { AgendaView } from "@/components/planning/views/AgendaView";
 import { EventDialog } from "@/components/planning/shared/EventDialog";
-import {
-    FilterSidebar,
-    type FilterContext,
-} from "@/components/planning/sidebar/FilterSidebar";
+import { FilterSidebar } from "@/components/planning/sidebar/FilterSidebar";
 import {
     ViewToggle,
     type ViewType,
@@ -25,7 +22,7 @@ import {
     addMonths,
     formatDateLong,
 } from "@/lib/planning/utils/dateUtils";
-import type { Event } from "@/lib/planning/types";
+import type { Event, TargetRole } from "@/lib/planning/types";
 
 export default function PlanningPage() {
     const { isLoading: userLoading } = useAppSelector((state) => state.user);
@@ -36,9 +33,7 @@ export default function PlanningPage() {
     const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
     const [selectedEvent, setSelectedEvent] = useState<Event | undefined>();
     const [initialDate, setInitialDate] = useState<Date | undefined>();
-    const [filterContext, setFilterContext] = useState<FilterContext | null>(
-        null
-    );
+    const [selectedRoles, setSelectedRoles] = useState<TargetRole[]>([]);
 
     // Charger la vue depuis localStorage
     useEffect(() => {
@@ -56,52 +51,40 @@ export default function PlanningPage() {
         localStorage.setItem("planning-view", currentView);
     }, [currentView]);
 
-    // Charger le contexte de filtrage depuis localStorage
+    // Charger les rôles filtrés depuis localStorage
     useEffect(() => {
-        const savedContext = localStorage.getItem("planning-filter-context");
-        if (savedContext) {
+        const savedRoles = localStorage.getItem("planning-filter-roles");
+        if (savedRoles) {
             try {
-                const context = JSON.parse(savedContext) as FilterContext;
-                setFilterContext(context);
+                const roles = JSON.parse(savedRoles) as TargetRole[];
+                setSelectedRoles(roles);
             } catch (e) {
                 // Ignorer les erreurs de parsing
             }
         }
     }, []);
 
-    // Sauvegarder le contexte de filtrage dans localStorage
+    // Sauvegarder les rôles filtrés dans localStorage
     useEffect(() => {
-        if (filterContext) {
-            localStorage.setItem(
-                "planning-filter-context",
-                JSON.stringify(filterContext)
-            );
-        }
-    }, [filterContext]);
+        localStorage.setItem(
+            "planning-filter-roles",
+            JSON.stringify(selectedRoles)
+        );
+    }, [selectedRoles]);
 
     // Récupérer les événements
     const { events, isLoading, error, refetch } = useEvents();
 
-    // Filtrer les événements selon le contexte sélectionné
+    // Filtrer les événements selon les rôles sélectionnés
     const filteredEvents = useMemo(() => {
-        if (!filterContext) return events;
+        // Si aucun rôle sélectionné, afficher tous les événements
+        if (selectedRoles.length === 0) return events;
 
-        return events.filter((event) => {
-            if (filterContext.type === "personal") {
-                // Afficher uniquement les événements personnels de l'utilisateur
-                return (
-                    event.owner_type === "personal" &&
-                    event.owner_id === filterContext.id
-                );
-            } else {
-                // Afficher uniquement les événements du CLAS sélectionné
-                return (
-                    event.owner_type === "clas" &&
-                    event.owner_id === filterContext.id
-                );
-            }
-        });
-    }, [events, filterContext]);
+        // Filtrer les événements dont target_roles contient au moins un des rôles sélectionnés
+        return events.filter((event) =>
+            event.target_roles.some((role) => selectedRoles.includes(role))
+        );
+    }, [events, selectedRoles]);
 
     // Navigation adaptée à la vue
     const goToPrevious = () => {
@@ -235,8 +218,8 @@ export default function PlanningPage() {
                 {/* Sidebar avec filtres */}
                 <aside className="w-80 border-r bg-muted/10">
                     <FilterSidebar
-                        selectedContext={filterContext}
-                        onContextChange={setFilterContext}
+                        selectedRoles={selectedRoles}
+                        onRolesChange={setSelectedRoles}
                     />
                 </aside>
 
@@ -290,7 +273,6 @@ export default function PlanningPage() {
                 mode={dialogMode}
                 event={selectedEvent}
                 initialDate={initialDate}
-                filterContext={filterContext}
                 onSuccess={handleDialogSuccess}
             />
         </div>

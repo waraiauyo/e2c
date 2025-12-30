@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { Event, EventParticipant, EventParticipantWithProfile, EventReminder, EventWithDetails, EventFilters } from "@/lib/planning/types";
+import type { Event, EventParticipant, EventParticipantWithProfile, EventReminder, EventWithDetails, EventFilters, TargetRole } from "@/lib/planning/types";
 
 /**
  * Queries Supabase pour la gestion des événements
@@ -13,7 +13,6 @@ import type { Event, EventParticipant, EventParticipantWithProfile, EventReminde
 
 /**
  * Récupère tous les événements accessibles par l'utilisateur courant
- * Respecte les RLS : coordinators voient tout, animators voient leur CLAS + personnel
  */
 export async function getAllEvents(): Promise<Event[]> {
     const supabase = await createClient();
@@ -40,16 +39,9 @@ export async function getFilteredEvents(filters: EventFilters): Promise<Event[]>
         .from("events")
         .select("*");
 
-    // Filtre par type de propriétaire
-    if (filters.ownerType) {
-        query = query.eq("owner_type", filters.ownerType);
-    }
-
-    // Filtre par CLAS
-    if (filters.clasIds && filters.clasIds.length > 0) {
-        query = query
-            .eq("owner_type", "clas")
-            .in("owner_id", filters.clasIds);
+    // Filtre par rôles cibles (utilise l'opérateur overlaps pour les tableaux)
+    if (filters.targetRoles && filters.targetRoles.length > 0) {
+        query = query.overlaps("target_roles", filters.targetRoles);
     }
 
     // Filtre par statut
@@ -117,19 +109,15 @@ export async function getEventById(id: string): Promise<EventWithDetails | null>
 }
 
 /**
- * Récupère les événements d'un propriétaire spécifique
+ * Récupère les événements par rôles cibles
  */
-export async function getEventsByOwner(
-    ownerType: "personal" | "clas",
-    ownerId: string
-): Promise<Event[]> {
+export async function getEventsByRoles(roles: TargetRole[]): Promise<Event[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
         .from("events")
         .select("*")
-        .eq("owner_type", ownerType)
-        .eq("owner_id", ownerId)
+        .overlaps("target_roles", roles)
         .order("start_time", { ascending: true });
 
     if (error) {

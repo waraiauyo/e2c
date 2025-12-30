@@ -64,8 +64,7 @@ function formatEventDetails(event: {
     start_time: string;
     end_time: string;
     all_day: boolean;
-    owner_type: "personal" | "clas";
-    clasName?: string;
+    roleLabels?: string;
 }): string {
     const startDate = new Date(event.start_time);
     const endDate = new Date(event.end_time);
@@ -103,10 +102,10 @@ function formatEventDetails(event: {
             </div>
             ` : ''}
 
-            ${event.owner_type === "clas" && event.clasName ? `
+            ${event.roleLabels ? `
             <div style="margin-bottom: 12px;">
-                <strong style="color: #374151;">🏫 CLAS :</strong>
-                <span style="color: #6b7280;">${event.clasName}</span>
+                <strong style="color: #374151;">👥 Destinataires :</strong>
+                <span style="color: #6b7280;">${event.roleLabels}</span>
             </div>
             ` : ''}
 
@@ -134,8 +133,7 @@ export function eventCreatedTemplate(
         start_time: string;
         end_time: string;
         all_day: boolean;
-        owner_type: "personal" | "clas";
-        clasName?: string;
+        roleLabels?: string;
     },
     creatorName: string
 ): string {
@@ -170,8 +168,7 @@ export function eventUpdatedTemplate(
         start_time: string;
         end_time: string;
         all_day: boolean;
-        owner_type: "personal" | "clas";
-        clasName?: string;
+        roleLabels?: string;
     },
     updaterName: string
 ): string {

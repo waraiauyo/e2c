@@ -1,7 +1,7 @@
-import { Clas } from "@/types/database";
 import { normalizeText } from "@/lib/utils";
+import type { ClasWithTeam } from "./types";
 
-type ClasFilterFn = (clas: Clas) => boolean;
+type ClasFilterFn = (clas: ClasWithTeam) => boolean;
 
 export const filterByName = (query: string): ClasFilterFn => (clas) => {
   if (!query) return true;
@@ -14,7 +14,7 @@ export const filterByName = (query: string): ClasFilterFn => (clas) => {
 
 export const filterByLevel = (level: string): ClasFilterFn => (clas) => {
   if (level === "all") return true;
-  return normalizeText(clas.grade_levels || "").includes(normalizeText(level));
+  return clas.grade_level === level;
 };
 
 export const filterByAllophone = (option: string): ClasFilterFn => (clas) => {

@@ -28,13 +28,10 @@ export const eventFormSchema = z.object({
 
     all_day: z.boolean(),
 
-    owner_type: z.enum(["personal", "clas"]),
-
-    owner_id: z.string().min(1, "Le propriétaire est requis"),
+    target_roles: z.array(z.enum(["animator", "coordinator", "director"]))
+        .min(1, "Au moins un rôle cible est requis"),
 
     status: z.enum(["confirmed", "pending", "cancelled"]),
-
-    color: z.string().nullable().optional(),
 
     participant_ids: z.array(z.string()),
 

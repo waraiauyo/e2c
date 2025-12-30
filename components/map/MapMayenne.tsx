@@ -25,7 +25,15 @@ L.Marker.prototype.options.icon = L.icon({
     iconAnchor: [12, 41],
 });
 
-export default function MapMayenne() {
+interface MapMayenneProps {
+    flyToPosition?: { lat: number; lng: number } | null;
+    onFlyComplete?: () => void;
+}
+
+export default function MapMayenne({
+    flyToPosition,
+    onFlyComplete,
+}: MapMayenneProps) {
     const dispatch = useAppDispatch();
     const mapMarkers = useAppSelector(selectClasForMap);
     const status = useAppSelector(selectClasStatus);
@@ -62,7 +70,11 @@ export default function MapMayenne() {
                 {mask && <GeoJSON data={mask} style={STYLES.MASK} />}
                 {border && <GeoJSON data={border} style={STYLES.BORDER} />}
 
-                <MapController borderData={border} />
+                <MapController
+                    borderData={border}
+                    flyToPosition={flyToPosition}
+                    onFlyComplete={onFlyComplete}
+                />
             </MapContainer>
         </div>
     );

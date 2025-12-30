@@ -1,29 +1,49 @@
 .leaflet-popup-content-wrapper {
-  background: var(--popover);
-  color: var(--popover-foreground);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  padding: 0;
+    background: var(--popover);
+    color: var(--popover-foreground);
+    border-radius: var(--radius);
+    box-shadow:
+        0 4px 6px -1px rgb(0 0 0 / 0.1),
+        0 2px 4px -2px rgb(0 0 0 / 0.1);
+    padding: 0;
 }
 
 .leaflet-popup-content {
-  margin: 0;
-  padding: 16px;
+    margin: 0;
+    padding: 16px;
 }
 
 .leaflet-popup-tip {
-  background: var(--popover);
+    background: var(--popover);
 }
 
 .leaflet-popup-close-button {
-  color: var(--muted-foreground) !important;
-  top: 6px !important;
-  right: 6px !important;
-  width: 18px !important;
-  height: 18px !important;
-  font-size: 16px !important;
+    color: var(--muted-foreground) !important;
+    top: 6px !important;
+    right: 6px !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 16px !important;
 }
 
 .leaflet-popup-close-button:hover {
-  color: var(--foreground) !important;
+    color: var(--foreground) !important;
+}
+
+/* Reset des styles de liens Leaflet pour utiliser Tailwind */
+.leaflet-popup-content a {
+    color: inherit;
+}
+
+.leaflet-popup-content a:hover {
+    color: inherit;
+}
+
+/* Boutons shadcn : forcer la couleur primary-foreground */
+.leaflet-popup-content a[data-slot="button"] {
+    color: var(--primary-foreground);
+}
+
+.leaflet-popup-content a[data-slot="button"]:hover {
+    color: var(--primary-foreground);
 }

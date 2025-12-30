@@ -2,7 +2,8 @@
  * Utilitaires pour la manipulation d'événements
  */
 
-import type { Event, EventWithDetails, CalendarDay, CalendarWeek, CalendarMonth, EventColor } from "@/lib/planning/types";
+import type { Event, EventWithDetails, CalendarDay, CalendarWeek, CalendarMonth, TargetRole } from "@/lib/planning/types";
+import { getEventColor, ROLE_COLORS } from "@/lib/planning/types";
 import { isSameDay, startOfMonth, endOfMonth, getMonthDays, isToday, isWeekend } from "./dateUtils";
 
 // ============================================================================
@@ -180,95 +181,67 @@ export function eventsOverlap(event1: Event, event2: Event): boolean {
 }
 
 // ============================================================================
-// Génération de couleurs
+// Génération de couleurs basées sur les rôles
 // ============================================================================
+
+/**
+ * Mapping des couleurs de rôle vers les classes Tailwind
+ */
+const ROLE_COLOR_CLASSES = {
+    [ROLE_COLORS.animator]: {
+        bg: "bg-blue-500",
+        text: "text-blue-700 dark:text-blue-300",
+        bgLight: "bg-blue-50 dark:bg-blue-950",
+        border: "border-blue-200 dark:border-blue-800",
+    },
+    [ROLE_COLORS.coordinator]: {
+        bg: "bg-green-500",
+        text: "text-green-700 dark:text-green-300",
+        bgLight: "bg-green-50 dark:bg-green-950",
+        border: "border-green-200 dark:border-green-800",
+    },
+    [ROLE_COLORS.director]: {
+        bg: "bg-orange-500",
+        text: "text-orange-700 dark:text-orange-300",
+        bgLight: "bg-orange-50 dark:bg-orange-950",
+        border: "border-orange-200 dark:border-orange-800",
+    },
+} as const;
+
+/**
+ * Obtient les classes de couleur pour un événement basées sur ses rôles cibles
+ */
+function getEventColorClasses(event: Event) {
+    const color = getEventColor(event.target_roles);
+    return ROLE_COLOR_CLASSES[color] || ROLE_COLOR_CLASSES[ROLE_COLORS.animator];
+}
 
 /**
  * Obtient la classe Tailwind pour une couleur d'événement
  */
-export function getEventColorClass(color: string | null): string {
-    if (!color) return "bg-blue-500";
-
-    const colorMap: Record<string, string> = {
-        blue: "bg-blue-500",
-        green: "bg-green-500",
-        yellow: "bg-yellow-500",
-        red: "bg-red-500",
-        purple: "bg-purple-500",
-        pink: "bg-pink-500",
-        orange: "bg-orange-500",
-        teal: "bg-teal-500",
-        indigo: "bg-indigo-500",
-        gray: "bg-gray-500",
-    };
-
-    return colorMap[color] || "bg-blue-500";
+export function getEventColorClass(event: Event): string {
+    return getEventColorClasses(event).bg;
 }
 
 /**
  * Obtient la classe Tailwind pour le texte d'une couleur
  */
-export function getEventColorTextClass(color: string | null): string {
-    if (!color) return "text-blue-700";
-
-    const colorMap: Record<string, string> = {
-        blue: "text-blue-700",
-        green: "text-green-700",
-        yellow: "text-yellow-700",
-        red: "text-red-700",
-        purple: "text-purple-700",
-        pink: "text-pink-700",
-        orange: "text-orange-700",
-        teal: "text-teal-700",
-        indigo: "text-indigo-700",
-        gray: "text-gray-700",
-    };
-
-    return colorMap[color] || "text-blue-700";
+export function getEventColorTextClass(event: Event): string {
+    return getEventColorClasses(event).text;
 }
 
 /**
  * Obtient la classe Tailwind pour le fond léger d'une couleur
  */
-export function getEventColorBgLightClass(color: string | null): string {
-    if (!color) return "bg-blue-50";
-
-    const colorMap: Record<string, string> = {
-        blue: "bg-blue-50",
-        green: "bg-green-50",
-        yellow: "bg-yellow-50",
-        red: "bg-red-50",
-        purple: "bg-purple-50",
-        pink: "bg-pink-50",
-        orange: "bg-orange-50",
-        teal: "bg-teal-50",
-        indigo: "bg-indigo-50",
-        gray: "bg-gray-50",
-    };
-
-    return colorMap[color] || "bg-blue-50";
+export function getEventColorBgLightClass(event: Event): string {
+    return getEventColorClasses(event).bgLight;
 }
 
 /**
  * Obtient la classe Tailwind pour la bordure d'une couleur
  */
-export function getEventColorBorderClass(color: string | null): string {
-    if (!color) return "border-blue-200";
-
-    const colorMap: Record<string, string> = {
-        blue: "border-blue-200",
-        green: "border-green-200",
-        yellow: "border-yellow-200",
-        red: "border-red-200",
-        purple: "border-purple-200",
-        pink: "border-pink-200",
-        orange: "border-orange-200",
-        teal: "border-teal-200",
-        indigo: "border-indigo-200",
-        gray: "border-gray-200",
-    };
-
-    return colorMap[color] || "border-blue-200";
+export function getEventColorBorderClass(event: Event): string {
+    return getEventColorClasses(event).border;
 }
 
 // ============================================================================
@@ -290,22 +263,6 @@ export function searchEvents(events: Event[], query: string): Event[] {
     });
 }
 
-/**
- * Suggère une couleur basée sur le titre de l'événement
- */
-export function suggestEventColor(title: string): EventColor {
-    const lowerTitle = title.toLowerCase();
-
-    if (lowerTitle.includes("réunion") || lowerTitle.includes("meeting")) return "blue";
-    if (lowerTitle.includes("cours") || lowerTitle.includes("formation")) return "green";
-    if (lowerTitle.includes("urgent") || lowerTitle.includes("important")) return "red";
-    if (lowerTitle.includes("anniversaire") || lowerTitle.includes("fête")) return "pink";
-    if (lowerTitle.includes("pause") || lowerTitle.includes("repos")) return "gray";
-    if (lowerTitle.includes("atelier")) return "purple";
-    if (lowerTitle.includes("sport") || lowerTitle.includes("activité")) return "orange";
-
-    return "blue"; // Couleur par défaut
-}
 
 // ============================================================================
 // Statistiques
@@ -317,16 +274,6 @@ export function suggestEventColor(title: string): EventColor {
 export function countEventsByStatus(events: Event[]): Record<string, number> {
     return events.reduce((acc, event) => {
         acc[event.status] = (acc[event.status] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-}
-
-/**
- * Compte le nombre d'événements par type de propriétaire
- */
-export function countEventsByOwnerType(events: Event[]): Record<string, number> {
-    return events.reduce((acc, event) => {
-        acc[event.owner_type] = (acc[event.owner_type] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
 }

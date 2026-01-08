@@ -89,3 +89,8 @@ export interface ClasWithTeam extends Clas {
 export interface ClasTeamMemberWithProfile extends ClasTeamMember {
     profile?: Profile;
 }
+
+export interface ClasWithTeamAndProfiles extends Clas {
+    team_members: ClasTeamMemberWithProfile[];
+    raw_contacts: ClasRawContact[];
+}

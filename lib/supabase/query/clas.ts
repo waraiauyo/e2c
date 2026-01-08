@@ -6,6 +6,7 @@ import type {
     ClasTeamMember,
     ClasRawContact,
     ClasWithTeam,
+    ClasWithTeamAndProfiles,
     ClasTeamMemberWithProfile,
     ClasInsert,
     ClasUpdate,
@@ -96,12 +97,12 @@ export async function getClasById(clasId: string): Promise<GetClasResult> {
 }
 
 export interface GetClasWithTeamResult {
-    clas: ClasWithTeam | null;
+    clas: ClasWithTeamAndProfiles | null;
     error: string | null;
 }
 
 /**
- * Get a CLAS with its team members and raw contacts
+ * Get a CLAS with its team members (including profiles) and raw contacts
  */
 export async function getClasWithTeam(
     clasId: string
@@ -123,10 +124,13 @@ export async function getClasWithTeam(
             };
         }
 
-        // Get team members
+        // Get team members with their profiles
         const { data: teamMembers, error: teamError } = await supabase
             .from("clas_team_members")
-            .select("*")
+            .select(`
+                *,
+                profile:profiles(*)
+            `)
             .eq("clas_id", clasId);
 
         if (teamError) {
@@ -149,10 +153,16 @@ export async function getClasWithTeam(
             };
         }
 
+        // Map team members to include profile data
+        const teamMembersWithProfiles: ClasTeamMemberWithProfile[] = (teamMembers || []).map((tm: any) => ({
+            ...tm,
+            profile: tm.profile || undefined,
+        }));
+
         return {
             clas: {
                 ...clas,
-                team_members: teamMembers || [],
+                team_members: teamMembersWithProfiles,
                 raw_contacts: rawContacts || [],
             },
             error: null,

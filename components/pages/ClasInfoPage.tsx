@@ -128,7 +128,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                 <div className="text-center space-y-2">
                     <h2 className="text-xl font-semibold">CLAS non trouvé</h2>
                     <p className="text-muted-foreground">
-                        {error || "Ce CLAS n'existe pas ou a été supprimé."}
+                        Ce CLAS n'existe pas ou a été supprimé.
                     </p>
                 </div>
                 <Button variant="outline" onClick={() => router.back()}>
@@ -142,8 +142,8 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
     const allophoneNum = parseInt(clas.allophone_count || "0") || 0;
 
     return (
-        <div className="flex flex-col p-6 space-y-6 max-w-4xl mx-auto">
-            <div className="flex items-center gap-4">
+        <div className="flex flex-col items-center p-6 space-y-6">
+            <div className="flex items-center gap-4 w-full max-w-4xl">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -153,7 +153,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                 </Button>
                 <h1 className="text-2xl font-bold">Informations du CLAS</h1>
             </div>
-            <Card>
+            <Card className="w-full max-w-4xl">
                 <CardHeader>
                     <div className="flex items-start gap-4">
                         {clas.logo_url ? (
@@ -169,14 +169,14 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                                 <Building2 className="h-8 w-8 text-muted-foreground" />
                             </div>
                         )}
-                        <div className="flex-1 space-y-2">
-                            <CardTitle className="text-xl">
+                        <div className="flex-1 min-w-0 space-y-2">
+                            <CardTitle className="text-xl break-words">
                                 {clas.name}
                             </CardTitle>
                             {clas.location && (
-                                <CardDescription className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 shrink-0" />
-                                    {clas.location}
+                                <CardDescription className="flex items-start gap-2">
+                                    <MapPin className="h-4 w-4 shrink-0 mt-0.5" />
+                                    <span className="break-words">{clas.location}</span>
                                 </CardDescription>
                             )}
                         </div>
@@ -235,7 +235,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                                     href={clas.website_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
+                                    className="text-sm text-primary underline underline-offset-4 hover:text-primary/80 break-all"
                                 >
                                     {clas.website_url}
                                 </a>
@@ -244,7 +244,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     )}
                 </CardContent>
             </Card>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
@@ -284,7 +284,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     </CardHeader>
                     <CardContent>
                         {clas.schedule ? (
-                            <p className="text-sm bg-muted p-3 rounded-md whitespace-pre-line">
+                            <p className="text-sm bg-muted p-3 rounded-md whitespace-pre-line break-words">
                                 {clas.schedule}
                             </p>
                         ) : (
@@ -295,7 +295,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     </CardContent>
                 </Card>
             </div>
-            <Card>
+            <Card className="w-full max-w-4xl">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                         <UserCheck className="h-5 w-5" />
@@ -347,7 +347,6 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                             />
                         </>
                     )}
-
                     {clas.team_members.length === 0 && (
                         <p className="text-sm text-muted-foreground text-center py-4">
                             Aucun membre dans l&apos;équipe
@@ -356,7 +355,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                 </CardContent>
             </Card>
             {clas.raw_contacts.length > 0 && (
-                <Card>
+                <Card className="w-full max-w-4xl">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                             <Phone className="h-5 w-5" />
@@ -381,22 +380,24 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                                                 {contact.name}
                                             </p>
                                         )}
-                                        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                                        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground min-w-0 w-full">
                                             {contact.email && (
                                                 <a
                                                     href={`mailto:${contact.email}`}
-                                                    className="flex items-center gap-1 hover:text-primary"
+                                                    className="flex items-center gap-1 hover:text-primary min-w-0"
                                                 >
-                                                    <Mail className="h-3 w-3" />
-                                                    {contact.email}
+                                                    <Mail className="h-3 w-3 shrink-0" />
+                                                    <span className="truncate">
+                                                        {contact.email}
+                                                    </span>
                                                 </a>
                                             )}
                                             {contact.phone && (
                                                 <a
                                                     href={`tel:${contact.phone}`}
-                                                    className="flex items-center gap-1 hover:text-primary"
+                                                    className="flex items-center gap-1 hover:text-primary shrink-0"
                                                 >
-                                                    <Phone className="h-3 w-3" />
+                                                    <Phone className="h-3 w-3 shrink-0" />
                                                     {contact.phone}
                                                 </a>
                                             )}
@@ -464,7 +465,7 @@ function TeamSection({
                                     {email && (
                                         <a
                                             href={`mailto:${email}`}
-                                            className="flex items-center gap-1 hover:text-primary truncate w-fit"
+                                            className="flex items-center gap-1 hover:text-primary min-w-0 max-w-full"
                                         >
                                             <Mail className="h-3 w-3 shrink-0" />
                                             <span className="truncate">
@@ -475,7 +476,7 @@ function TeamSection({
                                     {phone && (
                                         <a
                                             href={`tel:${phone}`}
-                                            className="flex items-center gap-1 hover:text-primary w-fit"
+                                            className="flex items-center gap-1 hover:text-primary"
                                         >
                                             <Phone className="h-3 w-3 shrink-0" />
                                             {phone}
@@ -483,7 +484,7 @@ function TeamSection({
                                     )}
                                 </div>
                                 {member.notes && (
-                                    <p className="text-xs text-muted-foreground italic">
+                                    <p className="text-xs text-muted-foreground italic break-words">
                                         {member.notes}
                                     </p>
                                 )}

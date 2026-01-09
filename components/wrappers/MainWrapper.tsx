@@ -38,7 +38,7 @@ export default function MainWrapper({
 
     return (
         <div className={`flex h-dvh flex-col ${className}`.trim()}>
-            <main className="flex flex-1 flex-col gap-2 overflow-auto">
+            <main className="flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden">
                 {children}
             </main>
             {!isAuthPage && <BottomNavigation />}

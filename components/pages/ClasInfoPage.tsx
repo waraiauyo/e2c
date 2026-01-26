@@ -111,7 +111,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
     };
 
     const coordinators = getMembersByRole("coordinator");
-    const directors = getMembersByRole("director");
+    const directors = getMembersByRole("directeur");
     const animators = getMembersByRole("animator");
 
     if (loading) {
@@ -126,12 +126,18 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
         return (
             <div className="flex flex-col items-center justify-center h-full p-6 space-y-4 bg-white">
                 <div className="text-center space-y-2">
-                    <h2 className="text-xl font-semibold text-[#005E84]">CLAS non trouvé</h2>
+                    <h2 className="text-xl font-semibold text-[#005E84]">
+                        CLAS non trouvé
+                    </h2>
                     <p className="text-muted-foreground">
                         Ce CLAS n'existe pas ou a été supprimé.
                     </p>
                 </div>
-                <Button variant="outline" onClick={() => router.back()} className="border-[#005E84] text-[#005E84] hover:bg-[#F4F4F4]">
+                <Button
+                    variant="outline"
+                    onClick={() => router.back()}
+                    className="border-[#005E84] text-[#005E84] hover:bg-[#F4F4F4]"
+                >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Retour
                 </Button>
@@ -152,7 +158,9 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
-                <h1 className="text-2xl font-bold text-[#1E3231]">Informations du CLAS</h1>
+                <h1 className="text-2xl font-bold text-[#1E3231]">
+                    Informations du CLAS
+                </h1>
             </div>
             <Card className="w-full max-w-4xl border-[#E2E8F0] shadow-sm bg-white">
                 <CardHeader>
@@ -177,7 +185,9 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                             {clas.location && (
                                 <CardDescription className="flex items-start gap-2 text-[#1E3231]/80">
                                     <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-[#DEAA00]" />
-                                    <span className="break-words">{clas.location}</span>
+                                    <span className="break-words">
+                                        {clas.location}
+                                    </span>
                                 </CardDescription>
                             )}
                         </div>
@@ -321,7 +331,9 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     )}
                     {directors.length > 0 && (
                         <>
-                            {coordinators.length > 0 && <Separator className="bg-[#F4F4F4]" />}
+                            {coordinators.length > 0 && (
+                                <Separator className="bg-[#F4F4F4]" />
+                            )}
                             <TeamSection
                                 title="Direction"
                                 members={directors}
@@ -336,7 +348,9 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     {animators.length > 0 && (
                         <>
                             {(coordinators.length > 0 ||
-                                directors.length > 0) && <Separator className="bg-[#F4F4F4]" />}
+                                directors.length > 0) && (
+                                <Separator className="bg-[#F4F4F4]" />
+                            )}
                             <TeamSection
                                 title="Animation"
                                 members={animators}
@@ -435,9 +449,7 @@ function TeamSection({
 }: TeamSectionProps) {
     return (
         <div className="space-y-3">
-            <h4 className="font-medium text-sm text-[#005E84]">
-                {title}
-            </h4>
+            <h4 className="font-medium text-sm text-[#005E84]">{title}</h4>
             <div className="grid gap-3 sm:grid-cols-2">
                 {members.map((member) => {
                     const name = getMemberName(member);

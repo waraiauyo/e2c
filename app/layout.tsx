@@ -1,3 +1,4 @@
+
 import "./globals.css";
 
 import type { Metadata } from "next";
@@ -23,8 +24,8 @@ export default function RootLayout({
                 <StoreProvider>
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="system"
-                        enableSystem
+                        defaultTheme="light" 
+                        enableSystem={false}
                     >
                         <MainWrapper>{children}</MainWrapper>
                         <Toaster />

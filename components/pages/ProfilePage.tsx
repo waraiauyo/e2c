@@ -50,6 +50,7 @@ import {
     LogOut,
     Phone,
     Lock,
+    UserCircle,
 } from "lucide-react";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 
@@ -334,423 +335,407 @@ export default function ProfilePage() {
     };
 
     return userLoading || !profile ? (
-        <div className="flex items-center justify-center w-full h-full">
-            <LoadingSpinner size="lg" />
+        <div className="flex items-center justify-center w-full h-full bg-white">
+            <LoadingSpinner size="lg" className="text-[#005E84]" />
         </div>
     ) : (
-        <div className="flex flex-col items-center p-6 space-y-6">
+        <div className="flex flex-col items-center p-6 space-y-6 bg-white min-h-full">
             {emailMessage && (
-                        <div
-                            className={`w-full max-w-4xl rounded-lg border p-4 ${
-                                emailMessage.type === "success"
-                                    ? "bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200"
-                                    : "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200"
-                            }`}
-                        >
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="flex items-start gap-3">
-                                    <Mail className="h-5 w-5 mt-1 shrink-0" />
-                                    <p className="text-sm font-medium">
-                                        {emailMessage.text}
-                                    </p>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                    onClick={() => setEmailMessage(null)}
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </div>
+                <div
+                    className={`w-full max-w-4xl rounded-lg border p-4 ${
+                        emailMessage.type === "success"
+                            ? "bg-green-50 border-green-200 text-green-800"
+                            : "bg-blue-50 border-blue-200 text-blue-800"
+                    }`}
+                >
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                            <Mail className="h-5 w-5 mt-1 shrink-0" />
+                            <p className="text-sm font-medium">
+                                {emailMessage.text}
+                            </p>
                         </div>
-                    )}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            onClick={() => setEmailMessage(null)}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
 
-                    <Card className="w-full max-w-4xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Camera className="h-5 w-5" />
-                                Photo de profil
-                            </CardTitle>
-                            <CardDescription>
-                                Modifiez votre photo de profil (5 Mo maximum)
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center gap-6">
-                                <Avatar className="h-24 w-24">
-                                    <AvatarImage
-                                        src={profile.avatar_url || undefined}
-                                        alt="Avatar"
-                                    />
-                                    <AvatarFallback className="text-2xl">
-                                        {getInitials()}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 space-y-2">
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleAvatarChange}
-                                        accept="image/*"
-                                        className="hidden"
-                                        disabled={uploadingAvatar}
-                                    />
-                                    <Button
-                                        onClick={() =>
-                                            fileInputRef.current?.click()
-                                        }
-                                        disabled={uploadingAvatar}
-                                        variant="outline"
-                                    >
-                                        {uploadingAvatar ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Téléchargement...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Camera className="mr-2 h-4 w-4" />
-                                                Modifier l&apos;avatar
-                                            </>
-                                        )}
-                                    </Button>
-                                    <p className="text-sm text-muted-foreground">
-                                        Formats acceptés : JPG, PNG, GIF, WEBP
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="w-full max-w-4xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <User className="h-5 w-5" />
-                                Informations du profil
-                            </CardTitle>
-                            <CardDescription>
-                                Vos informations personnelles
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <Label>Nom complet</Label>
-                                <div className="mt-2 text-sm">
-                                    {profile.first_name && profile.last_name
-                                        ? `${profile.first_name} ${profile.last_name}`
-                                        : profile.first_name ||
-                                          profile.last_name ||
-                                          "Non renseigné"}
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div>
-                                <Label>Type de compte</Label>
-                                <div className="mt-2">
-                                    <Badge
-                                        variant="secondary"
-                                        className="text-sm"
-                                    >
-                                        {getAccountTypeLabel(
-                                            profile.account_type
-                                        )}
-                                    </Badge>
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div>
-                                <Label>CLAS associés</Label>
-                                <div className="mt-2 space-y-2">
-                                    {loadingClas ? (
-                                        <div className="flex items-center gap-2">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span className="text-sm text-muted-foreground">
-                                                Chargement...
-                                            </span>
-                                        </div>
-                                    ) : userClas.length > 0 ? (
-                                        userClas.map((clas) => (
-                                            <div
-                                                key={clas.id}
-                                                className="flex items-center gap-2"
-                                            >
-                                                <Building2 className="h-4 w-4 text-muted-foreground" />
-                                                <span className="text-sm">
-                                                    {clas.name}
-                                                </span>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="text-xs"
-                                                >
-                                                    {clas.role === "coordinator"
-                                                        ? "Coordinateur"
-                                                        : clas.role === "director"
-                                                          ? "Directeur"
-                                                          : "Animateur"}
-                                                </Badge>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground">
-                                            Aucun CLAS associé
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="w-full max-w-4xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Phone className="h-5 w-5" />
-                                Numéro de téléphone
-                            </CardTitle>
-                            <CardDescription>
-                                Modifiez votre numéro de téléphone
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label>Téléphone actuel</Label>
-                                    <div className="mt-2 text-sm text-muted-foreground">
-                                        {profile.phone || "Non renseigné"}
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <Form {...phoneForm}>
-                                    <form
-                                        onSubmit={phoneForm.handleSubmit(
-                                            onPhoneSubmit
-                                        )}
-                                        className="space-y-4"
-                                    >
-                                        <FormField
-                                            control={phoneForm.control}
-                                            name="phone"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Nouveau numéro
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="tel"
-                                                            placeholder="06 12 34 56 78"
-                                                            disabled={
-                                                                updatingPhone
-                                                            }
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button
-                                            type="submit"
-                                            disabled={updatingPhone}
-                                            className="w-full"
-                                        >
-                                            {updatingPhone ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Modification...
-                                                </>
-                                            ) : (
-                                                "Modifier le téléphone"
-                                            )}
-                                        </Button>
-                                    </form>
-                                </Form>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="w-full max-w-4xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Mail className="h-5 w-5" />
-                                Modifier l&apos;email
-                            </CardTitle>
-                            <CardDescription>
-                                Un email de confirmation sera envoyé à votre
-                                nouvelle adresse
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label>Email actuel</Label>
-                                    <div className="mt-2 text-sm text-muted-foreground">
-                                        {user?.email}
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <Form {...emailForm}>
-                                    <form
-                                        onSubmit={emailForm.handleSubmit(
-                                            onEmailSubmit
-                                        )}
-                                        className="space-y-4"
-                                    >
-                                        <FormField
-                                            control={emailForm.control}
-                                            name="email"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Nouvel email
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="email"
-                                                            placeholder="nouveau@email.com"
-                                                            disabled={
-                                                                updatingEmail
-                                                            }
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button
-                                            type="submit"
-                                            disabled={updatingEmail}
-                                            className="w-full"
-                                        >
-                                            {updatingEmail ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Modification...
-                                                </>
-                                            ) : (
-                                                "Modifier l'email"
-                                            )}
-                                        </Button>
-                                    </form>
-                                </Form>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="w-full max-w-4xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Lock className="h-5 w-5" />
-                                Modifier le mot de passe
-                            </CardTitle>
-                            <CardDescription>
-                                Changez votre mot de passe de connexion
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Form {...passwordForm}>
-                                <form
-                                    onSubmit={passwordForm.handleSubmit(
-                                        onPasswordSubmit
-                                    )}
-                                    className="space-y-4"
-                                >
-                                    <FormField
-                                        control={passwordForm.control}
-                                        name="password"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Nouveau mot de passe
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="password"
-                                                        placeholder="••••••••"
-                                                        disabled={updatingPassword}
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={passwordForm.control}
-                                        name="confirmPassword"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Confirmer le mot de passe
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="password"
-                                                        placeholder="••••••••"
-                                                        disabled={updatingPassword}
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Button
-                                        type="submit"
-                                        disabled={updatingPassword}
-                                        className="w-full"
-                                    >
-                                        {updatingPassword ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Modification...
-                                            </>
-                                        ) : (
-                                            "Modifier le mot de passe"
-                                        )}
-                                    </Button>
-                                </form>
-                            </Form>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="w-full max-w-4xl">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <LogOut className="h-5 w-5" />
-                                Déconnexion
-                            </CardTitle>
-                            <CardDescription>
-                                Déconnectez-vous de votre compte
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
+            {/* Photo de profil */}
+            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-[#005E84]">
+                        <Camera className="h-5 w-5 text-[#DEAA00]" />
+                        Photo de profil
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Modifiez votre photo de profil (5 Mo maximum)
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center gap-6">
+                        <Avatar className="h-24 w-24 border-2 border-[#F4F4F4] shadow-sm">
+                            <AvatarImage
+                                src={profile.avatar_url || undefined}
+                                alt="Avatar"
+                            />
+                            <AvatarFallback className="text-2xl bg-[#005E84] text-white font-bold">
+                                {getInitials()}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 space-y-3">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleAvatarChange}
+                                accept="image/*"
+                                className="hidden"
+                                disabled={uploadingAvatar}
+                            />
                             <Button
-                                onClick={handleLogout}
-                                disabled={loggingOut}
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploadingAvatar}
                                 variant="outline"
-                                className="w-full"
+                                className="border-[#E2E8F0] text-[#005E84] hover:bg-[#F4F4F4] hover:text-[#005E84]"
                             >
-                                {loggingOut ? (
-                                    <LoadingSpinner />
+                                {uploadingAvatar ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Téléchargement...
+                                    </>
                                 ) : (
                                     <>
-                                        <LogOut className="mr-2 h-4 w-4" />
-                                        Se déconnecter
+                                        <Camera className="mr-2 h-4 w-4" />
+                                        Modifier l&apos;avatar
                                     </>
                                 )}
                             </Button>
-                        </CardContent>
-                    </Card>
-                </div>
+                            <p className="text-xs text-muted-foreground">
+                                Formats acceptés : JPG, PNG, GIF, WEBP
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Informations du profil */}
+            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-[#005E84]">
+                        <UserCircle className="h-5 w-5 text-[#DEAA00]" />
+                        Informations personnelles
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Vos informations de compte
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid gap-1">
+                        <Label className="text-[#1E3231]">Nom complet</Label>
+                        <div className="text-sm font-medium text-[#1E3231]">
+                            {profile.first_name && profile.last_name
+                                ? `${profile.first_name} ${profile.last_name}`
+                                : profile.first_name || profile.last_name || "Non renseigné"}
+                        </div>
+                    </div>
+
+                    <Separator className="bg-[#F4F4F4]" />
+
+                    <div className="grid gap-2">
+                        <Label className="text-[#1E3231]">Type de compte</Label>
+                        <div>
+                            <Badge
+                                className="bg-[#E9B44C] hover:bg-[#d8a035] text-[#1E3231] border-none font-semibold"
+                            >
+                                {getAccountTypeLabel(profile.account_type)}
+                            </Badge>
+                        </div>
+                    </div>
+
+                    <Separator className="bg-[#F4F4F4]" />
+
+                    <div className="grid gap-3">
+                        <Label className="text-[#1E3231]">CLAS associés</Label>
+                        <div className="space-y-2">
+                            {loadingClas ? (
+                                <div className="flex items-center gap-2">
+                                    <Loader2 className="h-4 w-4 animate-spin text-[#005E84]" />
+                                    <span className="text-sm text-muted-foreground">
+                                        Chargement...
+                                    </span>
+                                </div>
+                            ) : userClas.length > 0 ? (
+                                userClas.map((clas) => (
+                                    <div
+                                        key={clas.id}
+                                        className="flex items-center justify-between p-3 rounded-lg border border-[#F4F4F4] bg-[#FDFDFD]"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Building2 className="h-4 w-4 text-[#005E84]" />
+                                            <span className="text-sm font-medium text-[#1E3231]">
+                                                {clas.name}
+                                            </span>
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-xs border-[#DEAA00] text-[#DEAA00] bg-white"
+                                        >
+                                            {clas.role === "coordinator"
+                                                ? "Coordinateur"
+                                                : clas.role === "director"
+                                                  ? "Directeur"
+                                                  : "Animateur"}
+                                        </Badge>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-muted-foreground italic">
+                                    Aucun CLAS associé
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Téléphone */}
+            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-[#005E84]">
+                        <Phone className="h-5 w-5 text-[#DEAA00]" />
+                        Numéro de téléphone
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Modifiez votre numéro de téléphone
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-6">
+                        <div className="grid gap-1">
+                            <Label className="text-[#1E3231]">Téléphone actuel</Label>
+                            <div className="text-sm font-medium text-[#1E3231]">
+                                {profile.phone || "Non renseigné"}
+                            </div>
+                        </div>
+
+                        <Separator className="bg-[#F4F4F4]" />
+
+                        <Form {...phoneForm}>
+                            <form
+                                onSubmit={phoneForm.handleSubmit(onPhoneSubmit)}
+                                className="space-y-4"
+                            >
+                                <FormField
+                                    control={phoneForm.control}
+                                    name="phone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[#1E3231]">Nouveau numéro</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="tel"
+                                                    placeholder="06 12 34 56 78"
+                                                    disabled={updatingPhone}
+                                                    className="bg-white border-[#E2E8F0] focus-visible:ring-[#DEAA00]"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button
+                                    type="submit"
+                                    disabled={updatingPhone}
+                                    className="w-full bg-[#005E84] hover:bg-[#004d6e] text-white"
+                                >
+                                    {updatingPhone ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Modification...
+                                        </>
+                                    ) : (
+                                        "Modifier le téléphone"
+                                    )}
+                                </Button>
+                            </form>
+                        </Form>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Email */}
+            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-[#005E84]">
+                        <Mail className="h-5 w-5 text-[#DEAA00]" />
+                        Modifier l&apos;email
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Un email de confirmation sera envoyé à votre nouvelle adresse
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-6">
+                        <div className="grid gap-1">
+                            <Label className="text-[#1E3231]">Email actuel</Label>
+                            <div className="text-sm font-medium text-[#1E3231]">
+                                {user?.email}
+                            </div>
+                        </div>
+
+                        <Separator className="bg-[#F4F4F4]" />
+
+                        <Form {...emailForm}>
+                            <form
+                                onSubmit={emailForm.handleSubmit(onEmailSubmit)}
+                                className="space-y-4"
+                            >
+                                <FormField
+                                    control={emailForm.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[#1E3231]">Nouvel email</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="email"
+                                                    placeholder="nouveau@email.com"
+                                                    disabled={updatingEmail}
+                                                    className="bg-white border-[#E2E8F0] focus-visible:ring-[#DEAA00]"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button
+                                    type="submit"
+                                    disabled={updatingEmail}
+                                    className="w-full bg-[#005E84] hover:bg-[#004d6e] text-white"
+                                >
+                                    {updatingEmail ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Modification...
+                                        </>
+                                    ) : (
+                                        "Modifier l'email"
+                                    )}
+                                </Button>
+                            </form>
+                        </Form>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Mot de passe */}
+            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-[#005E84]">
+                        <Lock className="h-5 w-5 text-[#DEAA00]" />
+                        Modifier le mot de passe
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Changez votre mot de passe de connexion
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...passwordForm}>
+                        <form
+                            onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+                            className="space-y-4"
+                        >
+                            <FormField
+                                control={passwordForm.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[#1E3231]">Nouveau mot de passe</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                disabled={updatingPassword}
+                                                className="bg-white border-[#E2E8F0] focus-visible:ring-[#DEAA00]"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={passwordForm.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[#1E3231]">Confirmer le mot de passe</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="••••••••"
+                                                disabled={updatingPassword}
+                                                className="bg-white border-[#E2E8F0] focus-visible:ring-[#DEAA00]"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button
+                                type="submit"
+                                disabled={updatingPassword}
+                                className="w-full bg-[#005E84] hover:bg-[#004d6e] text-white"
+                            >
+                                {updatingPassword ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Modification...
+                                    </>
+                                ) : (
+                                    "Modifier le mot de passe"
+                                )}
+                            </Button>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
+
+            {/* Déconnexion */}
+            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-[#ef4444]">
+                        <LogOut className="h-5 w-5" />
+                        Zone de danger
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Button
+                        onClick={handleLogout}
+                        disabled={loggingOut}
+                        variant="outline"
+                        className="w-full border-[#E2E8F0] text-[#ef4444] hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                    >
+                        {loggingOut ? (
+                            <LoadingSpinner className="text-red-600" />
+                        ) : (
+                            <>
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Se déconnecter
+                            </>
+                        )}
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
     );
 }

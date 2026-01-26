@@ -15,7 +15,7 @@ import { useEvents } from "@/lib/planning/hooks/useEvents";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { Button } from "@/components/shadcn/button";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
 import {
     addWeeks,
     addDays,
@@ -35,81 +35,54 @@ export default function PlanningPage() {
     const [initialDate, setInitialDate] = useState<Date | undefined>();
     const [selectedRoles, setSelectedRoles] = useState<TargetRole[]>([]);
 
-    // Charger la vue depuis localStorage
     useEffect(() => {
         const savedView = localStorage.getItem("planning-view");
-        if (
-            savedView &&
-            ["day", "week", "month", "agenda"].includes(savedView)
-        ) {
+        if (savedView && ["day", "week", "month", "agenda"].includes(savedView)) {
             setCurrentView(savedView as ViewType);
         }
     }, []);
 
-    // Sauvegarder la vue dans localStorage
     useEffect(() => {
         localStorage.setItem("planning-view", currentView);
     }, [currentView]);
 
-    // Charger les rôles filtrés depuis localStorage
     useEffect(() => {
         const savedRoles = localStorage.getItem("planning-filter-roles");
         if (savedRoles) {
             try {
                 const roles = JSON.parse(savedRoles) as TargetRole[];
                 setSelectedRoles(roles);
-            } catch (e) {
-                // Ignorer les erreurs de parsing
-            }
+            } catch (e) {}
         }
     }, []);
 
-    // Sauvegarder les rôles filtrés dans localStorage
     useEffect(() => {
-        localStorage.setItem(
-            "planning-filter-roles",
-            JSON.stringify(selectedRoles)
-        );
+        localStorage.setItem("planning-filter-roles", JSON.stringify(selectedRoles));
     }, [selectedRoles]);
 
-    // Récupérer les événements
     const { events, isLoading, error, refetch } = useEvents();
 
-    // Filtrer les événements selon les rôles sélectionnés
     const filteredEvents = useMemo(() => {
-        // Si aucun rôle sélectionné, afficher tous les événements
         if (selectedRoles.length === 0) return events;
-
-        // Filtrer les événements dont target_roles contient au moins un des rôles sélectionnés
         return events.filter((event) =>
             event.target_roles.some((role) => selectedRoles.includes(role))
         );
     }, [events, selectedRoles]);
 
-    // Navigation adaptée à la vue
     const goToPrevious = () => {
-        if (currentView === "day") {
-            setCurrentDate(addDays(currentDate, -1));
-        } else if (currentView === "month") {
-            setCurrentDate(addMonths(currentDate, -1));
-        } else {
-            setCurrentDate(addWeeks(currentDate, -1));
-        }
+        if (currentView === "day") setCurrentDate(addDays(currentDate, -1));
+        else if (currentView === "month") setCurrentDate(addMonths(currentDate, -1));
+        else setCurrentDate(addWeeks(currentDate, -1));
     };
 
     const goToNext = () => {
-        if (currentView === "day") {
-            setCurrentDate(addDays(currentDate, 1));
-        } else if (currentView === "month") {
-            setCurrentDate(addMonths(currentDate, 1));
-        } else {
-            setCurrentDate(addWeeks(currentDate, 1));
-        }
+        if (currentView === "day") setCurrentDate(addDays(currentDate, 1));
+        else if (currentView === "month") setCurrentDate(addMonths(currentDate, 1));
+        else setCurrentDate(addWeeks(currentDate, 1));
     };
 
     const goToToday = () => setCurrentDate(new Date());
 
-    // Handlers
     const handleEventClick = (event: Event) => {
         setSelectedEvent(event);
         setDialogMode("edit");
@@ -145,12 +118,12 @@ export default function PlanningPage() {
 
     if (error) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                    <p className="text-destructive font-semibold mb-2">
-                        Erreur lors du chargement des événements
+            <div className="flex items-center justify-center h-full bg-white">
+                <div className="text-center p-6 bg-red-50 rounded-xl">
+                    <p className="text-[#005E84] font-bold mb-2">
+                        Oups, une erreur est survenue
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600">
                         {error.message}
                     </p>
                 </div>
@@ -159,37 +132,38 @@ export default function PlanningPage() {
     }
 
     return (
-        <div className="flex h-full flex-col">
-            {/* Topbar */}
-            <header className="border-b bg-background px-6 py-4">
-                <div className="flex items-center justify-between">
-                    {/* Navigation date */}
+        <div className="flex h-full flex-col bg-white">
+            {/* Topbar stylisée */}
+            <header className="border-b border-[#F4F4F4] px-6 py-4 bg-white sticky top-0 z-20">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        {/* Navigation date (visible uniquement pour week/day/month) */}
                         {currentView !== "agenda" && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={goToToday}
+                                    className="border-[#005E84] text-[#005E84] hover:bg-[#005E84] hover:text-white font-medium"
                                 >
                                     Aujourd'hui
                                 </Button>
 
-                                <div className="flex items-center border rounded-md">
+                                <div className="flex items-center bg-[#F4F4F4] rounded-lg p-0.5">
                                     <Button
                                         variant="ghost"
-                                        size="sm"
+                                        size="icon"
+                                        className="h-8 w-8 hover:bg-white hover:text-[#DEAA00] rounded-md"
                                         onClick={goToPrevious}
                                     >
                                         <ChevronLeft className="h-4 w-4" />
                                     </Button>
-                                    <div className="px-4 py-1 text-sm font-medium min-w-[200px] text-center">
+                                    <div className="px-4 py-1 text-sm font-bold text-[#1E3231] min-w-[180px] text-center capitalize">
                                         {formatDateLong(currentDate)}
                                     </div>
                                     <Button
                                         variant="ghost"
-                                        size="sm"
+                                        size="icon"
+                                        className="h-8 w-8 hover:bg-white hover:text-[#DEAA00] rounded-md"
                                         onClick={goToNext}
                                     >
                                         <ChevronRight className="h-4 w-4" />
@@ -199,34 +173,35 @@ export default function PlanningPage() {
                         )}
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <ViewToggle
                             currentView={currentView}
                             onViewChange={setCurrentView}
                         />
-                        <Button onClick={handleCreateEvent}>
+                        <Button 
+                            onClick={handleCreateEvent}
+                            className="bg-[#005E84] hover:bg-[#004d6e] text-white shadow-md hover:shadow-lg transition-all"
+                        >
                             <Plus className="h-4 w-4 mr-2" />
-                            Nouvel événement
+                            <span className="font-semibold">Nouveau</span>
                         </Button>
                     </div>
                 </div>
             </header>
 
-            {/* Main content */}
             <div className="flex flex-1 overflow-hidden">
-                {/* Sidebar avec filtres */}
-                <aside className="w-80 border-r bg-muted/10">
+                <aside className="w-72 border-r border-[#F4F4F4] bg-white hidden lg:block p-4">
                     <FilterSidebar
                         selectedRoles={selectedRoles}
                         onRolesChange={setSelectedRoles}
                     />
                 </aside>
 
-                {/* Calendar area */}
-                <main className="flex-1 overflow-hidden">
+                <main className="flex-1 overflow-hidden bg-white relative">
                     {isLoading || userLoading ? (
-                        <LoadingSpinner size="lg" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
+                            <LoadingSpinner size="lg" className="text-[#005E84]" />
+                        </div>
                     ) : (
                         <>
                             {currentView === "day" && (
@@ -266,7 +241,6 @@ export default function PlanningPage() {
                 </main>
             </div>
 
-            {/* Event Dialog */}
             <EventDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}

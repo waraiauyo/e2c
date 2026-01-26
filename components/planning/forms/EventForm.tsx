@@ -75,9 +75,6 @@ export function EventForm({
     const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const [participantSearch, setParticipantSearch] = useState("");
-    const [roleFilter, setRoleFilter] = useState<
-        "all" | "admin" | "coordinator" | "director" | "animator"
-    >("all");
 
     const isAdmin = profile?.account_type === "admin";
     const isCoordinator =
@@ -186,6 +183,43 @@ export function EventForm({
             form.setValue("target_roles", ["animator"]);
         }
     }, [isCoordinator, form]);
+
+    // Mapper les target_roles vers les account_types correspondants
+    const getMatchingAccountTypes = (roles: TargetRole[]): string[] => {
+        const accountTypes: string[] = [];
+        if (roles.includes("animator")) accountTypes.push("animator");
+        if (roles.includes("coordinator")) accountTypes.push("coordinator");
+        if (roles.includes("director")) accountTypes.push("director");
+        // Les admins sont toujours inclus car ils ont accès à tout
+        accountTypes.push("admin");
+        return accountTypes;
+    };
+
+    // Filtrer les utilisateurs selon les target_roles sélectionnés
+    const filteredUsers = allUsers.filter((user) => {
+        if (user.id === userId) return false; // Exclure l'utilisateur actuel
+        if (!targetRoles || targetRoles.length === 0) return true;
+        const matchingAccountTypes = getMatchingAccountTypes(targetRoles);
+        return user.account_type && matchingAccountTypes.includes(user.account_type);
+    });
+
+    // Auto-sélectionner les participants quand les target_roles changent
+    useEffect(() => {
+        if (!allUsers.length || mode === "edit") return; // Ne pas auto-sélectionner en mode édition
+
+        if (targetRoles && targetRoles.length > 0) {
+            const matchingAccountTypes = getMatchingAccountTypes(targetRoles);
+            const matchingUserIds = allUsers
+                .filter((user) =>
+                    user.id !== userId &&
+                    user.account_type &&
+                    matchingAccountTypes.includes(user.account_type)
+                )
+                .map((user) => user.id);
+
+            form.setValue("participant_ids", matchingUserIds);
+        }
+    }, [targetRoles, allUsers, userId, form, mode]);
 
     const handleRoleToggle = (role: TargetRole, checked: boolean) => {
         const current = form.getValues("target_roles") || [];
@@ -590,49 +624,14 @@ export function EventForm({
                                                 }
                                             />
 
-                                            {/* Filtres par rôle */}
-                                            <div className="flex flex-wrap gap-1 px-3 py-2 border-b">
-                                                {[
-                                                    {
-                                                        value: "all",
-                                                        label: "Tous",
-                                                    },
-                                                    {
-                                                        value: "coordinator",
-                                                        label: "Coord.",
-                                                    },
-                                                    {
-                                                        value: "director",
-                                                        label: "Dir.",
-                                                    },
-                                                    {
-                                                        value: "animator",
-                                                        label: "Anim.",
-                                                    },
-                                                    {
-                                                        value: "admin",
-                                                        label: "Admin",
-                                                    },
-                                                ].map((role) => (
-                                                    <button
-                                                        key={role.value}
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setRoleFilter(
-                                                                role.value as typeof roleFilter
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            "px-2 py-1 text-xs rounded-md transition-colors",
-                                                            roleFilter ===
-                                                                role.value
-                                                                ? "bg-primary text-primary-foreground"
-                                                                : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {role.label}
-                                                    </button>
-                                                ))}
+                                            {/* Info sur le filtrage automatique */}
+                                            <div className="px-3 py-2 border-b bg-muted/30">
+                                                <p className="text-xs text-muted-foreground">
+                                                    Filtrés selon les destinataires :{" "}
+                                                    <span className="font-medium text-foreground">
+                                                        {targetRoles?.map((r) => ROLE_LABELS[r]).join(", ") || "Aucun"}
+                                                    </span>
+                                                </p>
                                             </div>
 
                                             {/* Badges des participants sélectionnés */}
@@ -716,45 +715,16 @@ export function EventForm({
                                                     <div className="py-4">
                                                         <Users className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
                                                         <p className="text-sm text-muted-foreground">
-                                                            {participantSearch.trim() ||
-                                                            roleFilter !== "all"
+                                                            {participantSearch.trim()
                                                                 ? "Aucun utilisateur trouvé"
-                                                                : "Aucun utilisateur disponible"}
+                                                                : "Aucun utilisateur disponible pour ces rôles"}
                                                         </p>
-                                                        {roleFilter !==
-                                                            "all" && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    setRoleFilter(
-                                                                        "all"
-                                                                    )
-                                                                }
-                                                                className="text-xs text-primary hover:underline mt-2"
-                                                            >
-                                                                Réinitialiser le
-                                                                filtre
-                                                            </button>
-                                                        )}
                                                     </div>
                                                 </CommandEmpty>
                                                 <CommandGroup>
-                                                    {allUsers
-                                                        .filter(
-                                                            (u) =>
-                                                                u.id !== userId
-                                                        )
+                                                    {filteredUsers
                                                         .filter((user) => {
-                                                            // Filtre par rôle
-                                                            if (
-                                                                roleFilter !==
-                                                                    "all" &&
-                                                                user.account_type !==
-                                                                    roleFilter
-                                                            ) {
-                                                                return false;
-                                                            }
-                                                            // Filtre par recherche
+                                                            // Filtre par recherche uniquement
                                                             if (
                                                                 !participantSearch.trim()
                                                             )

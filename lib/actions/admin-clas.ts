@@ -40,10 +40,16 @@ export async function createClasAction(data: z.infer<typeof clasSchema>) {
 
   // 3. Préparation des données pour Supabase
   const insertData: ClasInsert = {
-    ...rest,
+    name: rest.name,
+    grade_level: rest.grade_level,
     location,
     latitude,
     longitude,
+    // Convertir undefined en null pour les champs optionnels
+    capacity: rest.capacity ?? null,
+    current_project: rest.current_project ?? null,
+    public_description: rest.public_description ?? null,
+    schedule: rest.schedule ?? null,
     // Champs par défaut
     allophone_count: null,
     volunteer_count: 0,
@@ -85,11 +91,16 @@ export async function updateClasAction(id: string, data: z.infer<typeof clasSche
 
   const updateData: ClasUpdate = {
     id,
-    ...rest,
+    name: rest.name,
+    grade_level: rest.grade_level,
     location,
+    // Convertir undefined en null pour les champs optionnels
+    capacity: rest.capacity ?? null,
+    current_project: rest.current_project ?? null,
+    public_description: rest.public_description ?? null,
+    schedule: rest.schedule ?? null,
     // On ne met à jour les coordonnées que si on les a trouvées
-    ...(latitude && longitude ? { latitude, longitude } : {}),
-    updated_at: new Date().toISOString()
+    ...(latitude && longitude ? { latitude, longitude } : {})
   };
 
   const result = await updateClas(updateData);

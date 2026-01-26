@@ -23,7 +23,7 @@ const navItems = [
         icon: Calendar,
     },
     {
-        href: "/resources",
+        href: "/drive",
         label: "Ressources",
         icon: FolderOpen,
     },

@@ -11,8 +11,7 @@ const clasSchema = z.object({
   name: z.string().min(2, "Le nom est requis"),
   location: z.string().min(5, "L'adresse est requise"),
   grade_level: z.enum(["primary", "middle_school"]),
-  capacity: z.coerce.string().optional(), // On garde en string comme dans votre DB, ou number si changé
-  current_project: z.string().optional(),
+  capacity: z.coerce.string().optional(),
   public_description: z.string().optional(),
   schedule: z.string().optional(),
 });
@@ -47,7 +46,6 @@ export async function createClasAction(data: z.infer<typeof clasSchema>) {
     longitude,
     // Convertir undefined en null pour les champs optionnels
     capacity: rest.capacity ?? null,
-    current_project: rest.current_project ?? null,
     public_description: rest.public_description ?? null,
     schedule: rest.schedule ?? null,
     // Champs par défaut
@@ -96,7 +94,6 @@ export async function updateClasAction(id: string, data: z.infer<typeof clasSche
     location,
     // Convertir undefined en null pour les champs optionnels
     capacity: rest.capacity ?? null,
-    current_project: rest.current_project ?? null,
     public_description: rest.public_description ?? null,
     schedule: rest.schedule ?? null,
     // On ne met à jour les coordonnées que si on les a trouvées

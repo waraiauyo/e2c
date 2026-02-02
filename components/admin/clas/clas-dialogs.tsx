@@ -42,7 +42,6 @@ const formSchema = z.object({
   location: z.string().min(5, "Adresse requise"),
   grade_level: z.enum(["primary", "middle_school"]),
   capacity: z.string().optional(),
-  current_project: z.string().optional(),
   public_description: z.string().optional(),
   schedule: z.string().optional(),
 });
@@ -67,7 +66,6 @@ export function ClasDialog({ mode, clas, open, onOpenChange }: ClasDialogProps) 
       location: clas?.location || "",
       grade_level: clas?.grade_level || "primary",
       capacity: clas?.capacity || "",
-      current_project: clas?.current_project || "",
       public_description: clas?.public_description || "",
       schedule: clas?.schedule || "",
     },
@@ -81,7 +79,6 @@ export function ClasDialog({ mode, clas, open, onOpenChange }: ClasDialogProps) 
         location: clas.location || "",
         grade_level: clas.grade_level,
         capacity: clas.capacity || "",
-        current_project: clas.current_project || "",
         public_description: clas.public_description || "",
         schedule: clas.schedule || "",
       });
@@ -203,18 +200,6 @@ export function ClasDialog({ mode, clas, open, onOpenChange }: ClasDialogProps) 
                   <p className="text-[0.8rem] text-muted-foreground">
                     Sert au calcul automatique de la position sur la carte.
                   </p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="current_project"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Projet en cours (Optionnel)</FormLabel>
-                  <FormControl><Input placeholder="ex: Fresque murale" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}

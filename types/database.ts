@@ -7,6 +7,7 @@
 export type AccountType = "admin" | "coordinator" | "director" | "animator";
 export type TeamRole = "coordinator" | "director" | "animator";
 export type GradeLevel = "primary" | "middle_school";
+export type ProjectStatus = "ongoing" | "finished";
 
 export interface Profile {
     id: string;
@@ -32,10 +33,20 @@ export interface Clas {
     capacity: string | null;
     allophone_count: string | null;
     schedule: string | null;
-    current_project: string | null;
     volunteer_count: number | null;
     website_url: string | null;
     logo_url: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ClasProject {
+    id: string;
+    clas_id: string;
+    name: string;
+    description: string | null;
+    year: string;
+    status: ProjectStatus;
     created_at: string;
     updated_at: string;
 }
@@ -72,6 +83,10 @@ export type ClasRawContactInsert = Omit<
     ClasRawContact,
     "id" | "created_at" | "updated_at"
 >;
+export type ClasProjectInsert = Omit<
+    ClasProject,
+    "id" | "created_at" | "updated_at"
+>;
 
 export type ClasUpdate = Partial<ClasInsert> & { id: string };
 export type ClasTeamMemberUpdate = Partial<ClasTeamMemberInsert> & {
@@ -80,6 +95,7 @@ export type ClasTeamMemberUpdate = Partial<ClasTeamMemberInsert> & {
 export type ClasRawContactUpdate = Partial<ClasRawContactInsert> & {
     id: string;
 };
+export type ClasProjectUpdate = Partial<ClasProjectInsert> & { id: string };
 
 export interface ClasWithTeam extends Clas {
     team_members: ClasTeamMember[];

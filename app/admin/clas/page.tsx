@@ -56,7 +56,7 @@ export default async function AdminClasPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="w-[300px]">Centre & Projet</TableHead>
+              <TableHead className="w-[300px]">Centre</TableHead>
               <TableHead>Niveau</TableHead>
               <TableHead>Localisation</TableHead>
               <TableHead className="text-center">Capacité</TableHead>
@@ -79,13 +79,6 @@ export default async function AdminClasPage() {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-semibold text-base">{clas.name}</span>
-                      {clas.current_project ? (
-                        <span className="text-sm text-muted-foreground truncate max-w-[250px] italic">
-                          "{clas.current_project}"
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/50">Aucun projet défini</span>
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>

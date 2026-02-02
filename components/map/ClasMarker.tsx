@@ -25,7 +25,6 @@ interface ClasInfos {
     location: string;
     description: string | null;
     gradeLevel: GradeLevel;
-    currentProject: string | null;
     websiteUrl: string | null;
     allophoneCount: string;
     capacity: string;
@@ -72,17 +71,6 @@ export const ClasMarker = ({ position, infos }: ClasMarkerProps) => {
                         <p className="text-xs text-muted-foreground leading-relaxed">
                             {infos.description}
                         </p>
-                    )}
-
-                    {infos.currentProject && (
-                        <div className="space-y-1">
-                            <span className="text-xs text-muted-foreground">
-                                Projet de l&apos;année
-                            </span>
-                            <p className="text-xs font-medium">
-                                {infos.currentProject}
-                            </p>
-                        </div>
                     )}
 
                     {infos.websiteUrl && (

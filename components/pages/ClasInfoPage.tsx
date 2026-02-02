@@ -33,7 +33,6 @@ import {
     UserCheck,
     Globe,
     GraduationCap,
-    Target,
     Mail,
     Phone,
     ExternalLink,
@@ -216,20 +215,6 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                                 </h3>
                                 <p className="text-sm leading-relaxed text-[#1E3231]">
                                     {clas.public_description}
-                                </p>
-                            </div>
-                        </>
-                    )}
-                    {clas.current_project && (
-                        <>
-                            <Separator className="bg-[#F4F4F4]" />
-                            <div className="space-y-2">
-                                <h3 className="font-medium text-sm text-[#005E84] flex items-center gap-2">
-                                    <Target className="h-4 w-4 text-[#DEAA00]" />
-                                    Projet de l&apos;année
-                                </h3>
-                                <p className="text-sm text-[#1E3231]">
-                                    {clas.current_project}
                                 </p>
                             </div>
                         </>

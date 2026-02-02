@@ -37,7 +37,6 @@ export const selectClasForMap = createSelector([selectFilteredClas], (items) =>
           location: c.location || "Non renseigné",
           description: c.public_description || null,
           gradeLevel: c.grade_level,
-          currentProject: c.current_project || null,
           websiteUrl: c.website_url || null,
           capacity: c.capacity || "Non renseignée",
           allophoneCount: c.allophone_count || "0",

@@ -18,7 +18,6 @@ function baseTemplate(content: string): string {
         <tr>
             <td align="center">
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <!-- Header -->
                     <tr>
                         <td style="background-color: #3b82f6; padding: 30px; text-align: center;">
                             <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">
@@ -27,14 +26,12 @@ function baseTemplate(content: string): string {
                         </td>
                     </tr>
 
-                    <!-- Content -->
                     <tr>
                         <td style="padding: 40px 30px;">
                             ${content}
                         </td>
                     </tr>
 
-                    <!-- Footer -->
                     <tr>
                         <td style="background-color: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0; color: #6b7280; font-size: 12px;">
@@ -221,6 +218,48 @@ export function eventDeletedTemplate(
         <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
             Cet événement a été retiré de votre calendrier.
         </p>
+    `;
+
+    return baseTemplate(content);
+}
+
+/**
+ * Template : Nouveau compte créé avec identifiants
+ */
+export function accountCreatedTemplate(
+    firstName: string,
+    email: string,
+    password: string
+): string {
+    const content = `
+        <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+            Bonjour ${firstName},
+        </p>
+
+        <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+            Votre compte a été créé sur la plateforme <strong>E2C CLAS Mayenne</strong>.
+        </p>
+
+        <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+            Voici vos identifiants de connexion. Nous vous conseillons de changer votre mot de passe lors de votre première connexion.
+        </p>
+
+        <div style="background-color: #f3f4f6; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 4px;">
+            <div style="margin-bottom: 12px;">
+                <strong style="color: #374151;">✉️ Email :</strong>
+                <span style="color: #6b7280; font-family: monospace; font-size: 1.1em;">${email}</span>
+            </div>
+            <div>
+                <strong style="color: #374151;">🔑 Mot de passe :</strong>
+                <span style="color: #6b7280; font-family: monospace; font-size: 1.1em;">${password}</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="https://votre-url-de-production.com/login" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                Accéder à la plateforme
+            </a>
+        </div>
     `;
 
     return baseTemplate(content);

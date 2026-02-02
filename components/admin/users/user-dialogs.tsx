@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, Wand2, RefreshCw } from "lucide-react"; // Ajout de Wand2
+import { Loader2, Plus, Pencil, Wand2, RefreshCw, Info } from "lucide-react"; // Ajout de Info
 
 import { Button } from "@/components/shadcn/button";
 import {
@@ -38,28 +38,24 @@ import { Profile } from "@/types/database";
 
 // --- UTILITAIRE DE GÉNÉRATION DE MDP ---
 const generateSecurePassword = () => {
-  const length = 16; // On vise 16 caractères pour être large au-dessus des 12 requis
+  const length = 16;
   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=";
   
-  // On force au moins un de chaque type pour satisfaire le validateur Zod
   const uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lowers = "abcdefghijklmnopqrstuvwxyz";
   const numbers = "0123456789";
   const specials = "!@#$%^&*()_+-=";
 
   let password = "";
-  // 1. On insère les obligatoires
   password += uppers.charAt(Math.floor(Math.random() * uppers.length));
   password += lowers.charAt(Math.floor(Math.random() * lowers.length));
   password += numbers.charAt(Math.floor(Math.random() * numbers.length));
   password += specials.charAt(Math.floor(Math.random() * specials.length));
 
-  // 2. On complète avec de l'aléatoire
   for (let i = 4; i < length; i++) {
     password += charset.charAt(Math.floor(Math.random() * charset.length));
   }
 
-  // 3. On mélange le tout pour ne pas avoir toujours Maj+Min+Chiffre+Special au début
   return password.split('').sort(() => 0.5 - Math.random()).join('');
 };
 
@@ -95,12 +91,11 @@ export function UserDialog({ mode, user, open, onOpenChange }: UserDialogProps) 
     },
   });
 
-  // Fonction pour générer et insérer le mot de passe
   const handleGeneratePassword = (e: React.MouseEvent) => {
-    e.preventDefault(); // Empêche le submit du formulaire
+    e.preventDefault();
     const newPassword = generateSecurePassword();
     form.setValue("password", newPassword, { 
-      shouldValidate: true, // Lance la validation Zod immédiatement
+      shouldValidate: true,
       shouldDirty: true 
     });
     toast.info("Mot de passe généré et inséré");
@@ -118,7 +113,6 @@ export function UserDialog({ mode, user, open, onOpenChange }: UserDialogProps) 
     }
   }, [user, mode, form]);
 
-  // Reset aussi quand on ferme/ouvre le dialogue en mode création
   useEffect(() => {
     if (!showDialog && mode === "create") {
        form.reset({
@@ -263,7 +257,7 @@ export function UserDialog({ mode, user, open, onOpenChange }: UserDialogProps) 
                     <div className="flex gap-2">
                         <FormControl>
                             <Input 
-                                type="text" // On met 'text' temporairement pour voir le mot de passe généré
+                                type="text"
                                 placeholder="Mot de passe..." 
                                 {...field} 
                             />
@@ -282,6 +276,16 @@ export function UserDialog({ mode, user, open, onOpenChange }: UserDialogProps) 
                     <p className="text-[0.8rem] text-muted-foreground">
                         Min. 12 car., Maj, Min, Chiffre, Spécial.
                     </p>
+
+                    {/* --- AJOUT : Annotation informative --- */}
+                    <div className="mt-3 flex items-start gap-2 rounded-md bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
+                        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                        <p>
+                            Un email contenant les identifiants de connexion (mot de passe inclus) sera automatiquement envoyé à l&apos;utilisateur lors de la création.
+                        </p>
+                    </div>
+                    {/* -------------------------------------- */}
+
                     <FormMessage />
                   </FormItem>
                 )}

@@ -5,6 +5,7 @@ import {
     eventCreatedTemplate,
     eventUpdatedTemplate,
     eventDeletedTemplate,
+    accountCreatedTemplate, // Ajout
 } from "./templates";
 import { getEventParticipants } from "@/lib/supabase/query/events";
 import { getUserProfile } from "@/lib/supabase/query/profiles";
@@ -20,6 +21,40 @@ interface EventEmailData {
     end_time: string;
     all_day: boolean;
     target_roles: TargetRole[];
+}
+
+/**
+ * Envoie un email de bienvenue avec les identifiants (NOUVEAU)
+ */
+export async function sendAccountCreatedNotification(
+    email: string,
+    firstName: string,
+    password: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        if (!isResendEnabled()) {
+            return { success: true };
+        }
+
+        const html = accountCreatedTemplate(firstName, email, password);
+
+        const result = await resend!.emails.send({
+            from: FROM_EMAIL,
+            to: email,
+            subject: "Bienvenue sur l'espace E2C - Vos identifiants",
+            html,
+        });
+
+        if (result.error) {
+            console.error("❌ Erreur envoi mail création compte:", result.error);
+            return { success: false, error: result.error.message };
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error("Erreur sendAccountCreatedNotification:", error);
+        return { success: false, error: "Erreur inconnue" };
+    }
 }
 
 /**

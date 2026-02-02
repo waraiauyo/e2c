@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { AccountType } from "@/types/database";
+import { sendAccountCreatedNotification } from "@/lib/resend/actions"; // AJOUT
 
 // Schéma de validation
 const userSchema = z.object({
@@ -46,7 +47,6 @@ export async function createUserAction(data: z.infer<typeof createUserSchema>) {
     if (!authData.user) throw new Error("Erreur inconnue lors de la création");
 
     // 2. Mise à jour forcée du profil public (rôle et infos)
-    // On attend un peu que le trigger SQL (s'il existe) crée le profil, sinon on update
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
       .update({
@@ -62,8 +62,21 @@ export async function createUserAction(data: z.infer<typeof createUserSchema>) {
       throw new Error("Erreur profil : " + profileError.message);
     }
 
+    // --- MODE DEBUG : Test d'envoi d'email ---
+    const emailResult = await sendAccountCreatedNotification(email, firstName, password);
+    
+    if (!emailResult.success) {
+        // En mode DEBUG, si l'email échoue, on supprime l'utilisateur pour pouvoir réessayer
+        // et on renvoie l'erreur exacte à l'interface
+        console.error("DEBUG - Erreur envoi mail:", emailResult.error);
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+        
+        throw new Error("ERREUR MAIL : " + emailResult.error);
+    }
+    // -----------------------------------------
+
     revalidatePath("/admin/users");
-    return { success: true, message: "Utilisateur créé avec succès" };
+    return { success: true, message: "Utilisateur créé et email envoyé avec succès" };
 
   } catch (error) {
     return { 
@@ -78,7 +91,6 @@ export async function updateUserAction(userId: string, data: z.infer<typeof user
     
     try {
         // 1. Mise à jour Auth (email si changé)
-        // Note: changer l'email demande souvent une reverification, ici on update juste les métadonnées
         const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
             email: data.email,
             user_metadata: { first_name: data.firstName, last_name: data.lastName }

@@ -225,3 +225,45 @@ export function eventDeletedTemplate(
 
     return baseTemplate(content);
 }
+
+/**
+ * Template : Nouveau compte créé avec identifiants
+ */
+export function accountCreatedTemplate(
+    firstName: string,
+    email: string,
+    password: string
+): string {
+    const content = `
+        <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+            Bonjour ${firstName},
+        </p>
+
+        <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+            Votre compte a été créé sur la plateforme <strong>E2C CLAS Mayenne</strong>.
+        </p>
+
+        <p style="margin: 0 0 20px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+            Voici vos identifiants de connexion. Nous vous conseillons de changer votre mot de passe lors de votre première connexion.
+        </p>
+
+        <div style="background-color: #f3f4f6; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 4px;">
+            <div style="margin-bottom: 12px;">
+                <strong style="color: #374151;">✉️ Email :</strong>
+                <span style="color: #6b7280; font-family: monospace; font-size: 1.1em;">${email}</span>
+            </div>
+            <div>
+                <strong style="color: #374151;">🔑 Mot de passe :</strong>
+                <span style="color: #6b7280; font-family: monospace; font-size: 1.1em;">${password}</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="https://votre-url-de-production.com/login" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                Accéder à la plateforme
+            </a>
+        </div>
+    `;
+
+    return baseTemplate(content);
+}

@@ -1,122 +1,131 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClas, updateClas, deleteClas } from "@/lib/supabase/query/clas";
-import { ClasInsert, ClasUpdate, GradeLevel } from "@/types/database";
-import { getCoordinatesFromAddress } from "@/lib/geocoding";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidatePath } from "next/cache";
+import { AccountType } from "@/types/database";
+import { sendAccountCreatedNotification } from "@/lib/resend/actions"; // AJOUT
 
 // Schéma de validation
-const clasSchema = z.object({
-  name: z.string().min(2, "Le nom est requis"),
-  location: z.string().min(5, "L'adresse est requise"),
-  grade_level: z.enum(["primary", "middle_school"]),
-  capacity: z.coerce.string().optional(), // On garde en string comme dans votre DB, ou number si changé
-  current_project: z.string().optional(),
-  public_description: z.string().optional(),
-  schedule: z.string().optional(),
+const userSchema = z.object({
+  email: z.string().email("Email invalide"),
+  firstName: z.string().min(2, "Prénom trop court"),
+  lastName: z.string().min(2, "Nom trop court"),
+  role: z.enum(["admin", "coordinator", "director", "animator"]),
 });
 
-export async function createClasAction(data: z.infer<typeof clasSchema>) {
-  // 1. Validation
-  const validation = clasSchema.safeParse(data);
+const createUserSchema = userSchema.extend({
+  password: z.string()
+    .min(12, "12 caractères minimum")
+    .regex(/[A-Z]/, "Une majuscule requise")
+    .regex(/[a-z]/, "Une minuscule requise")
+    .regex(/[0-9]/, "Un chiffre requis")
+    .regex(/[\W_]/, "Un caractère spécial requis"),
+});
+
+export async function createUserAction(data: z.infer<typeof createUserSchema>) {
+  const supabaseAdmin = createAdminClient();
+  
+  // Validation Zod
+  const validation = createUserSchema.safeParse(data);
   if (!validation.success) {
     return { success: false, error: validation.error.issues[0].message };
   }
 
-  const { location, ...rest } = validation.data;
+  const { email, password, firstName, lastName, role } = validation.data;
 
-  // 2. Géocoding automatique
-  let latitude = null;
-  let longitude = null;
-  
-  if (location) {
-    const coords = await getCoordinatesFromAddress(location);
-    if (coords) {
-      latitude = coords.latitude;
-      longitude = coords.longitude;
+  try {
+    // 1. Création du compte d'authentification
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Auto-confirmation de l'email
+      user_metadata: { first_name: firstName, last_name: lastName }
+    });
+
+    if (authError) throw new Error(authError.message);
+    if (!authData.user) throw new Error("Erreur inconnue lors de la création");
+
+    // 2. Mise à jour forcée du profil public (rôle et infos)
+    // On attend un peu que le trigger SQL (s'il existe) crée le profil, sinon on update
+    const { error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .update({
+        first_name: firstName,
+        last_name: lastName,
+        account_type: role as AccountType,
+      })
+      .eq("id", authData.user.id);
+
+    if (profileError) {
+      // Nettoyage en cas d'échec partiel
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      throw new Error("Erreur profil : " + profileError.message);
     }
+
+    // --- AJOUT : Envoi de l'email avec les identifiants ---
+    const emailResult = await sendAccountCreatedNotification(email, firstName, password);
+    
+    if (!emailResult.success) {
+        console.warn("L'utilisateur est créé mais l'email n'est pas parti : " + emailResult.error);
+        // On pourrait retourner un warning ici, mais on considère l'action réussie car le compte existe
+    }
+    // ------------------------------------------------------
+
+    revalidatePath("/admin/users");
+    return { success: true, message: "Utilisateur créé et email envoyé avec succès" };
+
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Une erreur est survenue" 
+    };
   }
-
-  // 3. Préparation des données pour Supabase
-  const insertData: ClasInsert = {
-    name: rest.name,
-    grade_level: rest.grade_level,
-    location,
-    latitude,
-    longitude,
-    // Convertir undefined en null pour les champs optionnels
-    capacity: rest.capacity ?? null,
-    current_project: rest.current_project ?? null,
-    public_description: rest.public_description ?? null,
-    schedule: rest.schedule ?? null,
-    // Champs par défaut
-    allophone_count: null,
-    volunteer_count: 0,
-    website_url: null,
-    logo_url: null
-  };
-
-  // 4. Enregistrement
-  const result = await createClas(insertData);
-  
-  if (result.error) {
-    return { success: false, error: result.error };
-  }
-
-  revalidatePath("/admin/clas");
-  return { success: true, message: "CLAS créé avec succès" };
 }
 
-export async function updateClasAction(id: string, data: z.infer<typeof clasSchema>) {
-  const validation = clasSchema.safeParse(data);
-  if (!validation.success) {
-    return { success: false, error: validation.error.issues[0].message };
-  }
+export async function updateUserAction(userId: string, data: z.infer<typeof userSchema>) {
+    const supabaseAdmin = createAdminClient();
+    
+    try {
+        // 1. Mise à jour Auth (email si changé)
+        // Note: changer l'email demande souvent une reverification, ici on update juste les métadonnées
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+            email: data.email,
+            user_metadata: { first_name: data.firstName, last_name: data.lastName }
+        });
+        
+        if (authError) throw authError;
 
-  const { location, ...rest } = validation.data;
+        // 2. Mise à jour Profil Public
+        const { error: profileError } = await supabaseAdmin
+            .from("profiles")
+            .update({
+                first_name: data.firstName,
+                last_name: data.lastName,
+                email: data.email, // Important de garder synchro
+                account_type: data.role as AccountType
+            })
+            .eq("id", userId);
 
-  // Géocoding (seulement si l'adresse a changé, mais ici on le refait par simplicité
-  // Idéalement, on pourrait comparer avec l'ancienne valeur si on l'avait sous la main)
-  let latitude = null;
-  let longitude = null;
-  
-  if (location) {
-    const coords = await getCoordinatesFromAddress(location);
-    if (coords) {
-      latitude = coords.latitude;
-      longitude = coords.longitude;
+        if (profileError) throw profileError;
+
+        revalidatePath("/admin/users");
+        return { success: true, message: "Utilisateur mis à jour" };
+
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : "Erreur mise à jour" };
     }
-  }
-
-  const updateData: ClasUpdate = {
-    id,
-    name: rest.name,
-    grade_level: rest.grade_level,
-    location,
-    // Convertir undefined en null pour les champs optionnels
-    capacity: rest.capacity ?? null,
-    current_project: rest.current_project ?? null,
-    public_description: rest.public_description ?? null,
-    schedule: rest.schedule ?? null,
-    // On ne met à jour les coordonnées que si on les a trouvées
-    ...(latitude && longitude ? { latitude, longitude } : {})
-  };
-
-  const result = await updateClas(updateData);
-
-  if (result.error) {
-    return { success: false, error: result.error };
-  }
-
-  revalidatePath("/admin/clas");
-  return { success: true, message: "CLAS mis à jour" };
 }
 
-export async function deleteClasAction(clasId: string) {
-  const result = await deleteClas(clasId);
-  if (result.success) {
-    revalidatePath("/admin/clas");
+export async function deleteUserAction(userId: string) {
+  const supabaseAdmin = createAdminClient();
+  try {
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (error) throw error;
+    
+    revalidatePath("/admin/users");
+    return { success: true, message: "Utilisateur supprimé" };
+  } catch (error) {
+    return { success: false, error: "Impossible de supprimer l'utilisateur" };
   }
-  return result;
-}   
+}

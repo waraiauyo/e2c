@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, Wand2, RefreshCw } from "lucide-react"; // Ajout de Wand2
+import { Loader2, Plus, Pencil, Wand2, RefreshCw, Info } from "lucide-react"; // AJOUT de Info
 
 import { Button } from "@/components/shadcn/button";
 import {
@@ -282,6 +282,16 @@ export function UserDialog({ mode, user, open, onOpenChange }: UserDialogProps) 
                     <p className="text-[0.8rem] text-muted-foreground">
                         Min. 12 car., Maj, Min, Chiffre, Spécial.
                     </p>
+
+                    {/* --- AJOUT : Annotation informative --- */}
+                    <div className="mt-3 flex items-start gap-2 rounded-md bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
+                        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                        <p>
+                            Un email contenant les identifiants de connexion (mot de passe inclus) sera automatiquement envoyé à l&apos;utilisateur lors de la création.
+                        </p>
+                    </div>
+                    {/* -------------------------------------- */}
+
                     <FormMessage />
                   </FormItem>
                 )}

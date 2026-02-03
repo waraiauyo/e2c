@@ -1026,7 +1026,7 @@ export default function DrivePage() {
                                                 selectedCount > 0 ||
                                                 itemSelected
                                                     ? "opacity-100"
-                                                    : "opacity-0 group-hover:opacity-100"
+                                                    : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                                             }`}
                                             onClick={(e) => e.stopPropagation()}
                                         >
@@ -1043,7 +1043,7 @@ export default function DrivePage() {
                                             className={`absolute top-2 right-2 transition-opacity ${
                                                 selectedCount > 0
                                                     ? "opacity-0"
-                                                    : "opacity-0 group-hover:opacity-100"
+                                                    : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                                             }`}
                                             onClick={(e) => e.stopPropagation()}
                                         >

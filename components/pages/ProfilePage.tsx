@@ -711,31 +711,23 @@ export default function ProfilePage() {
             </Card>
 
             {/* Déconnexion */}
-            <Card className="w-full max-w-4xl border border-[#E2E8F0] shadow-sm bg-white">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-[#ef4444]">
-                        <LogOut className="h-5 w-5" />
-                        Zone de danger
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Button
-                        onClick={handleLogout}
-                        disabled={loggingOut}
-                        variant="outline"
-                        className="w-full border-[#E2E8F0] text-[#ef4444] hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-                    >
-                        {loggingOut ? (
-                            <LoadingSpinner className="text-red-600" />
-                        ) : (
-                            <>
-                                <LogOut className="mr-2 h-4 w-4" />
-                                Se déconnecter
-                            </>
-                        )}
-                    </Button>
-                </CardContent>
-            </Card>
+            <div className="w-full max-w-4xl">
+                <Button
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    variant="outline"
+                    className="w-full border-[#E2E8F0] text-[#005E84] hover:bg-[#F4F4F4] hover:text-[#005E84]"
+                >
+                    {loggingOut ? (
+                        <LoadingSpinner className="text-[#005E84]" />
+                    ) : (
+                        <>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Se déconnecter
+                        </>
+                    )}
+                </Button>
+            </div>
         </div>
     );
 }

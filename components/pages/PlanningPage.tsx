@@ -15,7 +15,14 @@ import { useEvents } from "@/lib/planning/hooks/useEvents";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { Button } from "@/components/shadcn/button";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+} from "@/components/shadcn/sheet";
+import { ChevronLeft, ChevronRight, Plus, Filter } from "lucide-react";
 import {
     addWeeks,
     addDays,
@@ -34,6 +41,7 @@ export default function PlanningPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | undefined>();
     const [initialDate, setInitialDate] = useState<Date | undefined>();
     const [selectedRoles, setSelectedRoles] = useState<TargetRole[]>([]);
+    const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
     useEffect(() => {
         const savedView = localStorage.getItem("planning-view");
@@ -134,56 +142,72 @@ export default function PlanningPage() {
     return (
         <div className="flex h-full flex-col bg-white">
             {/* Topbar stylisée */}
-            <header className="border-b border-[#F4F4F4] px-6 py-4 bg-white sticky top-0 z-20">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
+            <header className="border-b border-[#F4F4F4] px-2 sm:px-6 py-2 sm:py-4 bg-white sticky top-0 z-20">
+                <div className="flex items-center justify-between gap-2">
+                    {/* Navigation date */}
+                    <div className="flex items-center gap-1 sm:gap-3 min-w-0 flex-1">
+                        {/* Bouton filtre mobile */}
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="lg:hidden h-8 w-8 shrink-0"
+                            onClick={() => setFilterSheetOpen(true)}
+                        >
+                            <Filter className="h-4 w-4" />
+                        </Button>
+
                         {currentView !== "agenda" && (
-                            <div className="flex items-center gap-3">
+                            <>
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={goToToday}
-                                    className="border-[#005E84] text-[#005E84] hover:bg-[#005E84] hover:text-white font-medium"
+                                    className="border-[#005E84] text-[#005E84] hover:bg-[#005E84] hover:text-white font-medium hidden md:flex shrink-0"
                                 >
-                                    Aujourd'hui
+                                    Aujourd&apos;hui
                                 </Button>
 
-                                <div className="flex items-center bg-[#F4F4F4] rounded-lg p-0.5">
+                                <div className="flex items-center bg-[#F4F4F4] rounded-lg p-0.5 min-w-0">
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 hover:bg-white hover:text-[#DEAA00] rounded-md"
+                                        className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-white hover:text-[#DEAA00] rounded-md shrink-0"
                                         onClick={goToPrevious}
                                     >
                                         <ChevronLeft className="h-4 w-4" />
                                     </Button>
-                                    <div className="px-4 py-1 text-sm font-bold text-[#1E3231] min-w-[180px] text-center capitalize">
+                                    <button
+                                        onClick={goToToday}
+                                        className="px-1 sm:px-3 py-1 text-xs sm:text-sm font-bold text-[#1E3231] text-center capitalize truncate min-w-0"
+                                    >
                                         {formatDateLong(currentDate)}
-                                    </div>
+                                    </button>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 hover:bg-white hover:text-[#DEAA00] rounded-md"
+                                        className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-white hover:text-[#DEAA00] rounded-md shrink-0"
                                         onClick={goToNext}
                                     >
                                         <ChevronRight className="h-4 w-4" />
                                     </Button>
                                 </div>
-                            </div>
+                            </>
                         )}
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                         <ViewToggle
                             currentView={currentView}
                             onViewChange={setCurrentView}
                         />
-                        <Button 
+                        <Button
                             onClick={handleCreateEvent}
-                            className="bg-[#005E84] hover:bg-[#004d6e] text-white shadow-md hover:shadow-lg transition-all"
+                            size="sm"
+                            className="bg-[#005E84] hover:bg-[#004d6e] text-white shadow-md hover:shadow-lg transition-all h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
                         >
-                            <Plus className="h-4 w-4 mr-2" />
-                            <span className="font-semibold">Nouveau</span>
+                            <Plus className="h-4 w-4 sm:mr-1" />
+                            <span className="font-semibold hidden sm:inline">Nouveau</span>
                         </Button>
                     </div>
                 </div>
@@ -249,6 +273,22 @@ export default function PlanningPage() {
                 initialDate={initialDate}
                 onSuccess={handleDialogSuccess}
             />
+
+            {/* Sheet mobile pour les filtres */}
+            <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
+                <SheetContent side="left" className="w-80 p-0">
+                    <SheetHeader className="border-b p-4">
+                        <SheetTitle>Filtres</SheetTitle>
+                        <SheetDescription>
+                            Filtrer les événements par rôle
+                        </SheetDescription>
+                    </SheetHeader>
+                    <FilterSidebar
+                        selectedRoles={selectedRoles}
+                        onRolesChange={setSelectedRoles}
+                    />
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }

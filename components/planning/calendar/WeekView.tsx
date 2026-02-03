@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { EventCard } from "./EventCard";
 import {
     getWeekDays,
@@ -11,6 +11,20 @@ import {
 import type { Event } from "@/lib/planning/types";
 import { ScrollArea } from "@/components/shadcn/scroll-area";
 import { cn } from "@/lib/utils";
+
+// Hook pour détecter si on est sur mobile
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkIsMobile = () => setIsMobile(window.innerWidth < 640);
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, []);
+
+    return isMobile;
+}
 
 interface WeekViewProps {
     currentDate: Date;
@@ -43,7 +57,28 @@ export function WeekView({
     onEventClick,
     onTimeSlotClick,
 }: WeekViewProps) {
-    const weekDays = useMemo(() => getWeekDays(currentDate), [currentDate]);
+    const isMobile = useIsMobile();
+    const allWeekDays = useMemo(() => getWeekDays(currentDate), [currentDate]);
+
+    // Sur mobile, afficher 3 jours centrés sur le jour actuel
+    const weekDays = useMemo(() => {
+        if (!isMobile) return allWeekDays;
+
+        // Trouver l'index du jour courant dans la semaine
+        const todayIndex = allWeekDays.findIndex((d) => isSameDay(d, currentDate));
+        const centerIndex = todayIndex >= 0 ? todayIndex : 3; // Par défaut milieu de semaine
+
+        // Calculer les indices pour 3 jours (1 avant, courant, 1 après)
+        let startIndex = Math.max(0, centerIndex - 1);
+        let endIndex = Math.min(allWeekDays.length, startIndex + 3);
+
+        // Ajuster si on est en fin de semaine
+        if (endIndex - startIndex < 3) {
+            startIndex = Math.max(0, endIndex - 3);
+        }
+
+        return allWeekDays.slice(startIndex, endIndex);
+    }, [allWeekDays, currentDate, isMobile]);
 
     // Map des événements pour lookup O(1)
     const eventsMap = useMemo(() => {
@@ -199,7 +234,7 @@ export function WeekView({
             {/* En-tête avec les jours de la semaine */}
             <div className="flex border-b sticky top-0 bg-background z-10">
                 {/* Colonne vide pour aligner avec les heures */}
-                <div className="w-20 flex-shrink-0 border-r" />
+                <div className="w-12 sm:w-20 flex-shrink-0 border-r" />
 
                 {/* Jours de la semaine */}
                 {weekDays.map((day) => {
@@ -210,16 +245,16 @@ export function WeekView({
                         <div
                             key={dayKey}
                             className={cn(
-                                "flex-1 p-3 text-center border-r",
+                                "flex-1 p-2 sm:p-3 text-center border-r min-w-0",
                                 isCurrentDay && "bg-primary/5"
                             )}
                         >
-                            <div className="text-xs text-muted-foreground uppercase">
+                            <div className="text-[10px] sm:text-xs text-muted-foreground uppercase truncate">
                                 {getWeekdayName(day, true)}
                             </div>
                             <div
                                 className={cn(
-                                    "text-lg font-semibold mt-1",
+                                    "text-base sm:text-lg font-semibold mt-0.5 sm:mt-1",
                                     isCurrentDay && "text-primary"
                                 )}
                             >
@@ -239,11 +274,11 @@ export function WeekView({
                     }}
                 >
                     {/* Colonne des heures */}
-                    <div className="w-20 flex-shrink-0 border-r">
+                    <div className="w-12 sm:w-20 flex-shrink-0 border-r">
                         {HOURS.map((hour) => (
                             <div
                                 key={hour}
-                                className="h-[60px] border-b text-xs text-muted-foreground p-2 text-right"
+                                className="h-[60px] border-b text-[10px] sm:text-xs text-muted-foreground p-1 sm:p-2 text-right"
                             >
                                 {hour.toString().padStart(2, "0")}:00
                             </div>

@@ -133,8 +133,8 @@ export function DayView({
                         >
                             <div className="flex h-full">
                                 {/* Colonne heure */}
-                                <div className="w-20 flex-shrink-0 p-2 text-right">
-                                    <span className="text-xs text-muted-foreground font-medium">
+                                <div className="w-14 sm:w-20 flex-shrink-0 p-1 sm:p-2 text-right">
+                                    <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                                         {hour.toString().padStart(2, "0")}:00
                                     </span>
                                 </div>
@@ -151,7 +151,7 @@ export function DayView({
                     ))}
 
                     {/* Événements */}
-                    <div className="absolute inset-0 left-20 pointer-events-none">
+                    <div className="absolute inset-0 left-14 sm:left-20 pointer-events-none">
                         <div className="relative h-full pl-4 pr-4">
                             {dayEvents.map((event) => {
                                 const style = getEventStyle(event);
@@ -234,8 +234,8 @@ export function DayView({
                             }}
                         >
                             <div className="flex items-center">
-                                <div className="w-20 flex-shrink-0 pr-2 text-right">
-                                    <div className="inline-flex items-center justify-center w-12 h-5 bg-red-500 text-white text-xs font-medium rounded">
+                                <div className="w-14 sm:w-20 flex-shrink-0 pr-1 sm:pr-2 text-right">
+                                    <div className="inline-flex items-center justify-center w-10 sm:w-12 h-5 bg-red-500 text-white text-[10px] sm:text-xs font-medium rounded">
                                         {format(new Date(), "HH:mm")}
                                     </div>
                                 </div>

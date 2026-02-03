@@ -104,16 +104,23 @@ export function MonthView({
             <div className="flex-1 overflow-hidden flex flex-col">
                 {/* En-têtes des jours de la semaine */}
                 <div className="grid grid-cols-7 border-b bg-muted/30">
-                    {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map(
-                        (day) => (
-                            <div
-                                key={day}
-                                className="text-center py-2 text-sm font-medium text-muted-foreground border-r last:border-r-0"
-                            >
-                                {day}
-                            </div>
-                        )
-                    )}
+                    {[
+                        { short: "L", full: "Lun" },
+                        { short: "M", full: "Mar" },
+                        { short: "M", full: "Mer" },
+                        { short: "J", full: "Jeu" },
+                        { short: "V", full: "Ven" },
+                        { short: "S", full: "Sam" },
+                        { short: "D", full: "Dim" },
+                    ].map((day, i) => (
+                        <div
+                            key={i}
+                            className="text-center py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-muted-foreground border-r last:border-r-0"
+                        >
+                            <span className="sm:hidden">{day.short}</span>
+                            <span className="hidden sm:inline">{day.full}</span>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Grille des jours */}
@@ -133,7 +140,7 @@ export function MonthView({
                                 <div
                                     key={index}
                                     className={cn(
-                                        "border-r border-b last:border-r-0 p-2 min-h-[100px] cursor-pointer hover:bg-accent/50 transition-colors",
+                                        "border-r border-b last:border-r-0 p-1 sm:p-2 min-h-[60px] sm:min-h-[100px] cursor-pointer hover:bg-accent/50 transition-colors",
                                         !isCurrentMonth &&
                                             "bg-muted/20 text-muted-foreground",
                                         isTodayDate &&
@@ -142,10 +149,10 @@ export function MonthView({
                                     onClick={() => handleDayClick(day)}
                                 >
                                     {/* Numéro du jour */}
-                                    <div className="flex items-start justify-between mb-2">
+                                    <div className="flex items-start justify-between mb-1 sm:mb-2">
                                         <div
                                             className={cn(
-                                                "flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium",
+                                                "flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-xs sm:text-sm font-medium",
                                                 isTodayDate &&
                                                     "bg-primary text-primary-foreground"
                                             )}
@@ -157,16 +164,16 @@ export function MonthView({
                                         {eventCount > 0 && badgeVariant && (
                                             <Badge
                                                 variant={badgeVariant}
-                                                className="text-xs px-2"
+                                                className="text-[10px] sm:text-xs px-1.5 sm:px-2 h-5"
                                             >
                                                 {eventCount}
                                             </Badge>
                                         )}
                                     </div>
 
-                                    {/* Indicateurs visuels supplémentaires (optionnel) */}
+                                    {/* Indicateurs visuels supplémentaires (cachés sur mobile) */}
                                     {eventCount > 0 && (
-                                        <div className="space-y-1">
+                                        <div className="hidden sm:block space-y-1">
                                             {eventCount === 1 && (
                                                 <div className="text-xs text-muted-foreground">
                                                     1 événement

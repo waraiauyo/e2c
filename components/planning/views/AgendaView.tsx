@@ -189,10 +189,19 @@ export function AgendaView({
                     }
                 >
                     <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="7d">7 jours</TabsTrigger>
-                        <TabsTrigger value="30d">30 jours</TabsTrigger>
-                        <TabsTrigger value="3m">3 mois</TabsTrigger>
-                        <TabsTrigger value="all">Tout</TabsTrigger>
+                        <TabsTrigger value="7d" className="text-xs sm:text-sm">
+                            <span className="sm:hidden">7j</span>
+                            <span className="hidden sm:inline">7 jours</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="30d" className="text-xs sm:text-sm">
+                            <span className="sm:hidden">30j</span>
+                            <span className="hidden sm:inline">30 jours</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="3m" className="text-xs sm:text-sm">
+                            <span className="sm:hidden">3m</span>
+                            <span className="hidden sm:inline">3 mois</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="all" className="text-xs sm:text-sm">Tout</TabsTrigger>
                     </TabsList>
                 </Tabs>
 

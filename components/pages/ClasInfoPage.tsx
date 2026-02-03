@@ -39,7 +39,6 @@ import {
     Building2,
     Heart,
     FolderKanban,
-    Calendar,
     History,
 } from "lucide-react";
 
@@ -250,38 +249,28 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                 </CardContent>
             </Card>
 
-            {/* Projet de l'année (Mis en avant) */}
+            {/* Projet de l'année (Version Réduite & Compacte) */}
             {activeProject && (
-                <Card className="w-full max-w-4xl border-[#005E84]/20 shadow-sm bg-[#FDF8E8]">
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="flex items-center gap-2 text-base text-[#005E84]">
-                                <FolderKanban className="h-5 w-5 text-[#DEAA00]" />
-                                Projet de l'année
-                            </CardTitle>
-                            <Badge variant="outline" className="bg-white border-[#E9B44C] text-[#005E84] font-bold">
-                                {activeProject.year}
-                            </Badge>
+                <Card className="w-full max-w-4xl border-[#005E84]/20 shadow-sm bg-white">
+                    <CardContent className="flex items-center gap-3 p-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#005E84]/10 border border-[#005E84]/20">
+                            <FolderKanban className="h-5 w-5 text-[#005E84]" />
                         </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        <h3 className="font-bold text-lg text-[#1E3231]">{activeProject.name}</h3>
-                        {activeProject.description && (
-                            <p className="text-sm text-[#1E3231]/90 leading-relaxed whitespace-pre-line">
-                                {activeProject.description}
-                            </p>
-                        )}
-                        <div className="flex items-center gap-2 text-xs text-[#005E84]/70 pt-2 border-t border-[#E9B44C]/20 mt-3">
-                            <Calendar className="h-3.5 w-3.5" />
-                            <span className="font-medium">Statut : En cours</span>
+                        <div className="min-w-0 flex-1">
+                            <span className="text-[10px] font-bold text-[#005E84] uppercase tracking-wider block mb-0.5">
+                                Projet de l'année
+                            </span>
+                            <h3 className="text-base font-bold text-[#1E3231] truncate">
+                                {activeProject.name}
+                            </h3>
                         </div>
                     </CardContent>
                 </Card>
             )}
 
-            {/* Grille Capacité / Horaires */}
+            {/* Grille Capacité / Horaires (Couleurs inversées) */}
             <div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl">
-                <Card className="bg-[#F4F4F4] border-none">
+                <Card className="bg-white border-[#E2E8F0] shadow-sm">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base text-[#005E84]">
                             <Users className="h-5 w-5" />
@@ -289,7 +278,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-[#E2E8F0]">
+                        <div className="flex items-center justify-between bg-[#F4F4F4] p-3 rounded-lg">
                             <span className="text-sm text-muted-foreground">
                                 Élèves
                             </span>
@@ -299,7 +288,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                         </div>
                         {clas.volunteer_count !== null &&
                             clas.volunteer_count > 0 && (
-                                <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-[#E2E8F0]">
+                                <div className="flex items-center justify-between bg-[#F4F4F4] p-3 rounded-lg">
                                     <span className="text-sm text-muted-foreground flex items-center gap-2">
                                         <Heart className="h-4 w-4 text-[#DEAA00]" />
                                         Bénévoles
@@ -311,7 +300,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                             )}
                     </CardContent>
                 </Card>
-                <Card className="bg-[#F4F4F4] border-none">
+                <Card className="bg-white border-[#E2E8F0] shadow-sm">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base text-[#005E84]">
                             <Clock className="h-5 w-5" />
@@ -320,7 +309,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     </CardHeader>
                     <CardContent>
                         {clas.schedule ? (
-                            <p className="text-sm bg-white p-3 rounded-md whitespace-pre-line break-words border border-[#E2E8F0] text-[#1E3231]">
+                            <p className="text-sm bg-[#F4F4F4] p-3 rounded-md whitespace-pre-line break-words text-[#1E3231]">
                                 {clas.schedule}
                             </p>
                         ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Trash2, Pencil, Eye, FolderKanban } from "lucide-react";
+import { MoreHorizontal, Trash2, Pencil, Eye, FolderKanban, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/shadcn/button";
 import {
@@ -25,7 +25,8 @@ import {
 import { deleteClasAction } from "@/lib/actions/admin-clas";
 import { Clas } from "@/types/database";
 import { ClasDialog } from "./clas-dialogs";
-import { ProjectManagerDialog } from "./project-dialogs"; // Import du nouveau gestionnaire
+import { ProjectManagerDialog } from "./project-dialogs";
+import { TeamManagerDialog } from "./team-dialogs"; // Import nouveau
 
 interface ClasActionsProps {
   clas: Clas;
@@ -34,7 +35,8 @@ interface ClasActionsProps {
 export function ClasActions({ clas }: ClasActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showProjectsDialog, setShowProjectsDialog] = useState(false); // Nouvel état
+  const [showProjectsDialog, setShowProjectsDialog] = useState(false);
+  const [showTeamDialog, setShowTeamDialog] = useState(false); // État nouveau
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -56,7 +58,6 @@ export function ClasActions({ clas }: ClasActionsProps) {
 
   return (
     <>
-      {/* Dialogs existants */}
       <ClasDialog 
         mode="edit" 
         clas={clas} 
@@ -64,10 +65,17 @@ export function ClasActions({ clas }: ClasActionsProps) {
         onOpenChange={setShowEditDialog} 
       />
 
-      {/* Nouveau Dialog Projets */}
       <ProjectManagerDialog
         open={showProjectsDialog}
         onOpenChange={setShowProjectsDialog}
+        clasId={clas.id}
+        clasName={clas.name}
+      />
+
+      {/* Nouveau Dialog Team */}
+      <TeamManagerDialog
+        open={showTeamDialog}
+        onOpenChange={setShowTeamDialog}
         clasId={clas.id}
         clasName={clas.name}
       />
@@ -87,18 +95,25 @@ export function ClasActions({ clas }: ClasActionsProps) {
             Voir la page
           </DropdownMenuItem>
 
-          {/* Nouvelle option Projets */}
+          <DropdownMenuSeparator />
+
           <DropdownMenuItem onClick={() => setShowProjectsDialog(true)}>
             <FolderKanban className="mr-2 h-4 w-4" />
             Gérer les projets
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Modifier
+          {/* Nouvelle option */}
+          <DropdownMenuItem onClick={() => setShowTeamDialog(true)}>
+            <Users className="mr-2 h-4 w-4" />
+            Gérer l'équipe
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />
+
+          <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Modifier le CLAS
+          </DropdownMenuItem>
           
           <DropdownMenuItem
             onClick={() => setShowDeleteDialog(true)}

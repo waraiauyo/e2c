@@ -77,17 +77,21 @@ export const ClasMarker = ({ position, infos }: ClasMarkerProps) => {
                         </p>
                     )}
                     
-                    {/* Section Projet Actif */}
+                    {/* Section Projet Actif - Mise à jour : Intitulé au-dessus, date retirée */}
                     {infos.activeProject && (
-                        <div className="bg-amber-50 border border-amber-200 rounded p-2 flex items-start gap-2">
-                            <FolderKanban className="h-3.5 w-3.5 text-amber-600 mt-0.5 shrink-0" />
-                            <div className="min-w-0">
-                                <p className="text-xs font-semibold text-amber-900 truncate">
-                                    {infos.activeProject.name}
-                                </p>
-                                <p className="text-[10px] text-amber-700">
-                                    Projet {infos.activeProject.year}
-                                </p>
+                        <div className="rounded-md border border-[#E2E8F0] bg-white p-2.5 shadow-sm">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#005E84]/10 border border-[#005E84]/20">
+                                    <FolderKanban className="h-4 w-4 text-[#005E84]" />
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+                                        Projet de l'année
+                                    </span>
+                                    <span className="text-xs font-bold text-[#1E3231] truncate">
+                                        {infos.activeProject.name}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     )}

@@ -21,11 +21,14 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/shadcn/form";
+import { Alert, AlertDescription } from "@/components/shadcn/alert";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { loginUser } from "@/lib/redux/features/userSlice";
+import { useCookieConsent } from "@/components/providers/CookieConsentProvider";
+import { Cookie } from "lucide-react";
 
 const loginFormSchema = z.object({
     email: z
@@ -41,6 +44,9 @@ export default function LoginPage() {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { isLoading } = useAppSelector((state) => state.user);
+    const { isAccepted, isLoaded } = useCookieConsent();
+
+    const canLogin = isLoaded && isAccepted;
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginFormSchema),
@@ -123,8 +129,17 @@ export default function LoginPage() {
                                 />
                             </div>
                             <CardFooter className="flex-col gap-4 px-0 pt-6">
+                                {!canLogin && isLoaded && (
+                                    <Alert variant="destructive">
+                                        <Cookie className="h-4 w-4" />
+                                        <AlertDescription>
+                                            Vous devez accepter les cookies pour
+                                            vous connecter.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
                                 <Button
-                                    disabled={isLoading}
+                                    disabled={isLoading || !canLogin}
                                     type="submit"
                                     className="w-full"
                                 >

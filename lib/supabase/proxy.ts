@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isPublicRoute, isAuthRoute } from "@/lib/constants/routes";
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -48,12 +49,7 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
-    if (
-        !user &&
-        !request.nextUrl.pathname.startsWith("/login") &&
-        !request.nextUrl.pathname.startsWith("/register") &&
-        !request.nextUrl.pathname.startsWith("/forgot-password")
-    ) {
+    if (!user && !isPublicRoute(request.nextUrl.pathname)) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone();
         url.pathname = "/login";
@@ -61,12 +57,7 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    if (
-        user &&
-        (request.nextUrl.pathname.startsWith("/login") ||
-            request.nextUrl.pathname.startsWith("/register") ||
-            request.nextUrl.pathname.startsWith("/forgot-password"))
-    ) {
+    if (user && isAuthRoute(request.nextUrl.pathname)) {
         // user is logged in, redirect to home page
         const url = request.nextUrl.clone();
         url.pathname = "/";

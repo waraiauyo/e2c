@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { fetchCurrentUser } from "@/lib/redux/features/userSlice";
-
-const authRoutes = ["/login", "/forgot-password", "/reset-password"];
+import { isPublicRoute } from "@/lib/constants/routes";
 
 export default function MainWrapper({
     children,
@@ -19,7 +18,7 @@ export default function MainWrapper({
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.user);
     const hasLoadedUser = useRef(false);
-    const isAuthPage = authRoutes.some((route) => pathname.startsWith(route));
+    const isAuthPage = isPublicRoute(pathname);
 
     // Reset le ref quand on est sur une page d'auth (après logout)
     useEffect(() => {

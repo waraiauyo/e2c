@@ -1,4 +1,4 @@
-import type { Clas, ClasTeamMemberWithProfile } from "@/types/database";
+import type { Clas, ClasTeamMemberWithProfile, ClasProject } from "@/types/database";
 
 export interface ClasFilters {
     searchQuery: string;
@@ -8,6 +8,7 @@ export interface ClasFilters {
 
 export interface ClasWithTeam extends Clas {
     team_members: ClasTeamMemberWithProfile[];
+    projects: ClasProject[];
 }
 
 export interface ClasState {

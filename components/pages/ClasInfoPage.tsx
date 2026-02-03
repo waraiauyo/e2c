@@ -38,6 +38,9 @@ import {
     ExternalLink,
     Building2,
     Heart,
+    FolderKanban,
+    Calendar,
+    History,
 } from "lucide-react";
 
 const GRADE_LEVEL_LABELS: Record<GradeLevel, string> = {
@@ -113,6 +116,10 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
     const directors = getMembersByRole("directeur");
     const animators = getMembersByRole("animator");
 
+    // Récupération et tri des projets
+    const activeProject = clas?.projects?.find(p => p.status === "ongoing");
+    const allProjects = clas?.projects?.sort((a, b) => b.year.localeCompare(a.year)) || [];
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-full bg-white">
@@ -161,6 +168,8 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     Informations du CLAS
                 </h1>
             </div>
+            
+            {/* Carte Infos Principales */}
             <Card className="w-full max-w-4xl border-[#E2E8F0] shadow-sm bg-white">
                 <CardHeader>
                     <div className="flex items-start gap-4">
@@ -240,6 +249,37 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Projet de l'année (Mis en avant) */}
+            {activeProject && (
+                <Card className="w-full max-w-4xl border-[#005E84]/20 shadow-sm bg-[#FDF8E8]">
+                    <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="flex items-center gap-2 text-base text-[#005E84]">
+                                <FolderKanban className="h-5 w-5 text-[#DEAA00]" />
+                                Projet de l'année
+                            </CardTitle>
+                            <Badge variant="outline" className="bg-white border-[#E9B44C] text-[#005E84] font-bold">
+                                {activeProject.year}
+                            </Badge>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <h3 className="font-bold text-lg text-[#1E3231]">{activeProject.name}</h3>
+                        {activeProject.description && (
+                            <p className="text-sm text-[#1E3231]/90 leading-relaxed whitespace-pre-line">
+                                {activeProject.description}
+                            </p>
+                        )}
+                        <div className="flex items-center gap-2 text-xs text-[#005E84]/70 pt-2 border-t border-[#E9B44C]/20 mt-3">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span className="font-medium">Statut : En cours</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Grille Capacité / Horaires */}
             <div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl">
                 <Card className="bg-[#F4F4F4] border-none">
                     <CardHeader>
@@ -291,6 +331,8 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Équipe */}
             <Card className="w-full max-w-4xl border-[#E2E8F0] shadow-sm bg-white">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base text-[#005E84]">
@@ -354,6 +396,52 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Historique des projets (Tous les projets) */}
+            {allProjects.length > 0 && (
+                <Card className="w-full max-w-4xl border-[#E2E8F0] shadow-sm bg-white">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base text-[#005E84]">
+                            <History className="h-5 w-5 text-[#DEAA00]" />
+                            Historique des projets
+                        </CardTitle>
+                        <CardDescription>
+                            Liste de tous les projets réalisés par ce CLAS
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {allProjects.map((project, index) => (
+                            <div key={project.id}>
+                                {index > 0 && <Separator className="bg-[#F4F4F4] my-4" />}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <h4 className="font-semibold text-[#1E3231] text-sm">
+                                            {project.name}
+                                        </h4>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            {project.status === 'ongoing' && (
+                                                <Badge variant="secondary" className="bg-[#FDF8E8] text-[#DEAA00] hover:bg-[#FDF8E8] text-[10px] border border-[#E9B44C]/30">
+                                                    En cours
+                                                </Badge>
+                                            )}
+                                            <Badge variant="outline" className="text-xs font-normal border-[#E2E8F0]">
+                                                {project.year}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                    {project.description && (
+                                        <p className="text-sm text-muted-foreground leading-relaxed">
+                                            {project.description}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Contacts */}
             {clas.raw_contacts.length > 0 && (
                 <Card className="w-full max-w-4xl border-[#E2E8F0] shadow-sm bg-white">
                     <CardHeader>

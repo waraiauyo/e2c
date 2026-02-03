@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Trash2, Pencil, Eye } from "lucide-react";
+import { MoreHorizontal, Trash2, Pencil, Eye, FolderKanban } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/shadcn/button";
 import {
@@ -24,7 +24,8 @@ import {
 } from "@/components/shadcn/alert-dialog";
 import { deleteClasAction } from "@/lib/actions/admin-clas";
 import { Clas } from "@/types/database";
-import { ClasDialog } from "./clas-dialogs"; // Import du dialog
+import { ClasDialog } from "./clas-dialogs";
+import { ProjectManagerDialog } from "./project-dialogs"; // Import du nouveau gestionnaire
 
 interface ClasActionsProps {
   clas: Clas;
@@ -32,7 +33,8 @@ interface ClasActionsProps {
 
 export function ClasActions({ clas }: ClasActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false); // État pour le mode édition
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showProjectsDialog, setShowProjectsDialog] = useState(false); // Nouvel état
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -54,12 +56,20 @@ export function ClasActions({ clas }: ClasActionsProps) {
 
   return (
     <>
-      {/* Intégration du Dialog d'édition */}
+      {/* Dialogs existants */}
       <ClasDialog 
         mode="edit" 
         clas={clas} 
         open={showEditDialog} 
         onOpenChange={setShowEditDialog} 
+      />
+
+      {/* Nouveau Dialog Projets */}
+      <ProjectManagerDialog
+        open={showProjectsDialog}
+        onOpenChange={setShowProjectsDialog}
+        clasId={clas.id}
+        clasName={clas.name}
       />
 
       <DropdownMenu>
@@ -71,15 +81,25 @@ export function ClasActions({ clas }: ClasActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          
           <DropdownMenuItem onClick={() => window.location.href = `/clas/${clas.id}`}>
             <Eye className="mr-2 h-4 w-4" />
             Voir la page
           </DropdownMenuItem>
+
+          {/* Nouvelle option Projets */}
+          <DropdownMenuItem onClick={() => setShowProjectsDialog(true)}>
+            <FolderKanban className="mr-2 h-4 w-4" />
+            Gérer les projets
+          </DropdownMenuItem>
+          
           <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
             <Pencil className="mr-2 h-4 w-4" />
             Modifier
           </DropdownMenuItem>
+          
           <DropdownMenuSeparator />
+          
           <DropdownMenuItem
             onClick={() => setShowDeleteDialog(true)}
             className="text-destructive focus:text-destructive"

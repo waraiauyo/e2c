@@ -100,6 +100,7 @@ export type ClasProjectUpdate = Partial<ClasProjectInsert> & { id: string };
 export interface ClasWithTeam extends Clas {
     team_members: ClasTeamMember[];
     raw_contacts: ClasRawContact[];
+    projects: ClasProject[];
 }
 
 export interface ClasTeamMemberWithProfile extends ClasTeamMember {
@@ -109,4 +110,5 @@ export interface ClasTeamMemberWithProfile extends ClasTeamMember {
 export interface ClasWithTeamAndProfiles extends Clas {
     team_members: ClasTeamMemberWithProfile[];
     raw_contacts: ClasRawContact[];
+    projects: ClasProject[];
 }

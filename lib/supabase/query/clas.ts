@@ -11,6 +11,7 @@ import type {
     ClasInsert,
     ClasUpdate,
     Profile,
+    ClasProject,
 } from "@/types/database";
 
 // ============================================================================
@@ -102,7 +103,7 @@ export interface GetClasWithTeamResult {
 }
 
 /**
- * Get a CLAS with its team members (including profiles) and raw contacts
+ * Get a CLAS with its team members (including profiles), raw contacts and projects
  */
 export async function getClasWithTeam(
     clasId: string
@@ -153,6 +154,20 @@ export async function getClasWithTeam(
             };
         }
 
+        // Get projects
+        const { data: projects, error: projectsError } = await supabase
+            .from("clas_projects")
+            .select("*")
+            .eq("clas_id", clasId)
+            .order("year", { ascending: false });
+
+        if (projectsError) {
+            return {
+                clas: null,
+                error: projectsError.message,
+            };
+        }
+
         // Map team members to include profile data
         const teamMembersWithProfiles: ClasTeamMemberWithProfile[] = (teamMembers || []).map((tm: any) => ({
             ...tm,
@@ -164,6 +179,7 @@ export async function getClasWithTeam(
                 ...clas,
                 team_members: teamMembersWithProfiles,
                 raw_contacts: rawContacts || [],
+                projects: projects || [],
             },
             error: null,
         };
@@ -179,10 +195,10 @@ export async function getClasWithTeam(
 }
 
 /**
- * Get all CLAS with their team members (with profile information)
+ * Get all CLAS with their team members (with profile information) and projects
  */
 export async function getAllClasWithTeams(): Promise<{
-    clas: (Clas & { team_members: ClasTeamMemberWithProfile[] })[] | null;
+    clas: (Clas & { team_members: ClasTeamMemberWithProfile[]; projects: ClasProject[] })[] | null;
     error: string | null;
 }> {
     const supabase = await createClient();
@@ -216,7 +232,19 @@ export async function getAllClasWithTeams(): Promise<{
             };
         }
 
-        // Map team members to their CLAS
+        // Get all projects
+        const { data: allProjects, error: projectsError } = await supabase
+            .from("clas_projects")
+            .select("*");
+
+        if (projectsError) {
+            return {
+                clas: null,
+                error: projectsError.message,
+            };
+        }
+
+        // Map team members and projects to their CLAS
         const result = clasList.map((clas) => ({
             ...clas,
             team_members: (allTeamMembers || [])
@@ -225,6 +253,9 @@ export async function getAllClasWithTeams(): Promise<{
                     ...tm,
                     profile: tm.profile || undefined,
                 })),
+            projects: (allProjects || []).filter(
+                (p: any) => p.clas_id === clas.id
+            ),
         }));
 
         return {

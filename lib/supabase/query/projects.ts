@@ -1,14 +1,20 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { ClasProject, ClasProjectInsert, ClasProjectUpdate } from "@/types/database";
+import type {
+    ClasProject,
+    ClasProjectInsert,
+    ClasProjectUpdate,
+} from "@/types/database";
 
 export interface GetProjectsResult {
     projects: ClasProject[] | null;
     error: string | null;
 }
 
-export async function getProjectsByClasId(clasId: string): Promise<GetProjectsResult> {
+export async function getProjectsByClasId(
+    clasId: string
+): Promise<GetProjectsResult> {
     const supabase = await createClient();
     try {
         const { data, error } = await supabase
@@ -20,11 +26,16 @@ export async function getProjectsByClasId(clasId: string): Promise<GetProjectsRe
         if (error) return { projects: null, error: error.message };
         return { projects: data, error: null };
     } catch (err) {
-        return { projects: null, error: "Erreur lors de la récupération des projets." };
+        return {
+            projects: null,
+            error: "Erreur lors de la récupération des projets.",
+        };
     }
 }
 
-export async function createProject(project: ClasProjectInsert): Promise<{ data: ClasProject | null; error: string | null }> {
+export async function createProject(
+    project: ClasProjectInsert
+): Promise<{ data: ClasProject | null; error: string | null }> {
     const supabase = await createClient();
     try {
         const { data, error } = await supabase
@@ -40,7 +51,9 @@ export async function createProject(project: ClasProjectInsert): Promise<{ data:
     }
 }
 
-export async function updateProject(project: ClasProjectUpdate): Promise<{ data: ClasProject | null; error: string | null }> {
+export async function updateProject(
+    project: ClasProjectUpdate
+): Promise<{ data: ClasProject | null; error: string | null }> {
     const supabase = await createClient();
     const { id, ...rest } = project;
     try {
@@ -54,11 +67,16 @@ export async function updateProject(project: ClasProjectUpdate): Promise<{ data:
         if (error) return { data: null, error: error.message };
         return { data, error: null };
     } catch (err) {
-        return { data: null, error: "Erreur lors de la mise à jour du projet." };
+        return {
+            data: null,
+            error: "Erreur lors de la mise à jour du projet.",
+        };
     }
 }
 
-export async function deleteProject(id: string): Promise<{ success: boolean; error: string | null }> {
+export async function deleteProject(
+    id: string
+): Promise<{ success: boolean; error: string | null }> {
     const supabase = await createClient();
     try {
         const { error } = await supabase
@@ -69,6 +87,9 @@ export async function deleteProject(id: string): Promise<{ success: boolean; err
         if (error) return { success: false, error: error.message };
         return { success: true, error: null };
     } catch (err) {
-        return { success: false, error: "Erreur lors de la suppression du projet." };
+        return {
+            success: false,
+            error: "Erreur lors de la suppression du projet.",
+        };
     }
 }

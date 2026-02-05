@@ -5,19 +5,23 @@
 ```
 lib/redux/
 ├── features/
-│   └── userSlice.ts       # Slice pour la gestion de l'utilisateur
+│   ├── userSlice.ts          # Slice pour l'authentification et le profil utilisateur
+│   └── clas/
+│       ├── slice.ts          # Slice pour la gestion des CLAS
+│       ├── actions.ts        # Actions asynchrones (thunks)
+│       ├── selectors.ts      # Sélecteurs mémoïsés
+│       ├── filters.ts        # Fonctions de filtrage
+│       └── types.ts          # Types TypeScript
 ├── provider/
-│   └── StoreProvider.tsx  # Provider Redux pour Next.js
-├── hooks.ts               # Hooks typés pour Redux
-├── store.ts               # Configuration du store
-└── README.md              # Ce fichier
+│   └── StoreProvider.tsx     # Provider Redux pour Next.js
+├── hooks.ts                  # Hooks typés (useAppDispatch, useAppSelector)
+├── store.ts                  # Configuration du store
+└── README.md                 # Ce fichier
 ```
 
 ## Installation dans l'application
 
-### 1. Wrapper votre application avec le StoreProvider
-
-Dans votre fichier `app/layout.tsx` :
+Dans `app/layout.tsx` :
 
 ```tsx
 import StoreProvider from "@/lib/redux/provider/StoreProvider";
@@ -37,139 +41,120 @@ export default function RootLayout({
 }
 ```
 
-## Utilisation dans les composants
+## Slice User
 
-### Import des hooks
+### État
+
+| Propriété         | Type                  | Description                       |
+| ----------------- | --------------------- | --------------------------------- |
+| `user`            | `User \| null`        | Objet utilisateur Supabase        |
+| `profile`         | `UserProfile \| null` | Profil depuis la table `profiles` |
+| `isLoading`       | `boolean`             | Opération en cours                |
+| `isAuthenticated` | `boolean`             | Utilisateur connecté              |
+| `error`           | `string \| null`      | Message d'erreur                  |
+
+### Actions
 
 ```tsx
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { useAppDispatch } from "@/lib/redux/hooks";
 import {
     loginUser,
     logoutUser,
     fetchCurrentUser,
-    fetchUserProfile,
 } from "@/lib/redux/features/userSlice";
+
+// Connexion
+dispatch(loginUser({ email, password }));
+
+// Déconnexion
+dispatch(logoutUser());
+
+// Récupérer l'utilisateur courant
+dispatch(fetchCurrentUser());
 ```
 
-### Exemple de connexion
+## Slice CLAS
+
+### État
+
+| Propriété | Type                                             | Description                            |
+| --------- | ------------------------------------------------ | -------------------------------------- |
+| `items`   | `ClasWithTeam[]`                                 | Liste des CLAS avec équipes et projets |
+| `status`  | `'idle' \| 'loading' \| 'succeeded' \| 'failed'` | État du chargement                     |
+| `error`   | `string \| null`                                 | Message d'erreur                       |
+| `filters` | `ClasFilters`                                    | Filtres actifs                         |
+
+### Actions
 
 ```tsx
-"use client";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { fetchClasList } from "@/lib/redux/features/clas/actions";
+import {
+    setSearchQuery,
+    setLevelFilter,
+    resetFilters,
+} from "@/lib/redux/features/clas/slice";
 
-import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { loginUser } from "@/lib/redux/features/userSlice";
+// Charger la liste des CLAS
+dispatch(fetchClasList());
 
-export default function LoginComponent() {
-    const dispatch = useAppDispatch();
-    const { user, profile, isLoading, error } = useAppSelector(
-        (state) => state.user
-    );
+// Filtrer par recherche
+dispatch(setSearchQuery("Laval"));
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+// Filtrer par niveau
+dispatch(setLevelFilter("primary"));
 
-    const handleLogin = async () => {
-        await dispatch(loginUser({ email, password }));
-    };
-
-    return (
-        <div>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mot de passe"
-            />
-            <button onClick={handleLogin} disabled={isLoading}>
-                {isLoading ? "Connexion..." : "Se connecter"}
-            </button>
-            {error && <p className="text-red-500">{error}</p>}
-        </div>
-    );
-}
+// Réinitialiser les filtres
+dispatch(resetFilters());
 ```
 
-### Exemple de récupération de l'utilisateur au chargement
+### Sélecteurs
+
+```tsx
+import { useAppSelector } from "@/lib/redux/hooks";
+import {
+    selectFilteredClas,
+    selectClasForMap,
+} from "@/lib/redux/features/clas/selectors";
+
+// Liste filtrée des CLAS
+const filteredClas = useAppSelector(selectFilteredClas);
+
+// CLAS formatés pour la carte (avec coordonnées)
+const mapMarkers = useAppSelector(selectClasForMap);
+```
+
+## Exemple complet
 
 ```tsx
 "use client";
 
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { fetchCurrentUser } from "@/lib/redux/features/userSlice";
+import { fetchClasList } from "@/lib/redux/features/clas/actions";
+import {
+    selectFilteredClas,
+    selectClasStatus,
+} from "@/lib/redux/features/clas/selectors";
 
-export default function Dashboard() {
+export default function ClasList() {
     const dispatch = useAppDispatch();
-    const { user, profile, isLoading, isAuthenticated } = useAppSelector(
-        (state) => state.user
-    );
+    const clasList = useAppSelector(selectFilteredClas);
+    const status = useAppSelector(selectClasStatus);
 
     useEffect(() => {
-        dispatch(fetchCurrentUser());
+        dispatch(fetchClasList());
     }, [dispatch]);
 
-    if (isLoading) {
-        return <div>Chargement...</div>;
-    }
-
-    if (!isAuthenticated) {
-        return <div>Non connecté</div>;
-    }
+    if (status === "loading") return <div>Chargement...</div>;
+    if (status === "failed") return <div>Erreur de chargement</div>;
 
     return (
-        <div>
-            <h1>Bienvenue {profile?.first_name}</h1>
-            <p>Email: {user?.email}</p>
-        </div>
+        <ul>
+            {clasList.map((clas) => (
+                <li key={clas.id}>{clas.name}</li>
+            ))}
+        </ul>
     );
 }
 ```
-
-### Exemple de déconnexion
-
-```tsx
-import { useAppDispatch } from "@/lib/redux/hooks";
-import { logoutUser } from "@/lib/redux/features/userSlice";
-
-export default function LogoutButton() {
-    const dispatch = useAppDispatch();
-
-    const handleLogout = async () => {
-        await dispatch(logoutUser());
-    };
-
-    return <button onClick={handleLogout}>Se déconnecter</button>;
-}
-```
-
-## État disponible
-
-Le slice `user` contient les propriétés suivantes :
-
--   `user`: Objet utilisateur Supabase ou `null`
--   `profile`: Profil utilisateur depuis la table `profiles` ou `null`
--   `isLoading`: Booléen indiquant si une opération est en cours
--   `isAuthenticated`: Booléen indiquant si l'utilisateur est connecté
--   `error`: Message d'erreur ou `null`
-
-## Actions disponibles
-
-### Thunks asynchrones
-
--   `loginUser({ email, password })`: Connexion
--   `logoutUser()`: Déconnexion
--   `fetchCurrentUser()`: Récupère l'utilisateur actuellement connecté
--   `fetchUserProfile(userId)`: Récupère le profil d'un utilisateur spécifique
-
-### Actions synchrones
-
--   `clearError()`: Efface les erreurs
--   `setUser(user)`: Définit manuellement l'utilisateur
--   `setProfile(profile)`: Définit manuellement le profil

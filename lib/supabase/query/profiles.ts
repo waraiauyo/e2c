@@ -104,12 +104,14 @@ export async function getAllUsers(): Promise<UserProfile[]> {
             .order("first_name", { ascending: true });
 
         if (error) {
-            throw new Error(`Erreur lors de la récupération des utilisateurs: ${error.message}`);
+            throw new Error(
+                `Erreur lors de la récupération des utilisateurs: ${error.message}`
+            );
         }
 
         return data as UserProfile[];
     } catch (err) {
-        console.error("Error fetching users:", err);
+        console.error("Erreur lors de la récupération des utilisateurs:", err);
         return [];
     }
 }

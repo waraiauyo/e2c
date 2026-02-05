@@ -45,7 +45,10 @@ export default function PlanningPage() {
 
     useEffect(() => {
         const savedView = localStorage.getItem("planning-view");
-        if (savedView && ["day", "week", "month", "agenda"].includes(savedView)) {
+        if (
+            savedView &&
+            ["day", "week", "month", "agenda"].includes(savedView)
+        ) {
             setCurrentView(savedView as ViewType);
         }
     }, []);
@@ -65,7 +68,10 @@ export default function PlanningPage() {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("planning-filter-roles", JSON.stringify(selectedRoles));
+        localStorage.setItem(
+            "planning-filter-roles",
+            JSON.stringify(selectedRoles)
+        );
     }, [selectedRoles]);
 
     const { events, isLoading, error, refetch } = useEvents();
@@ -79,13 +85,15 @@ export default function PlanningPage() {
 
     const goToPrevious = () => {
         if (currentView === "day") setCurrentDate(addDays(currentDate, -1));
-        else if (currentView === "month") setCurrentDate(addMonths(currentDate, -1));
+        else if (currentView === "month")
+            setCurrentDate(addMonths(currentDate, -1));
         else setCurrentDate(addWeeks(currentDate, -1));
     };
 
     const goToNext = () => {
         if (currentView === "day") setCurrentDate(addDays(currentDate, 1));
-        else if (currentView === "month") setCurrentDate(addMonths(currentDate, 1));
+        else if (currentView === "month")
+            setCurrentDate(addMonths(currentDate, 1));
         else setCurrentDate(addWeeks(currentDate, 1));
     };
 
@@ -131,9 +139,7 @@ export default function PlanningPage() {
                     <p className="text-[#005E84] font-bold mb-2">
                         Oups, une erreur est survenue
                     </p>
-                    <p className="text-sm text-gray-600">
-                        {error.message}
-                    </p>
+                    <p className="text-sm text-gray-600">{error.message}</p>
                 </div>
             </div>
         );
@@ -207,7 +213,9 @@ export default function PlanningPage() {
                             className="bg-[#005E84] hover:bg-[#004d6e] text-white shadow-md hover:shadow-lg transition-all h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
                         >
                             <Plus className="h-4 w-4 sm:mr-1" />
-                            <span className="font-semibold hidden sm:inline">Nouveau</span>
+                            <span className="font-semibold hidden sm:inline">
+                                Nouveau
+                            </span>
                         </Button>
                     </div>
                 </div>
@@ -224,7 +232,10 @@ export default function PlanningPage() {
                 <main className="flex-1 overflow-hidden bg-white relative">
                     {isLoading || userLoading ? (
                         <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
-                            <LoadingSpinner size="lg" className="text-[#005E84]" />
+                            <LoadingSpinner
+                                size="lg"
+                                className="text-[#005E84]"
+                            />
                         </div>
                     ) : (
                         <>

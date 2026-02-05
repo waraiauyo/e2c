@@ -1,4 +1,3 @@
-
 import "./globals.css";
 
 import type { Metadata } from "next";
@@ -11,8 +10,16 @@ import StoreProvider from "@/lib/redux/provider/StoreProvider";
 import { CookieBanner } from "@/components/cookie/CookieBanner";
 
 export const metadata: Metadata = {
-    title: "E2C",
+    title: "Espace collaboratif du CLAS | E2C",
     description: "",
+    robots: {
+        index: false,
+        follow: false,
+        googleBot: {
+            index: false,
+            follow: false,
+        },
+    },
 };
 
 export default function RootLayout({

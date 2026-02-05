@@ -4,148 +4,148 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 }
 
 :root {
-  /* CHARTE GRAPHIQUE CLAS53 */
-  /* Bleu: #005E84 | Jaune 1: #E9B44C | Jaune 2: #DEAA00 | Foncé: #1E3231 | Gris: #F4F4F4 */
+    /* CHARTE GRAPHIQUE CLAS53 */
+    /* Bleu: #005E84 | Jaune 1: #E9B44C | Jaune 2: #DEAA00 | Foncé: #1E3231 | Gris: #F4F4F4 */
 
-  --radius: 0.625rem;
+    --radius: 0.625rem;
 
-  /* BASE BLANCHE */
-  --background: #FFFFFF;
-  --foreground: #1E3231; /* Texte foncé de la charte pour le contraste */
+    /* BASE BLANCHE */
+    --background: #ffffff;
+    --foreground: #1e3231; /* Texte foncé de la charte pour le contraste */
 
-  /* CARTES */
-  --card: #FFFFFF;
-  --card-foreground: #1E3231;
-  --popover: #FFFFFF;
-  --popover-foreground: #1E3231;
+    /* CARTES */
+    --card: #ffffff;
+    --card-foreground: #1e3231;
+    --popover: #ffffff;
+    --popover-foreground: #1e3231;
 
-  /* PRIMAIRE (Bleu) */
-  --primary: #005E84;
-  --primary-foreground: #FFFFFF;
+    /* PRIMAIRE (Bleu) */
+    --primary: #005e84;
+    --primary-foreground: #ffffff;
 
-  /* SECONDAIRE (Jaune 1 - Moutarde) */
-  /* Utilisé pour les badges, fonds secondaires */
-  --secondary: #E9B44C;
-  --secondary-foreground: #1E3231;
+    /* SECONDAIRE (Jaune 1 - Moutarde) */
+    /* Utilisé pour les badges, fonds secondaires */
+    --secondary: #e9b44c;
+    --secondary-foreground: #1e3231;
 
-  /* ACCENT (Gris clair pour les fonds neutres, ou mélange léger) */
-  --muted: #F4F4F4;
-  --muted-foreground: #64748B; /* Slate-500 pour le texte atténué */
-  
-  /* ACCENT INTERACTIF */
-  /* On utilise le gris très clair pour le survol de base pour ne pas agresser */
-  --accent: #F4F4F4;
-  --accent-foreground: #005E84;
+    /* ACCENT (Gris clair pour les fonds neutres, ou mélange léger) */
+    --muted: #f4f4f4;
+    --muted-foreground: #64748b; /* Slate-500 pour le texte atténué */
 
-  /* DESTRUCTIVE */
-  --destructive: #ef4444;
-  --destructive-foreground: #FFFFFF;
+    /* ACCENT INTERACTIF */
+    /* On utilise le gris très clair pour le survol de base pour ne pas agresser */
+    --accent: #f4f4f4;
+    --accent-foreground: #005e84;
 
-  /* BORDURES & INPUTS */
-  --border: #E2E8F0;
-  --input: #E2E8F0;
+    /* DESTRUCTIVE */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
 
-  /* RING & FOCUS (Jaune 2 - Doré Foncé) */
-  /* C'est là qu'on apporte la touche "stylée" : le focus et les bordures actives en jaune soutenu */
-  --ring: #DEAA00;
+    /* BORDURES & INPUTS */
+    --border: #e2e8f0;
+    --input: #e2e8f0;
 
-  /* CHARTS - Utilisation de toute la palette */
-  --chart-1: #005E84; /* Bleu */
-  --chart-2: #E9B44C; /* Jaune 1 */
-  --chart-3: #DEAA00; /* Jaune 2 */
-  --chart-4: #1E3231; /* Vert/Gris foncé */
-  --chart-5: #0B0B0B; /* Noir */
+    /* RING & FOCUS (Jaune 2 - Doré Foncé) */
+    /* C'est là qu'on apporte la touche "stylée" : le focus et les bordures actives en jaune soutenu */
+    --ring: #deaa00;
 
-  /* SIDEBAR */
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1E3231;
-  --sidebar-primary: #005E84;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FDF8E8; /* Un jaune très très pâle pour le survol dans la sidebar (mix de blanc et E9B44C) */
-  --sidebar-accent-foreground: #005E84;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #DEAA00;
+    /* CHARTS - Utilisation de toute la palette */
+    --chart-1: #005e84; /* Bleu */
+    --chart-2: #e9b44c; /* Jaune 1 */
+    --chart-3: #deaa00; /* Jaune 2 */
+    --chart-4: #1e3231; /* Vert/Gris foncé */
+    --chart-5: #0b0b0b; /* Noir */
+
+    /* SIDEBAR */
+    --sidebar: #ffffff;
+    --sidebar-foreground: #1e3231;
+    --sidebar-primary: #005e84;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #fdf8e8; /* Un jaune très très pâle pour le survol dans la sidebar (mix de blanc et E9B44C) */
+    --sidebar-accent-foreground: #005e84;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #deaa00;
 }
 
 .dark {
-  /* Si jamais le dark mode s'active, on garde la cohérence mais inversée */
-  --background: #1E3231;
-  --foreground: #F4F4F4;
-  --card: #152322;
-  --card-foreground: #F4F4F4;
-  --popover: #152322;
-  --popover-foreground: #F4F4F4;
-  --primary: #E9B44C; /* Jaune 1 ressort mieux sur le fond foncé */
-  --primary-foreground: #1E3231;
-  --secondary: #005E84;
-  --secondary-foreground: #FFFFFF;
-  --muted: #2A403F;
-  --muted-foreground: #9CA3AF;
-  --accent: #2A403F;
-  --accent-foreground: #F4F4F4;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #F4F4F4;
-  --border: #2A403F;
-  --input: #2A403F;
-  --ring: #DEAA00;
-  --chart-1: #E9B44C;
-  --chart-2: #005E84;
-  --chart-3: #DEAA00;
-  --chart-4: #F4F4F4;
-  --chart-5: #FFFFFF;
-  --sidebar: #1E3231;
-  --sidebar-foreground: #F4F4F4;
-  --sidebar-primary: #E9B44C;
-  --sidebar-primary-foreground: #1E3231;
-  --sidebar-accent: #2A403F;
-  --sidebar-accent-foreground: #F4F4F4;
-  --sidebar-border: #2A403F;
-  --sidebar-ring: #DEAA00;
+    /* Si jamais le dark mode s'active, on garde la cohérence mais inversée */
+    --background: #1e3231;
+    --foreground: #f4f4f4;
+    --card: #152322;
+    --card-foreground: #f4f4f4;
+    --popover: #152322;
+    --popover-foreground: #f4f4f4;
+    --primary: #e9b44c; /* Jaune 1 ressort mieux sur le fond foncé */
+    --primary-foreground: #1e3231;
+    --secondary: #005e84;
+    --secondary-foreground: #ffffff;
+    --muted: #2a403f;
+    --muted-foreground: #9ca3af;
+    --accent: #2a403f;
+    --accent-foreground: #f4f4f4;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #f4f4f4;
+    --border: #2a403f;
+    --input: #2a403f;
+    --ring: #deaa00;
+    --chart-1: #e9b44c;
+    --chart-2: #005e84;
+    --chart-3: #deaa00;
+    --chart-4: #f4f4f4;
+    --chart-5: #ffffff;
+    --sidebar: #1e3231;
+    --sidebar-foreground: #f4f4f4;
+    --sidebar-primary: #e9b44c;
+    --sidebar-primary-foreground: #1e3231;
+    --sidebar-accent: #2a403f;
+    --sidebar-accent-foreground: #f4f4f4;
+    --sidebar-border: #2a403f;
+    --sidebar-ring: #deaa00;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+    * {
+        @apply border-border outline-ring/50;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
 }

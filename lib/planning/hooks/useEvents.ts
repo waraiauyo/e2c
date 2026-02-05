@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getAllEvents, getFilteredEvents } from "@/lib/supabase/query/events";
-import type { Event, EventFilters, UseEventsOptions } from "@/lib/planning/types";
+import type {
+    Event,
+    EventFilters,
+    UseEventsOptions,
+} from "@/lib/planning/types";
 
 /**
  * Hook pour récupérer et gérer les événements
@@ -28,7 +32,11 @@ export function useEvents(options: UseEventsOptions = {}) {
 
             setEvents(data);
         } catch (err) {
-            setError(err instanceof Error ? err : new Error("Erreur lors de la récupération des événements"));
+            setError(
+                err instanceof Error
+                    ? err
+                    : new Error("Erreur lors de la récupération des événements")
+            );
         } finally {
             setIsLoading(false);
         }

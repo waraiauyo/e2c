@@ -15,7 +15,7 @@ import type {
 } from "@/types/database";
 
 // ============================================================================
-// CLAS Queries
+// Requêtes CLAS
 // ============================================================================
 
 export interface GetAllClasResult {
@@ -24,7 +24,7 @@ export interface GetAllClasResult {
 }
 
 /**
- * Get all CLAS centers
+ * Récupère tous les centres CLAS
  */
 export async function getAllClas(): Promise<GetAllClasResult> {
     const supabase = await createClient();
@@ -63,7 +63,7 @@ export interface GetClasResult {
 }
 
 /**
- * Get a single CLAS by ID
+ * Récupère un CLAS par son ID
  */
 export async function getClasById(clasId: string): Promise<GetClasResult> {
     const supabase = await createClient();
@@ -103,7 +103,7 @@ export interface GetClasWithTeamResult {
 }
 
 /**
- * Get a CLAS with its team members (including profiles), raw contacts and projects
+ * Récupère un CLAS avec ses membres d'équipe (incluant les profils), contacts bruts et projets
  */
 export async function getClasWithTeam(
     clasId: string
@@ -128,10 +128,12 @@ export async function getClasWithTeam(
         // Get team members with their profiles
         const { data: teamMembers, error: teamError } = await supabase
             .from("clas_team_members")
-            .select(`
+            .select(
+                `
                 *,
                 profile:profiles(*)
-            `)
+            `
+            )
             .eq("clas_id", clasId);
 
         if (teamError) {
@@ -169,7 +171,9 @@ export async function getClasWithTeam(
         }
 
         // Map team members to include profile data
-        const teamMembersWithProfiles: ClasTeamMemberWithProfile[] = (teamMembers || []).map((tm: any) => ({
+        const teamMembersWithProfiles: ClasTeamMemberWithProfile[] = (
+            teamMembers || []
+        ).map((tm: any) => ({
             ...tm,
             profile: tm.profile || undefined,
         }));
@@ -195,10 +199,15 @@ export async function getClasWithTeam(
 }
 
 /**
- * Get all CLAS with their team members (with profile information) and projects
+ * Récupère tous les CLAS avec leurs membres d'équipe (incluant les profils) et projets
  */
 export async function getAllClasWithTeams(): Promise<{
-    clas: (Clas & { team_members: ClasTeamMemberWithProfile[]; projects: ClasProject[] })[] | null;
+    clas:
+        | (Clas & {
+              team_members: ClasTeamMemberWithProfile[];
+              projects: ClasProject[];
+          })[]
+        | null;
     error: string | null;
 }> {
     const supabase = await createClient();
@@ -218,9 +227,9 @@ export async function getAllClasWithTeams(): Promise<{
         }
 
         // Get all team members with their profiles
-        const { data: allTeamMembers, error: teamError } = await supabase
-            .from("clas_team_members")
-            .select(`
+        const { data: allTeamMembers, error: teamError } = await supabase.from(
+            "clas_team_members"
+        ).select(`
                 *,
                 profile:profiles(*)
             `);
@@ -274,7 +283,7 @@ export async function getAllClasWithTeams(): Promise<{
 }
 
 // ============================================================================
-// CLAS Mutations (Coordinator only via RLS)
+// Mutations CLAS (Coordinateur uniquement via RLS)
 // ============================================================================
 
 export interface CreateClasResult {
@@ -283,7 +292,7 @@ export interface CreateClasResult {
 }
 
 /**
- * Create a new CLAS (Coordinator only)
+ * Crée un nouveau CLAS (Coordinateur uniquement)
  */
 export async function createClas(
     clasData: ClasInsert
@@ -320,7 +329,7 @@ export async function createClas(
 }
 
 /**
- * Update a CLAS (Coordinator only)
+ * Met à jour un CLAS (Coordinateur uniquement)
  */
 export async function updateClas(
     clasUpdate: ClasUpdate
@@ -365,7 +374,7 @@ export interface DeleteClasResult {
 }
 
 /**
- * Delete a CLAS (Coordinator only)
+ * Supprime un CLAS (Coordinateur uniquement)
  */
 export async function deleteClas(clasId: string): Promise<DeleteClasResult> {
     const supabase = await createClient();
@@ -396,7 +405,7 @@ export async function deleteClas(clasId: string): Promise<DeleteClasResult> {
 }
 
 // ============================================================================
-// Team Members Queries
+// Requêtes Membres d'équipe
 // ============================================================================
 
 export interface GetTeamMembersResult {
@@ -405,7 +414,7 @@ export interface GetTeamMembersResult {
 }
 
 /**
- * Get team members for a specific CLAS with their profile information
+ * Récupère les membres d'équipe d'un CLAS avec leurs informations de profil
  */
 export async function getClasTeamMembers(
     clasId: string
@@ -415,10 +424,12 @@ export async function getClasTeamMembers(
     try {
         const { data, error } = await supabase
             .from("clas_team_members")
-            .select(`
+            .select(
+                `
                 *,
                 profile:profiles(*)
-            `)
+            `
+            )
             .eq("clas_id", clasId);
 
         if (error) {
@@ -447,11 +458,9 @@ export async function getClasTeamMembers(
 }
 
 /**
- * Get CLAS where a specific user is a team member
+ * Récupère les CLAS où un utilisateur est membre de l'équipe
  */
-export async function getUserClas(
-    userId: string
-): Promise<GetAllClasResult> {
+export async function getUserClas(userId: string): Promise<GetAllClasResult> {
     const supabase = await createClient();
 
     try {
@@ -518,7 +527,7 @@ export interface GetUserClasWithRolesResult {
 }
 
 /**
- * Get CLAS where a specific user is a team member, with their role in each CLAS
+ * Récupère les CLAS où un utilisateur est membre, avec son rôle dans chaque CLAS
  */
 export async function getUserClasWithRoles(
     userId: string
@@ -529,10 +538,12 @@ export async function getUserClasWithRoles(
         // Get CLAS with roles via join
         const { data, error } = await supabase
             .from("clas_team_members")
-            .select(`
+            .select(
+                `
                 role,
                 clas:clas(id, name)
-            `)
+            `
+            )
             .eq("profile_id", userId)
             .order("clas(name)");
 

@@ -7,12 +7,12 @@ import {
     deleteEvent,
     duplicateEvent,
     updateEventParticipants,
-    getEventParticipants
+    getEventParticipants,
 } from "@/lib/supabase/query/events";
 import {
     sendEventCreatedNotification,
     sendEventUpdatedNotification,
-    sendEventDeletedNotification
+    sendEventDeletedNotification,
 } from "@/lib/resend/actions";
 import type { Event } from "@/lib/planning/types";
 import { toast } from "sonner";
@@ -46,22 +46,26 @@ export function useEventMutations() {
 
                 // Envoyer les notifications email aux participants
                 if (eventData.created_by) {
-                    const notificationResult = await sendEventCreatedNotification(
-                        newEvent.id,
-                        {
-                            title: newEvent.title,
-                            description: newEvent.description,
-                            location: newEvent.location,
-                            start_time: newEvent.start_time,
-                            end_time: newEvent.end_time,
-                            all_day: newEvent.all_day,
-                            target_roles: newEvent.target_roles,
-                        },
-                        eventData.created_by
-                    );
+                    const notificationResult =
+                        await sendEventCreatedNotification(
+                            newEvent.id,
+                            {
+                                title: newEvent.title,
+                                description: newEvent.description,
+                                location: newEvent.location,
+                                start_time: newEvent.start_time,
+                                end_time: newEvent.end_time,
+                                all_day: newEvent.all_day,
+                                target_roles: newEvent.target_roles,
+                            },
+                            eventData.created_by
+                        );
 
                     if (!notificationResult.success) {
-                        console.warn("Échec de l'envoi des notifications:", notificationResult.error);
+                        console.warn(
+                            "Échec de l'envoi des notifications:",
+                            notificationResult.error
+                        );
                     }
                 }
             }
@@ -69,7 +73,10 @@ export function useEventMutations() {
             toast.success("Événement créé avec succès");
             return newEvent;
         } catch (err) {
-            const error = err instanceof Error ? err : new Error("Erreur lors de la création");
+            const error =
+                err instanceof Error
+                    ? err
+                    : new Error("Erreur lors de la création");
             setError(error);
             toast.error(error.message);
             return null;
@@ -119,14 +126,20 @@ export function useEventMutations() {
                 );
 
                 if (!notificationResult.success) {
-                    console.warn("Échec de l'envoi des notifications:", notificationResult.error);
+                    console.warn(
+                        "Échec de l'envoi des notifications:",
+                        notificationResult.error
+                    );
                 }
             }
 
             toast.success("Événement mis à jour avec succès");
             return updatedEvent;
         } catch (err) {
-            const error = err instanceof Error ? err : new Error("Erreur lors de la mise à jour");
+            const error =
+                err instanceof Error
+                    ? err
+                    : new Error("Erreur lors de la mise à jour");
             setError(error);
             toast.error(error.message);
             return null;
@@ -150,7 +163,7 @@ export function useEventMutations() {
         try {
             // Récupérer les participants avant suppression
             const participants = await getEventParticipants(id);
-            const participantIds = participants.map(p => p.profile_id);
+            const participantIds = participants.map((p) => p.profile_id);
 
             // Supprimer l'événement
             await deleteEvent(id, deleteType);
@@ -165,7 +178,10 @@ export function useEventMutations() {
                 );
 
                 if (!notificationResult.success) {
-                    console.warn("Échec de l'envoi des notifications:", notificationResult.error);
+                    console.warn(
+                        "Échec de l'envoi des notifications:",
+                        notificationResult.error
+                    );
                 }
             }
 
@@ -176,7 +192,10 @@ export function useEventMutations() {
             );
             return true;
         } catch (err) {
-            const error = err instanceof Error ? err : new Error("Erreur lors de la suppression");
+            const error =
+                err instanceof Error
+                    ? err
+                    : new Error("Erreur lors de la suppression");
             setError(error);
             toast.error(error.message);
             return false;
@@ -197,7 +216,10 @@ export function useEventMutations() {
             toast.success("Événement dupliqué avec succès");
             return duplicatedEvent;
         } catch (err) {
-            const error = err instanceof Error ? err : new Error("Erreur lors de la duplication");
+            const error =
+                err instanceof Error
+                    ? err
+                    : new Error("Erreur lors de la duplication");
             setError(error);
             toast.error(error.message);
             return null;

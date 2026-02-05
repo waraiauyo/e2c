@@ -27,9 +27,9 @@ import { useRouter } from "next/navigation";
 
 const resetPasswordFormSchema = z
     .object({
-        password: z
-            .string()
-            .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." }),
+        password: z.string().min(8, {
+            message: "Le mot de passe doit contenir au moins 8 caractères.",
+        }),
         confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -86,7 +86,9 @@ export default function ResetPasswordPage() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Nouveau mot de passe</FormLabel>
+                                        <FormLabel>
+                                            Nouveau mot de passe
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"
@@ -122,7 +124,9 @@ export default function ResetPasswordPage() {
                                 type="submit"
                                 className="w-full"
                             >
-                                {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
+                                {loading
+                                    ? "Réinitialisation..."
+                                    : "Réinitialiser le mot de passe"}
                             </Button>
                         </form>
                     </Form>

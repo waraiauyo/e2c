@@ -42,7 +42,8 @@ export const loginUser = createAsyncThunk(
 
             if (userError || !user) {
                 return rejectWithValue(
-                    userError || "Erreur lors de la récupération de l'utilisateur."
+                    userError ||
+                        "Erreur lors de la récupération de l'utilisateur."
                 );
             }
 

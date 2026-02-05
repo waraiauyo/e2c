@@ -3,8 +3,13 @@
  * Basé sur la RFC 5545 (iCalendar)
  */
 
-import type { RecurrenceRule, RecurrenceFrequency, Weekday, Event } from "@/lib/planning/types";
-import { addDays, addWeeks, addMonths, isSameDay } from "./dateUtils";
+import type {
+    RecurrenceRule,
+    RecurrenceFrequency,
+    Weekday,
+    Event,
+} from "@/lib/planning/types";
+import { addDays, addWeeks, addMonths } from "./dateUtils";
 
 // ============================================================================
 // Génération d'occurrences
@@ -148,7 +153,9 @@ export function recurrenceRuleToString(rule: RecurrenceRule): string {
 /**
  * Parse une string RRULE en objet RecurrenceRule
  */
-export function parseRecurrenceRule(rruleString: string): RecurrenceRule | null {
+export function parseRecurrenceRule(
+    rruleString: string
+): RecurrenceRule | null {
     try {
         const parts = rruleString.split(";");
         const rule: Partial<RecurrenceRule> = {};
@@ -174,7 +181,9 @@ export function parseRecurrenceRule(rruleString: string): RecurrenceRule | null 
                     rule.byweekday = value.split(",") as Weekday[];
                     break;
                 case "BYMONTHDAY":
-                    rule.bymonthday = value.split(",").map((d) => parseInt(d, 10));
+                    rule.bymonthday = value
+                        .split(",")
+                        .map((d) => parseInt(d, 10));
                     break;
                 case "BYMONTH":
                     rule.bymonth = value.split(",").map((m) => parseInt(m, 10));
@@ -222,26 +231,46 @@ export function recurrenceRuleToText(rule: RecurrenceRule): string {
     // Fréquence de base
     switch (rule.freq) {
         case "DAILY":
-            parts.push(interval === 1 ? "Tous les jours" : `Tous les ${interval} jours`);
+            parts.push(
+                interval === 1 ? "Tous les jours" : `Tous les ${interval} jours`
+            );
             break;
         case "WEEKLY":
             if (rule.byweekday && rule.byweekday.length > 0) {
                 const days = rule.byweekday.map(weekdayToFrench).join(", ");
-                parts.push(interval === 1 ? `Toutes les semaines le ${days}` : `Toutes les ${interval} semaines le ${days}`);
+                parts.push(
+                    interval === 1
+                        ? `Toutes les semaines le ${days}`
+                        : `Toutes les ${interval} semaines le ${days}`
+                );
             } else {
-                parts.push(interval === 1 ? "Toutes les semaines" : `Toutes les ${interval} semaines`);
+                parts.push(
+                    interval === 1
+                        ? "Toutes les semaines"
+                        : `Toutes les ${interval} semaines`
+                );
             }
             break;
         case "MONTHLY":
             if (rule.bymonthday && rule.bymonthday.length > 0) {
                 const days = rule.bymonthday.join(", ");
-                parts.push(interval === 1 ? `Tous les mois le ${days}` : `Tous les ${interval} mois le ${days}`);
+                parts.push(
+                    interval === 1
+                        ? `Tous les mois le ${days}`
+                        : `Tous les ${interval} mois le ${days}`
+                );
             } else {
-                parts.push(interval === 1 ? "Tous les mois" : `Tous les ${interval} mois`);
+                parts.push(
+                    interval === 1
+                        ? "Tous les mois"
+                        : `Tous les ${interval} mois`
+                );
             }
             break;
         case "YEARLY":
-            parts.push(interval === 1 ? "Tous les ans" : `Tous les ${interval} ans`);
+            parts.push(
+                interval === 1 ? "Tous les ans" : `Tous les ${interval} ans`
+            );
             break;
     }
 
@@ -279,7 +308,11 @@ function weekdayToFrench(day: Weekday): string {
 /**
  * Crée une règle de récurrence quotidienne
  */
-export function createDailyRule(interval = 1, count?: number, until?: string): RecurrenceRule {
+export function createDailyRule(
+    interval = 1,
+    count?: number,
+    until?: string
+): RecurrenceRule {
     return {
         freq: "DAILY",
         interval,
@@ -327,7 +360,11 @@ export function createMonthlyRule(
 /**
  * Crée une règle de récurrence annuelle
  */
-export function createYearlyRule(interval = 1, count?: number, until?: string): RecurrenceRule {
+export function createYearlyRule(
+    interval = 1,
+    count?: number,
+    until?: string
+): RecurrenceRule {
     return {
         freq: "YEARLY",
         interval,
@@ -343,7 +380,10 @@ export function createYearlyRule(interval = 1, count?: number, until?: string): 
 /**
  * Valide une règle de récurrence
  */
-export function validateRecurrenceRule(rule: RecurrenceRule): { valid: boolean; errors: string[] } {
+export function validateRecurrenceRule(rule: RecurrenceRule): {
+    valid: boolean;
+    errors: string[];
+} {
     const errors: string[] = [];
 
     if (!rule.freq) {

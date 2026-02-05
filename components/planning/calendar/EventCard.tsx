@@ -59,7 +59,9 @@ export function EventCard({
 
     // Badges des rôles cibles
     const roleBadges = (size: "sm" | "default" = "default") => (
-        <div className={`flex flex-wrap gap-1 ${size === "sm" ? "gap-0.5" : ""}`}>
+        <div
+            className={`flex flex-wrap gap-1 ${size === "sm" ? "gap-0.5" : ""}`}
+        >
             {event.target_roles.map((role) => (
                 <span
                     key={role}
@@ -167,9 +169,7 @@ export function EventCard({
                     </div>
 
                     {/* Badges des rôles */}
-                    <div className="mb-3">
-                        {roleBadges()}
-                    </div>
+                    <div className="mb-3">{roleBadges()}</div>
 
                     {event.description && (
                         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
@@ -203,7 +203,6 @@ export function EventCard({
                     </div>
                 </div>
 
-                {/* Avatar group pour participants (placeholder pour l'instant) */}
                 <div className="flex items-center gap-1">
                     <TooltipProvider>
                         <Tooltip>

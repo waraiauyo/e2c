@@ -65,14 +65,16 @@ const phoneFormSchema = z.object({
     phone: z
         .string()
         .min(1, { message: "Le numéro de téléphone est requis." })
-        .regex(/^[0-9\s\-\+\.]+$/, { message: "Numéro de téléphone invalide." }),
+        .regex(/^[0-9\s\-\+\.]+$/, {
+            message: "Numéro de téléphone invalide.",
+        }),
 });
 
 const passwordFormSchema = z
     .object({
-        password: z
-            .string()
-            .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." }),
+        password: z.string().min(8, {
+            message: "Le mot de passe doit contenir au moins 8 caractères.",
+        }),
         confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -441,7 +443,9 @@ export default function ProfilePage() {
                         <div className="text-sm font-medium text-[#1E3231]">
                             {profile.first_name && profile.last_name
                                 ? `${profile.first_name} ${profile.last_name}`
-                                : profile.first_name || profile.last_name || "Non renseigné"}
+                                : profile.first_name ||
+                                  profile.last_name ||
+                                  "Non renseigné"}
                         </div>
                     </div>
 
@@ -450,9 +454,7 @@ export default function ProfilePage() {
                     <div className="grid gap-2">
                         <Label className="text-[#1E3231]">Type de compte</Label>
                         <div>
-                            <Badge
-                                className="bg-[#E9B44C] hover:bg-[#d8a035] text-[#1E3231] border-none font-semibold"
-                            >
+                            <Badge className="bg-[#E9B44C] hover:bg-[#d8a035] text-[#1E3231] border-none font-semibold">
                                 {getAccountTypeLabel(profile.account_type)}
                             </Badge>
                         </div>
@@ -518,7 +520,9 @@ export default function ProfilePage() {
                 <CardContent>
                     <div className="space-y-6">
                         <div className="grid gap-1">
-                            <Label className="text-[#1E3231]">Téléphone actuel</Label>
+                            <Label className="text-[#1E3231]">
+                                Téléphone actuel
+                            </Label>
                             <div className="text-sm font-medium text-[#1E3231]">
                                 {profile.phone || "Non renseigné"}
                             </div>
@@ -536,7 +540,9 @@ export default function ProfilePage() {
                                     name="phone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[#1E3231]">Nouveau numéro</FormLabel>
+                                            <FormLabel className="text-[#1E3231]">
+                                                Nouveau numéro
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="tel"
@@ -578,13 +584,16 @@ export default function ProfilePage() {
                         Modifier l&apos;email
                     </CardTitle>
                     <CardDescription className="text-muted-foreground">
-                        Un email de confirmation sera envoyé à votre nouvelle adresse
+                        Un email de confirmation sera envoyé à votre nouvelle
+                        adresse
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-6">
                         <div className="grid gap-1">
-                            <Label className="text-[#1E3231]">Email actuel</Label>
+                            <Label className="text-[#1E3231]">
+                                Email actuel
+                            </Label>
                             <div className="text-sm font-medium text-[#1E3231]">
                                 {user?.email}
                             </div>
@@ -602,7 +611,9 @@ export default function ProfilePage() {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[#1E3231]">Nouvel email</FormLabel>
+                                            <FormLabel className="text-[#1E3231]">
+                                                Nouvel email
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="email"
@@ -650,7 +661,9 @@ export default function ProfilePage() {
                 <CardContent>
                     <Form {...passwordForm}>
                         <form
-                            onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+                            onSubmit={passwordForm.handleSubmit(
+                                onPasswordSubmit
+                            )}
                             className="space-y-4"
                         >
                             <FormField
@@ -658,7 +671,9 @@ export default function ProfilePage() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[#1E3231]">Nouveau mot de passe</FormLabel>
+                                        <FormLabel className="text-[#1E3231]">
+                                            Nouveau mot de passe
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"
@@ -677,7 +692,9 @@ export default function ProfilePage() {
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[#1E3231]">Confirmer le mot de passe</FormLabel>
+                                        <FormLabel className="text-[#1E3231]">
+                                            Confirmer le mot de passe
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"

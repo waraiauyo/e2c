@@ -200,7 +200,10 @@ export function EventForm({
         if (user.id === userId) return false; // Exclure l'utilisateur actuel
         if (!targetRoles || targetRoles.length === 0) return true;
         const matchingAccountTypes = getMatchingAccountTypes(targetRoles);
-        return user.account_type && matchingAccountTypes.includes(user.account_type);
+        return (
+            user.account_type &&
+            matchingAccountTypes.includes(user.account_type)
+        );
     });
 
     // Auto-sélectionner les participants quand les target_roles changent
@@ -210,10 +213,11 @@ export function EventForm({
         if (targetRoles && targetRoles.length > 0) {
             const matchingAccountTypes = getMatchingAccountTypes(targetRoles);
             const matchingUserIds = allUsers
-                .filter((user) =>
-                    user.id !== userId &&
-                    user.account_type &&
-                    matchingAccountTypes.includes(user.account_type)
+                .filter(
+                    (user) =>
+                        user.id !== userId &&
+                        user.account_type &&
+                        matchingAccountTypes.includes(user.account_type)
                 )
                 .map((user) => user.id);
 
@@ -627,9 +631,18 @@ export function EventForm({
                                             {/* Info sur le filtrage automatique */}
                                             <div className="px-3 py-2 border-b bg-muted/30">
                                                 <p className="text-xs text-muted-foreground">
-                                                    Filtrés selon les destinataires :{" "}
+                                                    Filtrés selon les
+                                                    destinataires :{" "}
                                                     <span className="font-medium text-foreground">
-                                                        {targetRoles?.map((r) => ROLE_LABELS[r]).join(", ") || "Aucun"}
+                                                        {targetRoles
+                                                            ?.map(
+                                                                (r) =>
+                                                                    ROLE_LABELS[
+                                                                        r
+                                                                    ]
+                                                            )
+                                                            .join(", ") ||
+                                                            "Aucun"}
                                                     </span>
                                                 </p>
                                             </div>

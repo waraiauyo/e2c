@@ -12,7 +12,9 @@ export const FROM_EMAIL = "notifications@valentinrnld.com";
  */
 export function isResendEnabled(): boolean {
     if (!resend) {
-        console.warn("⚠️  Resend n'est pas configuré. Ajoutez RESEND_API_KEY dans .env pour activer les notifications email.");
+        console.warn(
+            "⚠️  Resend n'est pas configuré. Ajoutez RESEND_API_KEY dans .env pour activer les notifications email."
+        );
         return false;
     }
     return true;

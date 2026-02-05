@@ -15,9 +15,9 @@ export type TargetRole = "animator" | "coordinator" | "director";
 // ============================================================================
 
 export const ROLE_COLORS: Record<TargetRole, string> = {
-    animator: "#3b82f6",    // Bleu
+    animator: "#3b82f6", // Bleu
     coordinator: "#22c55e", // Vert
-    director: "#f97316",    // Orange
+    director: "#f97316", // Orange
 } as const;
 
 export const ROLE_LABELS: Record<TargetRole, string> = {
@@ -177,9 +177,14 @@ export interface UseEventsResult {
 }
 
 export interface EventMutations {
-    createEvent: (data: Omit<Event, "id" | "created_at" | "updated_at">) => Promise<Event>;
+    createEvent: (
+        data: Omit<Event, "id" | "created_at" | "updated_at">
+    ) => Promise<Event>;
     updateEvent: (id: string, data: Partial<Event>) => Promise<Event>;
-    deleteEvent: (id: string, deleteType?: "instance" | "series") => Promise<void>;
+    deleteEvent: (
+        id: string,
+        deleteType?: "instance" | "series"
+    ) => Promise<void>;
     duplicateEvent: (id: string) => Promise<Event>;
 }
 
@@ -236,7 +241,7 @@ export function getEventColor(targetRoles: TargetRole[]): string {
  */
 export function getEventRoleLabel(targetRoles: TargetRole[]): string {
     if (targetRoles.length === 3) return "Tous";
-    return targetRoles.map(r => ROLE_LABELS[r]).join(", ");
+    return targetRoles.map((r) => ROLE_LABELS[r]).join(", ");
 }
 
 // ============================================================================
@@ -250,17 +255,27 @@ type AccountType = "admin" | "coordinator" | "director" | "animator";
  * - Admins, coordinateurs et directeurs peuvent modifier tous les événements
  * - Les animateurs ne peuvent modifier que les événements destinés uniquement aux animateurs
  */
-export function canEditEvent(event: Event, userAccountType: AccountType | undefined): boolean {
+export function canEditEvent(
+    event: Event,
+    userAccountType: AccountType | undefined
+): boolean {
     if (!userAccountType) return false;
 
     // Admins, coordinateurs et directeurs peuvent tout modifier
-    if (userAccountType === "admin" || userAccountType === "coordinator" || userAccountType === "director") {
+    if (
+        userAccountType === "admin" ||
+        userAccountType === "coordinator" ||
+        userAccountType === "director"
+    ) {
         return true;
     }
 
     // Les animateurs ne peuvent modifier que les événements destinés uniquement aux animateurs
     if (userAccountType === "animator") {
-        return event.target_roles.length === 1 && event.target_roles[0] === "animator";
+        return (
+            event.target_roles.length === 1 &&
+            event.target_roles[0] === "animator"
+        );
     }
 
     return false;
@@ -270,20 +285,28 @@ export function canEditEvent(event: Event, userAccountType: AccountType | undefi
  * Vérifie si un utilisateur peut supprimer un événement
  * Mêmes règles que pour la modification
  */
-export function canDeleteEvent(event: Event, userAccountType: AccountType | undefined): boolean {
+export function canDeleteEvent(
+    event: Event,
+    userAccountType: AccountType | undefined
+): boolean {
     return canEditEvent(event, userAccountType);
 }
 
 /**
  * Retourne un message expliquant pourquoi l'utilisateur ne peut pas modifier l'événement
  */
-export function getPermissionDeniedReason(event: Event, userAccountType: AccountType | undefined): string | null {
+export function getPermissionDeniedReason(
+    event: Event,
+    userAccountType: AccountType | undefined
+): string | null {
     if (canEditEvent(event, userAccountType)) return null;
 
     if (userAccountType === "animator") {
-        const otherRoles = event.target_roles.filter(r => r !== "animator");
+        const otherRoles = event.target_roles.filter((r) => r !== "animator");
         if (otherRoles.length > 0) {
-            const roleNames = otherRoles.map(r => ROLE_LABELS[r]).join(" et ");
+            const roleNames = otherRoles
+                .map((r) => ROLE_LABELS[r])
+                .join(" et ");
             return `Cet événement est destiné aux ${roleNames}. Seuls les coordinateurs et directeurs peuvent le modifier.`;
         }
     }

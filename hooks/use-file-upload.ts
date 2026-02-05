@@ -8,12 +8,12 @@ const DRIVE_BUCKET_NAME = "drive";
 const CHUNK_SIZE = 6 * 1024 * 1024; // 6MB
 
 /**
- * Sanitize filename for S3/Supabase Storage compatibility
- * - Replaces spaces with underscores
- * - Removes special characters that are problematic for S3
- * - Normalizes accented characters to ASCII
- * - Preserves file extension
- * - Limits length to 200 characters
+ * Nettoie un nom de fichier pour compatibilité S3/Supabase Storage
+ * - Remplace les espaces par des underscores
+ * - Supprime les caractères spéciaux problématiques pour S3
+ * - Normalise les accents en ASCII (é -> e, ç -> c)
+ * - Préserve l'extension du fichier
+ * - Limite la longueur à 200 caractères
  */
 function sanitizeFileName(fileName: string): string {
     // Separate name and extension
@@ -52,7 +52,7 @@ function sanitizeFileName(fileName: string): string {
 }
 
 /**
- * Add numeric suffix to filename to make it unique
+ * Ajoute un suffixe numérique pour rendre le nom unique
  * fichier.pdf -> fichier_1.pdf, fichier_2.pdf, etc.
  */
 function addSuffixToFileName(fileName: string, suffix: number): string {
@@ -64,8 +64,8 @@ function addSuffixToFileName(fileName: string, suffix: number): string {
 }
 
 /**
- * Generate unique filenames for a batch of files
- * Handles duplicates within the batch and against existing names
+ * Génère des noms de fichiers uniques pour un lot de fichiers
+ * Gère les doublons au sein du lot et par rapport aux noms existants
  */
 function generateUniqueFileNames(
     files: File[],
@@ -95,8 +95,8 @@ function generateUniqueFileNames(
 export interface UploadingFile {
     id: string;
     file: File;
-    name: string;           // Original file name (for display)
-    sanitizedName: string;  // Sanitized name (for storage)
+    name: string; // Original file name (for display)
+    sanitizedName: string; // Sanitized name (for storage)
     progress: number;
     status: "pending" | "uploading" | "completed" | "error";
     error?: string;
@@ -113,14 +113,22 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     const [isUploading, setIsUploading] = useState(false);
     const uploadsRef = useRef<Map<string, tus.Upload>>(new Map());
 
-    const updateFile = useCallback((id: string, updates: Partial<UploadingFile>) => {
-        setUploadingFiles((prev) =>
-            prev.map((f) => (f.id === id ? { ...f, ...updates } : f))
-        );
-    }, []);
+    const updateFile = useCallback(
+        (id: string, updates: Partial<UploadingFile>) => {
+            setUploadingFiles((prev) =>
+                prev.map((f) => (f.id === id ? { ...f, ...updates } : f))
+            );
+        },
+        []
+    );
 
     const uploadFile = useCallback(
-        async (file: File, dirPath: string, fileId: string, sanitizedName: string) => {
+        async (
+            file: File,
+            dirPath: string,
+            fileId: string,
+            sanitizedName: string
+        ) => {
             const supabase = createClient();
             const { data: sessionData } = await supabase.auth.getSession();
 
@@ -133,7 +141,9 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
                 return;
             }
 
-            const filePath = dirPath ? `${dirPath}${sanitizedName}` : sanitizedName;
+            const filePath = dirPath
+                ? `${dirPath}${sanitizedName}`
+                : sanitizedName;
             const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
             return new Promise<void>((resolve, reject) => {
@@ -154,7 +164,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
                     },
                     chunkSize: CHUNK_SIZE,
                     onError: (error) => {
-                        console.error("Upload error:", error);
+                        console.error("Erreur upload:", error);
                         updateFile(fileId, {
                             status: "error",
                             error: error.message,
@@ -164,7 +174,9 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
                         reject(error);
                     },
                     onProgress: (bytesUploaded, bytesTotal) => {
-                        const progress = Math.round((bytesUploaded / bytesTotal) * 100);
+                        const progress = Math.round(
+                            (bytesUploaded / bytesTotal) * 100
+                        );
                         updateFile(fileId, { progress });
                     },
                     onSuccess: () => {
@@ -186,7 +198,11 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     );
 
     const uploadFiles = useCallback(
-        async (files: File[], dirPath: string, existingFileNames: string[] = []) => {
+        async (
+            files: File[],
+            dirPath: string,
+            existingFileNames: string[] = []
+        ) => {
             if (files.length === 0) return;
 
             setIsUploading(true);
@@ -218,9 +234,11 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
             setUploadingFiles((prev) => [...prev, ...newFiles]);
 
             const uploadPromises = newFiles.map((uf) =>
-                uploadFile(uf.file, dirPath, uf.id, uf.sanitizedName).catch(() => {
-                    // Error already handled in uploadFile
-                })
+                uploadFile(uf.file, dirPath, uf.id, uf.sanitizedName).catch(
+                    () => {
+                        // Error already handled in uploadFile
+                    }
+                )
             );
 
             await Promise.all(uploadPromises);
@@ -252,14 +270,20 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
         );
     }, []);
 
-    const totalProgress = uploadingFiles.length > 0
-        ? Math.round(
-              uploadingFiles.reduce((acc, f) => acc + f.progress, 0) / uploadingFiles.length
-          )
-        : 0;
+    const totalProgress =
+        uploadingFiles.length > 0
+            ? Math.round(
+                  uploadingFiles.reduce((acc, f) => acc + f.progress, 0) /
+                      uploadingFiles.length
+              )
+            : 0;
 
-    const completedCount = uploadingFiles.filter((f) => f.status === "completed").length;
-    const errorCount = uploadingFiles.filter((f) => f.status === "error").length;
+    const completedCount = uploadingFiles.filter(
+        (f) => f.status === "completed"
+    ).length;
+    const errorCount = uploadingFiles.filter(
+        (f) => f.status === "error"
+    ).length;
 
     return {
         uploadingFiles,

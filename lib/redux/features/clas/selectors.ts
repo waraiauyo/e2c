@@ -34,9 +34,11 @@ export const selectClasForMap = createSelector([selectFilteredClas], (items) =>
                 c.team_members?.filter((m) => m.role === "director") || [];
             const animators =
                 c.team_members?.filter((m) => m.role === "animator") || [];
-            
+
             // Trouver le projet actif
-            const activeProject = c.projects?.find((p) => p.status === "ongoing");
+            const activeProject = c.projects?.find(
+                (p) => p.status === "ongoing"
+            );
 
             return {
                 id: c.id,
@@ -65,10 +67,12 @@ export const selectClasForMap = createSelector([selectFilteredClas], (items) =>
                         email: m.profile?.email || m.contact_email || null,
                     })),
                     animatorCount: animators.length,
-                    activeProject: activeProject ? {
-                        name: activeProject.name,
-                        year: activeProject.year
-                    } : null,
+                    activeProject: activeProject
+                        ? {
+                              name: activeProject.name,
+                              year: activeProject.year,
+                          }
+                        : null,
                 },
             };
         })

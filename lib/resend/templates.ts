@@ -85,35 +85,51 @@ function formatEventDetails(event: {
                 <span style="color: #6b7280;">${dateStr}</span>
             </div>
 
-            ${!event.all_day ? `
+            ${
+                !event.all_day
+                    ? `
             <div style="margin-bottom: 12px;">
                 <strong style="color: #374151;">🕐 Horaire :</strong>
                 <span style="color: #6b7280;">${timeStr}</span>
             </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
-            ${event.location ? `
+            ${
+                event.location
+                    ? `
             <div style="margin-bottom: 12px;">
                 <strong style="color: #374151;">📍 Lieu :</strong>
                 <span style="color: #6b7280;">${event.location}</span>
             </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
-            ${event.roleLabels ? `
+            ${
+                event.roleLabels
+                    ? `
             <div style="margin-bottom: 12px;">
                 <strong style="color: #374151;">👥 Destinataires :</strong>
                 <span style="color: #6b7280;">${event.roleLabels}</span>
             </div>
-            ` : ''}
+            `
+                    : ""
+            }
 
-            ${event.description ? `
+            ${
+                event.description
+                    ? `
             <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
                 <strong style="color: #374151;">Description :</strong>
                 <p style="margin: 8px 0 0 0; color: #6b7280; line-height: 1.6;">
                     ${event.description}
                 </p>
             </div>
-            ` : ''}
+            `
+                    : ""
+            }
         </div>
     `;
 }

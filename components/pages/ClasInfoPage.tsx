@@ -116,8 +116,9 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
     const animators = getMembersByRole("animator");
 
     // Récupération et tri des projets
-    const activeProject = clas?.projects?.find(p => p.status === "ongoing");
-    const allProjects = clas?.projects?.sort((a, b) => b.year.localeCompare(a.year)) || [];
+    const activeProject = clas?.projects?.find((p) => p.status === "ongoing");
+    const allProjects =
+        clas?.projects?.sort((a, b) => b.year.localeCompare(a.year)) || [];
 
     if (loading) {
         return (
@@ -167,7 +168,7 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     Informations du CLAS
                 </h1>
             </div>
-            
+
             {/* Carte Infos Principales */}
             <Card className="w-full max-w-4xl border-[#E2E8F0] shadow-sm bg-white">
                 <CardHeader>
@@ -401,19 +402,27 @@ export function ClasInfoPage({ clasId }: ClasInfoPageProps) {
                     <CardContent className="space-y-4">
                         {allProjects.map((project, index) => (
                             <div key={project.id}>
-                                {index > 0 && <Separator className="bg-[#F4F4F4] my-4" />}
+                                {index > 0 && (
+                                    <Separator className="bg-[#F4F4F4] my-4" />
+                                )}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between gap-2">
                                         <h4 className="font-semibold text-[#1E3231] text-sm">
                                             {project.name}
                                         </h4>
                                         <div className="flex items-center gap-2 shrink-0">
-                                            {project.status === 'ongoing' && (
-                                                <Badge variant="secondary" className="bg-[#FDF8E8] text-[#DEAA00] hover:bg-[#FDF8E8] text-[10px] border border-[#E9B44C]/30">
+                                            {project.status === "ongoing" && (
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-[#FDF8E8] text-[#DEAA00] hover:bg-[#FDF8E8] text-[10px] border border-[#E9B44C]/30"
+                                                >
                                                     En cours
                                                 </Badge>
                                             )}
-                                            <Badge variant="outline" className="text-xs font-normal border-[#E2E8F0]">
+                                            <Badge
+                                                variant="outline"
+                                                className="text-xs font-normal border-[#E2E8F0]"
+                                            >
                                                 {project.year}
                                             </Badge>
                                         </div>

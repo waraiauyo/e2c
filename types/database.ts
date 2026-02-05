@@ -1,7 +1,7 @@
 /**
- * Database types for E2C application
+ * Types de base de données pour l'application E2C
  *
- * These types represent the database schema for CLAS-related tables
+ * Ces types représentent le schéma de la base de données pour les tables liées aux CLAS
  */
 
 export type AccountType = "admin" | "coordinator" | "director" | "animator";

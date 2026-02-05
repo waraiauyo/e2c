@@ -63,9 +63,16 @@ export function EventDialog({
     const userAccountType = profile?.account_type;
 
     // Vérifier les permissions pour l'édition
-    const userCanEdit = mode === "create" || (event ? canEditEvent(event, userAccountType) : false);
-    const userCanDelete = event ? canDeleteEvent(event, userAccountType) : false;
-    const permissionDeniedReason = event && !userCanEdit ? getPermissionDeniedReason(event, userAccountType) : null;
+    const userCanEdit =
+        mode === "create" ||
+        (event ? canEditEvent(event, userAccountType) : false);
+    const userCanDelete = event
+        ? canDeleteEvent(event, userAccountType)
+        : false;
+    const permissionDeniedReason =
+        event && !userCanEdit
+            ? getPermissionDeniedReason(event, userAccountType)
+            : null;
 
     const handleSubmit = async (data: EventFormValues) => {
         if (!userId) {
@@ -213,11 +220,15 @@ export function EventDialog({
                                 <div
                                     className="p-4 rounded-lg border-l-4"
                                     style={{
-                                        borderLeftColor: getEventColor(event.target_roles),
+                                        borderLeftColor: getEventColor(
+                                            event.target_roles
+                                        ),
                                         backgroundColor: `${getEventColor(event.target_roles)}10`,
                                     }}
                                 >
-                                    <h3 className="text-lg font-semibold mb-4">{event.title}</h3>
+                                    <h3 className="text-lg font-semibold mb-4">
+                                        {event.title}
+                                    </h3>
 
                                     {/* Rôles destinataires */}
                                     <div className="flex flex-wrap gap-1 mb-4">
@@ -241,7 +252,11 @@ export function EventDialog({
                                         <div className="flex items-center gap-2">
                                             <Clock className="h-4 w-4 text-muted-foreground" />
                                             <span>
-                                                {format(new Date(event.start_time), "EEEE d MMMM yyyy", { locale: fr })}
+                                                {format(
+                                                    new Date(event.start_time),
+                                                    "EEEE d MMMM yyyy",
+                                                    { locale: fr }
+                                                )}
                                                 {" • "}
                                                 {formatEventTime(event)}
                                             </span>

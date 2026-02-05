@@ -143,7 +143,9 @@ export default function LoginPage() {
                                     type="submit"
                                     className="w-full"
                                 >
-                                    {isLoading ? "Connexion..." : "Se connecter"}
+                                    {isLoading
+                                        ? "Connexion..."
+                                        : "Se connecter"}
                                 </Button>
                             </CardFooter>
                         </form>

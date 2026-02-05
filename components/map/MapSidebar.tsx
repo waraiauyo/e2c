@@ -42,13 +42,17 @@ export function MapSidebar({ onClasSelect }: MapSidebarProps) {
                         type="text"
                         placeholder="Ville ou nom du CLAS..."
                         value={filters.searchQuery}
-                        onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                        onChange={(e) =>
+                            dispatch(setSearchQuery(e.target.value))
+                        }
                         className="bg-white border-[#E2E8F0] focus-visible:ring-[#DEAA00] focus-visible:border-[#DEAA00] transition-colors shadow-sm"
                     />
                 </div>
 
                 <div className="pt-4 border-t border-[#E2E8F0]">
-                    <h3 className="font-bold text-[#005E84] text-sm mb-3">Filtres</h3>
+                    <h3 className="font-bold text-[#005E84] text-sm mb-3">
+                        Filtres
+                    </h3>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                             <Label className="text-xs font-semibold text-[#1E3231]/80 uppercase tracking-wider">
@@ -65,8 +69,12 @@ export function MapSidebar({ onClasSelect }: MapSidebarProps) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Tous</SelectItem>
-                                    <SelectItem value="primary">Primaire</SelectItem>
-                                    <SelectItem value="middle_school">Collège</SelectItem>
+                                    <SelectItem value="primary">
+                                        Primaire
+                                    </SelectItem>
+                                    <SelectItem value="middle_school">
+                                        Collège
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -84,7 +92,9 @@ export function MapSidebar({ onClasSelect }: MapSidebarProps) {
                                     <SelectValue placeholder="Choix" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Peu importe</SelectItem>
+                                    <SelectItem value="all">
+                                        Peu importe
+                                    </SelectItem>
                                     <SelectItem value="yes">Oui</SelectItem>
                                     <SelectItem value="no">Non</SelectItem>
                                 </SelectContent>
@@ -103,7 +113,7 @@ export function MapSidebar({ onClasSelect }: MapSidebarProps) {
                         {filteredClas.length}
                     </span>
                 </div>
-                
+
                 <ScrollArea className="h-[calc(100%-3rem)]">
                     <div className="p-4 space-y-3">
                         {filteredClas.length === 0 ? (
@@ -141,13 +151,16 @@ export function MapSidebar({ onClasSelect }: MapSidebarProps) {
                                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
                                             <MapPin className="h-3.5 w-3.5 text-[#DEAA00]" />
                                             <span className="truncate">
-                                                {clas.location || "Adresse non renseignée"}
+                                                {clas.location ||
+                                                    "Adresse non renseignée"}
                                             </span>
                                         </div>
                                         {clas.capacity && (
                                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                                                 <Users className="h-3.5 w-3.5 text-[#005E84]/60" />
-                                                <span>{clas.capacity} élèves</span>
+                                                <span>
+                                                    {clas.capacity} élèves
+                                                </span>
                                             </div>
                                         )}
                                     </div>

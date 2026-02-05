@@ -1,4 +1,8 @@
-import type { Clas, ClasTeamMemberWithProfile, ClasProject } from "@/types/database";
+import type {
+    Clas,
+    ClasTeamMemberWithProfile,
+    ClasProject,
+} from "@/types/database";
 
 export interface ClasFilters {
     searchQuery: string;
@@ -13,7 +17,7 @@ export interface ClasWithTeam extends Clas {
 
 export interface ClasState {
     items: ClasWithTeam[];
-    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
     lastFetched: number | null;
     filters: ClasFilters;

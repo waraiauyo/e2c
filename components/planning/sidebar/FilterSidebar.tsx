@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Checkbox } from "@/components/shadcn/checkbox";
@@ -40,7 +39,9 @@ export function FilterSidebar({
     return (
         <div className="p-4 space-y-5">
             <div>
-                <h3 className="font-bold text-[#005E84] text-sm mb-3">Filtrer par rôle</h3>
+                <h3 className="font-bold text-[#005E84] text-sm mb-3">
+                    Filtrer par rôle
+                </h3>
                 <Button
                     type="button"
                     variant={isAllSelected ? "default" : "outline"}
@@ -57,7 +58,7 @@ export function FilterSidebar({
                         ? "Tous les rôles (actif)"
                         : "Afficher tous les rôles"}
                 </Button>
-                
+
                 {/* Checkboxes pour chaque rôle */}
                 <div className="space-y-2">
                     {ALL_ROLES.map((role) => {
@@ -88,10 +89,14 @@ export function FilterSidebar({
                                             backgroundColor: ROLE_COLORS[role],
                                         }}
                                     />
-                                    <span className={cn(
-                                        "text-sm font-medium transition-colors",
-                                        isChecked ? "text-[#005E84]" : "text-[#1E3231]"
-                                    )}>
+                                    <span
+                                        className={cn(
+                                            "text-sm font-medium transition-colors",
+                                            isChecked
+                                                ? "text-[#005E84]"
+                                                : "text-[#1E3231]"
+                                        )}
+                                    >
                                         {ROLE_LABELS[role]}
                                     </span>
                                 </div>

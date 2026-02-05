@@ -55,11 +55,10 @@ import {
 } from "@/lib/actions/admin-projects";
 import type { ClasProject } from "@/types/database";
 
-// --- Schema de validation ---
+// Schéma de validation
 const projectSchema = z.object({
     name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
     year: z.string().min(4, "L'année est requise (ex: 2024-2025)"),
-    // CORRECTION ICI : Suppression des options { required_error: ... } qui causaient l'erreur
     status: z.enum(["ongoing", "finished"]),
     description: z.string().optional(),
 });
@@ -85,8 +84,12 @@ export function ProjectManagerDialog({
     const [projects, setProjects] = useState<ClasProject[]>([]);
     const [loading, setLoading] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingProject, setEditingProject] = useState<ClasProject | null>(null);
-    const [projectToDelete, setProjectToDelete] = useState<ClasProject | null>(null);
+    const [editingProject, setEditingProject] = useState<ClasProject | null>(
+        null
+    );
+    const [projectToDelete, setProjectToDelete] = useState<ClasProject | null>(
+        null
+    );
 
     // Charger les projets à l'ouverture
     const loadProjects = async () => {
@@ -150,7 +153,11 @@ export function ProjectManagerDialog({
                 </DialogHeader>
 
                 <div className="flex justify-end my-2">
-                    <Button onClick={handleCreate} size="sm" className="bg-[#005E84] hover:bg-[#004d6e]">
+                    <Button
+                        onClick={handleCreate}
+                        size="sm"
+                        className="bg-[#005E84] hover:bg-[#004d6e]"
+                    >
                         <Plus className="w-4 h-4 mr-2" />
                         Ajouter un projet
                     </Button>
@@ -170,19 +177,38 @@ export function ProjectManagerDialog({
                         <ScrollArea className="h-full">
                             <div className="divide-y">
                                 {projects.map((project) => (
-                                    <div key={project.id} className="p-4 hover:bg-slate-50 flex items-start justify-between group transition-colors">
+                                    <div
+                                        key={project.id}
+                                        className="p-4 hover:bg-slate-50 flex items-start justify-between group transition-colors"
+                                    >
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-semibold text-[#1E3231]">
                                                     {project.name}
                                                 </span>
-                                                <Badge 
-                                                    variant={project.status === 'ongoing' ? "default" : "secondary"}
-                                                    className={project.status === 'ongoing' ? "bg-[#E9B44C] text-[#1E3231] hover:bg-[#d8a035]" : ""}
+                                                <Badge
+                                                    variant={
+                                                        project.status ===
+                                                        "ongoing"
+                                                            ? "default"
+                                                            : "secondary"
+                                                    }
+                                                    className={
+                                                        project.status ===
+                                                        "ongoing"
+                                                            ? "bg-[#E9B44C] text-[#1E3231] hover:bg-[#d8a035]"
+                                                            : ""
+                                                    }
                                                 >
-                                                    {project.status === 'ongoing' ? 'En cours' : 'Terminé'}
+                                                    {project.status ===
+                                                    "ongoing"
+                                                        ? "En cours"
+                                                        : "Terminé"}
                                                 </Badge>
-                                                <Badge variant="outline" className="text-xs">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="text-xs"
+                                                >
                                                     {project.year}
                                                 </Badge>
                                             </div>
@@ -196,7 +222,9 @@ export function ProjectManagerDialog({
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleEdit(project)}
+                                                onClick={() =>
+                                                    handleEdit(project)
+                                                }
                                                 title="Modifier"
                                             >
                                                 <Pencil className="w-4 h-4 text-blue-600" />
@@ -204,7 +232,9 @@ export function ProjectManagerDialog({
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => setProjectToDelete(project)}
+                                                onClick={() =>
+                                                    setProjectToDelete(project)
+                                                }
                                                 title="Supprimer"
                                             >
                                                 <Trash2 className="w-4 h-4 text-red-600" />
@@ -218,8 +248,8 @@ export function ProjectManagerDialog({
                 </div>
 
                 {/* --- Dialogue Formulaire (Ajout/Edit) --- */}
-                <ProjectFormDialog 
-                    open={isFormOpen} 
+                <ProjectFormDialog
+                    open={isFormOpen}
                     onOpenChange={setIsFormOpen}
                     clasId={clasId}
                     projectToEdit={editingProject}
@@ -227,17 +257,21 @@ export function ProjectManagerDialog({
                 />
 
                 {/* --- Alerte Suppression --- */}
-                <AlertDialog open={!!projectToDelete} onOpenChange={(val) => !val && setProjectToDelete(null)}>
+                <AlertDialog
+                    open={!!projectToDelete}
+                    onOpenChange={(val) => !val && setProjectToDelete(null)}
+                >
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Cette action supprimera définitivement le projet "{projectToDelete?.name}".
+                                Cette action supprimera définitivement le projet
+                                "{projectToDelete?.name}".
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Annuler</AlertDialogCancel>
-                            <AlertDialogAction 
+                            <AlertDialogAction
                                 onClick={handleDelete}
                                 className="bg-red-600 hover:bg-red-700 text-white"
                             >
@@ -260,7 +294,13 @@ interface ProjectFormDialogProps {
     onSuccess: () => void;
 }
 
-function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSuccess }: ProjectFormDialogProps) {
+function ProjectFormDialog({
+    open,
+    onOpenChange,
+    clasId,
+    projectToEdit,
+    onSuccess,
+}: ProjectFormDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<ProjectFormValues>({
@@ -331,10 +371,17 @@ function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSucces
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>{projectToEdit ? "Modifier le projet" : "Nouveau projet"}</DialogTitle>
+                    <DialogTitle>
+                        {projectToEdit
+                            ? "Modifier le projet"
+                            : "Nouveau projet"}
+                    </DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4"
+                    >
                         <FormField
                             control={form.control}
                             name="name"
@@ -342,13 +389,16 @@ function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSucces
                                 <FormItem>
                                     <FormLabel>Nom du projet</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Ex: Fresque murale..." {...field} />
+                                        <Input
+                                            placeholder="Ex: Fresque murale..."
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
@@ -357,7 +407,10 @@ function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSucces
                                     <FormItem>
                                         <FormLabel>Année / Période</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Ex: 2024-2025" {...field} />
+                                            <Input
+                                                placeholder="Ex: 2024-2025"
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -369,15 +422,22 @@ function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSucces
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Statut</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                        >
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Sélectionner" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="ongoing">En cours</SelectItem>
-                                                <SelectItem value="finished">Terminé</SelectItem>
+                                                <SelectItem value="ongoing">
+                                                    En cours
+                                                </SelectItem>
+                                                <SelectItem value="finished">
+                                                    Terminé
+                                                </SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -393,10 +453,10 @@ function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSucces
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                        <Textarea 
-                                            placeholder="Détails du projet..." 
+                                        <Textarea
+                                            placeholder="Détails du projet..."
                                             className="resize-none h-24"
-                                            {...field} 
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -405,11 +465,21 @@ function ProjectFormDialog({ open, onOpenChange, clasId, projectToEdit, onSucces
                         />
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                            >
                                 Annuler
                             </Button>
-                            <Button type="submit" disabled={isSubmitting} className="bg-[#005E84] hover:bg-[#004d6e]">
-                                {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-[#005E84] hover:bg-[#004d6e]"
+                            >
+                                {isSubmitting && (
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                )}
                                 {projectToEdit ? "Enregistrer" : "Créer"}
                             </Button>
                         </DialogFooter>

@@ -164,7 +164,9 @@ export function DayEventsDialog({
                                     onClick={() => handleEventClick(event)}
                                     className="group relative p-4 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
                                     style={{
-                                        borderLeftColor: getEventColor(event.target_roles),
+                                        borderLeftColor: getEventColor(
+                                            event.target_roles
+                                        ),
                                         borderLeftWidth: "4px",
                                     }}
                                 >

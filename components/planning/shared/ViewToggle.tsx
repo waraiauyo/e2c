@@ -7,7 +7,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/shadcn/dropdown-menu";
-import { Calendar, CalendarDays, CalendarRange, List, ChevronDown } from "lucide-react";
+import {
+    Calendar,
+    CalendarDays,
+    CalendarRange,
+    List,
+    ChevronDown,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ViewType = "day" | "week" | "month" | "agenda";
@@ -30,7 +36,8 @@ const views: {
 ];
 
 export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
-    const currentViewData = views.find((v) => v.type === currentView) || views[1];
+    const currentViewData =
+        views.find((v) => v.type === currentView) || views[1];
     const CurrentIcon = currentViewData.icon;
 
     return (
@@ -82,7 +89,9 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
                             className="gap-2"
                         >
                             <Icon className="h-4 w-4" />
-                            <span className="hidden md:inline">{view.label}</span>
+                            <span className="hidden md:inline">
+                                {view.label}
+                            </span>
                         </Button>
                     );
                 })}

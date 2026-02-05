@@ -186,15 +186,18 @@ export default function DrivePage() {
     const [dirPath, setDirPath] = useState("");
 
     // Vérifie si l'utilisateur peut modifier/supprimer un élément
-    const canModify = useCallback((item: StorageItem): boolean => {
-        if (!profile) return false;
-        // Les admins peuvent tout faire
-        if (profile.account_type === "admin") return true;
-        // Les dossiers peuvent être modifiés par tous (pas de owner_id)
-        if (!item.id) return true;
-        // Le propriétaire peut modifier son fichier
-        return item.owner_id === profile.id;
-    }, [profile]);
+    const canModify = useCallback(
+        (item: StorageItem): boolean => {
+            if (!profile) return false;
+            // Les admins peuvent tout faire
+            if (profile.account_type === "admin") return true;
+            // Les dossiers peuvent être modifiés par tous (pas de owner_id)
+            if (!item.id) return true;
+            // Le propriétaire peut modifier son fichier
+            return item.owner_id === profile.id;
+        },
+        [profile]
+    );
 
     const [newFolderOpen, setNewFolderOpen] = useState(false);
     const [newFolderName, setNewFolderName] = useState("");
@@ -433,7 +436,8 @@ export default function DrivePage() {
         e.stopPropagation();
         // Ne pas permettre de drop sur soi-même ou sur un dossier sélectionné
         if (draggedItem?.name === folderName) return;
-        if (isDraggingSelection && selectedItems.has(`folder:${folderName}`)) return;
+        if (isDraggingSelection && selectedItems.has(`folder:${folderName}`))
+            return;
         e.dataTransfer.dropEffect = "move";
         setDropTargetFolder(folderName);
     };
@@ -454,7 +458,9 @@ export default function DrivePage() {
 
         // Get items to move
         const itemsToMove = isDraggingSelection
-            ? getSelectedItems().filter((item) => item.name !== targetFolderName)
+            ? getSelectedItems().filter(
+                  (item) => item.name !== targetFolderName
+              )
             : [draggedItem];
 
         if (itemsToMove.length === 0) return;
@@ -520,7 +526,9 @@ export default function DrivePage() {
         }
 
         // Get items to move
-        const itemsToMove = isDraggingSelection ? getSelectedItems() : [draggedItem];
+        const itemsToMove = isDraggingSelection
+            ? getSelectedItems()
+            : [draggedItem];
 
         if (itemsToMove.length === 0) return;
 
@@ -922,10 +930,14 @@ export default function DrivePage() {
                             <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => setDeleteMultipleDialogOpen(true)}
+                                onClick={() =>
+                                    setDeleteMultipleDialogOpen(true)
+                                }
                             >
                                 <Trash2 className="h-4 w-4 sm:mr-2" />
-                                <span className="hidden sm:inline">Supprimer</span>
+                                <span className="hidden sm:inline">
+                                    Supprimer
+                                </span>
                             </Button>
                         )}
                     </div>
@@ -1013,9 +1025,15 @@ export default function DrivePage() {
                                             if (selectedCount > 0) {
                                                 e.stopPropagation();
                                                 toggleSelection(item);
-                                            } else if (isFolder && !isDragging) {
+                                            } else if (
+                                                isFolder &&
+                                                !isDragging
+                                            ) {
                                                 openFolder(item.name);
-                                            } else if (!isFolder && getPreviewType(item.name)) {
+                                            } else if (
+                                                !isFolder &&
+                                                getPreviewType(item.name)
+                                            ) {
                                                 handlePreviewClick(item);
                                             }
                                         }}
@@ -1128,26 +1146,47 @@ export default function DrivePage() {
                                                     <>
                                                         <Avatar className="h-4 w-4">
                                                             <AvatarImage
-                                                                src={item.owner.avatar_url || undefined}
+                                                                src={
+                                                                    item.owner
+                                                                        .avatar_url ||
+                                                                    undefined
+                                                                }
                                                                 alt={`${item.owner.first_name || ""} ${item.owner.last_name || ""}`}
                                                             />
                                                             <AvatarFallback className="text-[8px]">
-                                                                {(item.owner.first_name?.[0] || "").toUpperCase()}
-                                                                {(item.owner.last_name?.[0] || "").toUpperCase()}
+                                                                {(
+                                                                    item.owner
+                                                                        .first_name?.[0] ||
+                                                                    ""
+                                                                ).toUpperCase()}
+                                                                {(
+                                                                    item.owner
+                                                                        .last_name?.[0] ||
+                                                                    ""
+                                                                ).toUpperCase()}
                                                             </AvatarFallback>
                                                         </Avatar>
                                                         <span className="text-xs text-muted-foreground truncate max-w-[80px]">
-                                                            {item.owner.first_name || ""}
+                                                            {item.owner
+                                                                .first_name ||
+                                                                ""}
                                                         </span>
                                                     </>
                                                 ) : (
-                                                    <span className="text-xs text-muted-foreground">—</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        —
+                                                    </span>
                                                 )}
                                                 {item.metadata?.size && (
                                                     <>
-                                                        <span className="text-xs text-muted-foreground">•</span>
                                                         <span className="text-xs text-muted-foreground">
-                                                            {formatFileSize(item.metadata.size)}
+                                                            •
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {formatFileSize(
+                                                                item.metadata
+                                                                    .size
+                                                            )}
                                                         </span>
                                                     </>
                                                 )}

@@ -1,7 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createProject, updateProject, deleteProject } from "@/lib/supabase/query/projects";
+import {
+    createProject,
+    updateProject,
+    deleteProject,
+} from "@/lib/supabase/query/projects";
 import type { ClasProjectInsert, ClasProjectUpdate } from "@/types/database";
 
 export async function createClasProjectAction(data: ClasProjectInsert) {

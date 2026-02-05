@@ -7,13 +7,10 @@ import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 import { Button } from "@/components/shadcn/button";
 import { Menu, X } from "lucide-react";
 
-const DynamicMapMayenne = dynamic(
-    () => import("@/components/map/MapMayenne"),
-    {
-        ssr: false,
-        loading: () => <LoadingSpinner size="lg" />,
-    }
-);
+const DynamicMapMayenne = dynamic(() => import("@/components/map/MapMayenne"), {
+    ssr: false,
+    loading: () => <LoadingSpinner size="lg" />,
+});
 
 export default function MapPage() {
     const [flyToPosition, setFlyToPosition] = useState<{
@@ -42,9 +39,9 @@ export default function MapPage() {
             {/* BOUTON TOGGLE (Burger / Croix) */}
             {/* Positionné en absolu par-dessus tout (z-index très élevé) */}
             <div className="md:hidden absolute top-4 right-4 z-[2000]">
-                <Button 
-                    variant="outline" 
-                    size="icon" 
+                <Button
+                    variant="outline"
+                    size="icon"
                     className="bg-white shadow-md border-gray-200 text-[#005E84]"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >

@@ -201,7 +201,9 @@ export function AgendaView({
                             <span className="sm:hidden">3m</span>
                             <span className="hidden sm:inline">3 mois</span>
                         </TabsTrigger>
-                        <TabsTrigger value="all" className="text-xs sm:text-sm">Tout</TabsTrigger>
+                        <TabsTrigger value="all" className="text-xs sm:text-sm">
+                            Tout
+                        </TabsTrigger>
                     </TabsList>
                 </Tabs>
 
@@ -246,7 +248,9 @@ export function AgendaView({
                                             onClick={() => onEventClick(event)}
                                             className="group relative p-4 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
                                             style={{
-                                                borderLeftColor: getEventColor(event.target_roles),
+                                                borderLeftColor: getEventColor(
+                                                    event.target_roles
+                                                ),
                                                 borderLeftWidth: "4px",
                                             }}
                                         >
@@ -260,19 +264,23 @@ export function AgendaView({
 
                                             {/* Badges des rôles */}
                                             <div className="flex flex-wrap gap-1 mb-2">
-                                                {event.target_roles.map((role) => (
-                                                    <span
-                                                        key={role}
-                                                        className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                                                        style={{
-                                                            backgroundColor: `${ROLE_COLORS[role]}20`,
-                                                            color: ROLE_COLORS[role],
-                                                            border: `1px solid ${ROLE_COLORS[role]}40`,
-                                                        }}
-                                                    >
-                                                        {ROLE_LABELS[role]}
-                                                    </span>
-                                                ))}
+                                                {event.target_roles.map(
+                                                    (role) => (
+                                                        <span
+                                                            key={role}
+                                                            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                                            style={{
+                                                                backgroundColor: `${ROLE_COLORS[role]}20`,
+                                                                color: ROLE_COLORS[
+                                                                    role
+                                                                ],
+                                                                border: `1px solid ${ROLE_COLORS[role]}40`,
+                                                            }}
+                                                        >
+                                                            {ROLE_LABELS[role]}
+                                                        </span>
+                                                    )
+                                                )}
                                             </div>
 
                                             {/* Heure */}

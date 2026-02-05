@@ -161,7 +161,9 @@ export function DayView({
                                         className="absolute left-4 right-4 rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer pointer-events-auto overflow-hidden"
                                         style={{
                                             ...style,
-                                            borderLeftColor: getEventColor(event.target_roles),
+                                            borderLeftColor: getEventColor(
+                                                event.target_roles
+                                            ),
                                             backgroundColor: `${getEventColor(event.target_roles)}15`,
                                         }}
                                         onClick={() => onEventClick(event)}
@@ -174,18 +176,22 @@ export function DayView({
 
                                             {/* Badges des rôles (compact) */}
                                             <div className="flex flex-wrap gap-0.5 mb-1">
-                                                {event.target_roles.map((role) => (
-                                                    <span
-                                                        key={role}
-                                                        className="inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium"
-                                                        style={{
-                                                            backgroundColor: `${ROLE_COLORS[role]}25`,
-                                                            color: ROLE_COLORS[role],
-                                                        }}
-                                                    >
-                                                        {ROLE_LABELS[role]}
-                                                    </span>
-                                                ))}
+                                                {event.target_roles.map(
+                                                    (role) => (
+                                                        <span
+                                                            key={role}
+                                                            className="inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium"
+                                                            style={{
+                                                                backgroundColor: `${ROLE_COLORS[role]}25`,
+                                                                color: ROLE_COLORS[
+                                                                    role
+                                                                ],
+                                                            }}
+                                                        >
+                                                            {ROLE_LABELS[role]}
+                                                        </span>
+                                                    )
+                                                )}
                                             </div>
 
                                             {/* Heure */}

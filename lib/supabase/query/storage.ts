@@ -32,7 +32,9 @@ interface OwnerData {
     owner_avatar_url: string | null;
 }
 
-export async function getFilesAndFolders(dirPath: string): Promise<StorageItem[]> {
+export async function getFilesAndFolders(
+    dirPath: string
+): Promise<StorageItem[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase.storage
@@ -47,8 +49,10 @@ export async function getFilesAndFolders(dirPath: string): Promise<StorageItem[]
     let ownerMap: Record<string, OwnerData> = {};
 
     if (fileIds.length > 0) {
-        const { data: ownersData, error: ownersError } = await supabase
-            .rpc("get_drive_file_owners", { file_ids: fileIds });
+        const { data: ownersData, error: ownersError } = await supabase.rpc(
+            "get_drive_file_owners",
+            { file_ids: fileIds }
+        );
 
         if (!ownersError && ownersData) {
             ownerMap = Object.fromEntries(
@@ -65,12 +69,14 @@ export async function getFilesAndFolders(dirPath: string): Promise<StorageItem[]
             created_at: item.created_at,
             updated_at: item.updated_at,
             owner_id: ownerData?.owner_id || null,
-            owner: ownerData?.owner_id ? {
-                id: ownerData.owner_id,
-                first_name: ownerData.owner_first_name,
-                last_name: ownerData.owner_last_name,
-                avatar_url: ownerData.owner_avatar_url,
-            } : null,
+            owner: ownerData?.owner_id
+                ? {
+                      id: ownerData.owner_id,
+                      first_name: ownerData.owner_first_name,
+                      last_name: ownerData.owner_last_name,
+                      avatar_url: ownerData.owner_avatar_url,
+                  }
+                : null,
             metadata: item.metadata as StorageItem["metadata"],
         };
     });
@@ -137,7 +143,10 @@ export async function deleteFolder(folderPath: string): Promise<void> {
     }
 }
 
-export async function moveFile(oldPath: string, newPath: string): Promise<void> {
+export async function moveFile(
+    oldPath: string,
+    newPath: string
+): Promise<void> {
     const supabase = await createClient();
 
     const { error } = await supabase.storage
@@ -147,7 +156,11 @@ export async function moveFile(oldPath: string, newPath: string): Promise<void> 
     if (error) throw Error(error.message);
 }
 
-export async function renameFile(dirPath: string, oldName: string, newName: string): Promise<void> {
+export async function renameFile(
+    dirPath: string,
+    oldName: string,
+    newName: string
+): Promise<void> {
     const supabase = await createClient();
 
     const oldPath = dirPath ? `${dirPath}${oldName}` : oldName;
@@ -160,7 +173,11 @@ export async function renameFile(dirPath: string, oldName: string, newName: stri
     if (error) throw Error(error.message);
 }
 
-export async function renameFolder(dirPath: string, oldName: string, newName: string): Promise<void> {
+export async function renameFolder(
+    dirPath: string,
+    oldName: string,
+    newName: string
+): Promise<void> {
     const oldFolderPath = dirPath ? `${dirPath}${oldName}` : oldName;
     const newFolderPath = dirPath ? `${dirPath}${newName}` : newName;
 
@@ -168,7 +185,10 @@ export async function renameFolder(dirPath: string, oldName: string, newName: st
     await moveFolder(oldFolderPath, newFolderPath);
 }
 
-export async function moveFolder(oldFolderPath: string, newFolderPath: string): Promise<void> {
+export async function moveFolder(
+    oldFolderPath: string,
+    newFolderPath: string
+): Promise<void> {
     const supabase = await createClient();
 
     // Lister tous les fichiers dans le dossier source

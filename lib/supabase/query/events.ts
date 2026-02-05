@@ -1,7 +1,15 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { Event, EventParticipant, EventParticipantWithProfile, EventReminder, EventWithDetails, EventFilters, TargetRole } from "@/lib/planning/types";
+import type {
+    Event,
+    EventParticipant,
+    EventParticipantWithProfile,
+    EventReminder,
+    EventWithDetails,
+    EventFilters,
+    TargetRole,
+} from "@/lib/planning/types";
 
 /**
  * Queries Supabase pour la gestion des événements
@@ -23,7 +31,9 @@ export async function getAllEvents(): Promise<Event[]> {
         .order("start_time", { ascending: true });
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération des événements: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération des événements: ${error.message}`
+        );
     }
 
     return data as Event[];
@@ -32,12 +42,12 @@ export async function getAllEvents(): Promise<Event[]> {
 /**
  * Récupère les événements avec filtres
  */
-export async function getFilteredEvents(filters: EventFilters): Promise<Event[]> {
+export async function getFilteredEvents(
+    filters: EventFilters
+): Promise<Event[]> {
     const supabase = await createClient();
 
-    let query = supabase
-        .from("events")
-        .select("*");
+    let query = supabase.from("events").select("*");
 
     // Filtre par rôles cibles (utilise l'opérateur overlaps pour les tableaux)
     if (filters.targetRoles && filters.targetRoles.length > 0) {
@@ -69,7 +79,9 @@ export async function getFilteredEvents(filters: EventFilters): Promise<Event[]>
     const { data, error } = await query;
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération des événements: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération des événements: ${error.message}`
+        );
     }
 
     return data as Event[];
@@ -78,12 +90,15 @@ export async function getFilteredEvents(filters: EventFilters): Promise<Event[]>
 /**
  * Récupère un événement par son ID avec tous les détails
  */
-export async function getEventById(id: string): Promise<EventWithDetails | null> {
+export async function getEventById(
+    id: string
+): Promise<EventWithDetails | null> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
         .from("events")
-        .select(`
+        .select(
+            `
             *,
             participants:event_participants(
                 id,
@@ -97,12 +112,15 @@ export async function getEventById(id: string): Promise<EventWithDetails | null>
                 )
             ),
             reminders:event_reminders(*)
-        `)
+        `
+        )
         .eq("id", id)
         .single();
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération de l'événement: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération de l'événement: ${error.message}`
+        );
     }
 
     return data as EventWithDetails;
@@ -121,7 +139,9 @@ export async function getEventsByRoles(roles: TargetRole[]): Promise<Event[]> {
         .order("start_time", { ascending: true });
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération des événements: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération des événements: ${error.message}`
+        );
     }
 
     return data as Event[];
@@ -144,7 +164,9 @@ export async function getEventsByDateRange(
         .order("start_time", { ascending: true });
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération des événements: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération des événements: ${error.message}`
+        );
     }
 
     return data as Event[];
@@ -169,7 +191,9 @@ export async function createEvent(
         .single();
 
     if (error) {
-        throw new Error(`Erreur lors de la création de l'événement: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la création de l'événement: ${error.message}`
+        );
     }
 
     return data as Event;
@@ -192,7 +216,9 @@ export async function updateEvent(
         .single();
 
     if (error) {
-        throw new Error(`Erreur lors de la mise à jour de l'événement: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la mise à jour de l'événement: ${error.message}`
+        );
     }
 
     return data as Event;
@@ -227,18 +253,19 @@ export async function deleteEvent(
                 .or(`id.eq.${parentId},recurrence_parent_id.eq.${parentId}`);
 
             if (error) {
-                throw new Error(`Erreur lors de la suppression de la série: ${error.message}`);
+                throw new Error(
+                    `Erreur lors de la suppression de la série: ${error.message}`
+                );
             }
         }
     } else {
         // Supprimer uniquement cette instance
-        const { error } = await supabase
-            .from("events")
-            .delete()
-            .eq("id", id);
+        const { error } = await supabase.from("events").delete().eq("id", id);
 
         if (error) {
-            throw new Error(`Erreur lors de la suppression de l'événement: ${error.message}`);
+            throw new Error(
+                `Erreur lors de la suppression de l'événement: ${error.message}`
+            );
         }
     }
 }
@@ -257,7 +284,9 @@ export async function duplicateEvent(id: string): Promise<Event> {
         .single();
 
     if (fetchError) {
-        throw new Error(`Erreur lors de la récupération de l'événement: ${fetchError.message}`);
+        throw new Error(
+            `Erreur lors de la récupération de l'événement: ${fetchError.message}`
+        );
     }
 
     // Créer une copie sans l'ID et les timestamps
@@ -273,7 +302,9 @@ export async function duplicateEvent(id: string): Promise<Event> {
         .single();
 
     if (error) {
-        throw new Error(`Erreur lors de la duplication de l'événement: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la duplication de l'événement: ${error.message}`
+        );
     }
 
     return data as Event;
@@ -286,12 +317,15 @@ export async function duplicateEvent(id: string): Promise<Event> {
 /**
  * Récupère les participants d'un événement
  */
-export async function getEventParticipants(eventId: string): Promise<EventParticipantWithProfile[]> {
+export async function getEventParticipants(
+    eventId: string
+): Promise<EventParticipantWithProfile[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
         .from("event_participants")
-        .select(`
+        .select(
+            `
             *,
             profile:profiles(
                 id,
@@ -300,11 +334,14 @@ export async function getEventParticipants(eventId: string): Promise<EventPartic
                 last_name,
                 avatar_url
             )
-        `)
+        `
+        )
         .eq("event_id", eventId);
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération des participants: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération des participants: ${error.message}`
+        );
     }
 
     return data as EventParticipantWithProfile[];
@@ -359,7 +396,9 @@ export async function addParticipant(
         .single();
 
     if (error) {
-        throw new Error(`Erreur lors de l'ajout du participant: ${error.message}`);
+        throw new Error(
+            `Erreur lors de l'ajout du participant: ${error.message}`
+        );
     }
 
     return data as EventParticipant;
@@ -381,7 +420,9 @@ export async function removeParticipant(
         .eq("profile_id", profileId);
 
     if (error) {
-        throw new Error(`Erreur lors du retrait du participant: ${error.message}`);
+        throw new Error(
+            `Erreur lors du retrait du participant: ${error.message}`
+        );
     }
 }
 
@@ -395,10 +436,7 @@ export async function updateEventParticipants(
     const supabase = await createClient();
 
     // Supprimer tous les participants existants
-    await supabase
-        .from("event_participants")
-        .delete()
-        .eq("event_id", eventId);
+    await supabase.from("event_participants").delete().eq("event_id", eventId);
 
     // Ajouter les nouveaux participants
     if (profileIds.length > 0) {
@@ -412,7 +450,9 @@ export async function updateEventParticipants(
             .insert(participants);
 
         if (error) {
-            throw new Error(`Erreur lors de la mise à jour des participants: ${error.message}`);
+            throw new Error(
+                `Erreur lors de la mise à jour des participants: ${error.message}`
+            );
         }
     }
 }
@@ -458,7 +498,9 @@ export async function createReminder(
         .single();
 
     if (error) {
-        throw new Error(`Erreur lors de la création du rappel: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la création du rappel: ${error.message}`
+        );
     }
 
     return data as EventReminder;
@@ -476,17 +518,23 @@ export async function deleteReminder(id: string): Promise<void> {
         .eq("id", id);
 
     if (error) {
-        throw new Error(`Erreur lors de la suppression du rappel: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la suppression du rappel: ${error.message}`
+        );
     }
 }
 
 /**
  * Récupère les rappels d'un événement pour l'utilisateur courant
  */
-export async function getEventReminders(eventId: string): Promise<EventReminder[]> {
+export async function getEventReminders(
+    eventId: string
+): Promise<EventReminder[]> {
     const supabase = await createClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
         throw new Error("Utilisateur non authentifié");
@@ -499,7 +547,9 @@ export async function getEventReminders(eventId: string): Promise<EventReminder[
         .eq("profile_id", user.id);
 
     if (error) {
-        throw new Error(`Erreur lors de la récupération des rappels: ${error.message}`);
+        throw new Error(
+            `Erreur lors de la récupération des rappels: ${error.message}`
+        );
     }
 
     return data as EventReminder[];

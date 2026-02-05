@@ -53,7 +53,10 @@ export function formatDateTime(date: Date | string): string {
  * Formate une plage horaire
  * @example "14:30 - 16:00"
  */
-export function formatTimeRange(start: Date | string, end: Date | string): string {
+export function formatTimeRange(
+    start: Date | string,
+    end: Date | string
+): string {
     return `${formatTime(start)} - ${formatTime(end)}`;
 }
 
@@ -61,7 +64,10 @@ export function formatTimeRange(start: Date | string, end: Date | string): strin
  * Formate une plage de dates
  * @example "15/01/2024 - 20/01/2024"
  */
-export function formatDateRange(start: Date | string, end: Date | string): string {
+export function formatDateRange(
+    start: Date | string,
+    end: Date | string
+): string {
     const startDate = typeof start === "string" ? new Date(start) : start;
     const endDate = typeof end === "string" ? new Date(end) : end;
 
@@ -71,7 +77,10 @@ export function formatDateRange(start: Date | string, end: Date | string): strin
     }
 
     // Si même mois
-    if (startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()) {
+    if (
+        startDate.getMonth() === endDate.getMonth() &&
+        startDate.getFullYear() === endDate.getFullYear()
+    ) {
         return `${startDate.getDate()} - ${endDate.getDate()} ${endDate.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}`;
     }
 
@@ -221,7 +230,10 @@ export function getDaysInMonth(date: Date | string): number {
 /**
  * Calcule la différence en jours entre deux dates
  */
-export function daysBetween(date1: Date | string, date2: Date | string): number {
+export function daysBetween(
+    date1: Date | string,
+    date2: Date | string
+): number {
     const d1 = typeof date1 === "string" ? new Date(date1) : date1;
     const d2 = typeof date2 === "string" ? new Date(date2) : date2;
     const diff = Math.abs(d2.getTime() - d1.getTime());
@@ -231,7 +243,10 @@ export function daysBetween(date1: Date | string, date2: Date | string): number 
 /**
  * Calcule la différence en heures entre deux dates
  */
-export function hoursBetween(date1: Date | string, date2: Date | string): number {
+export function hoursBetween(
+    date1: Date | string,
+    date2: Date | string
+): number {
     const d1 = typeof date1 === "string" ? new Date(date1) : date1;
     const d2 = typeof date2 === "string" ? new Date(date2) : date2;
     const diff = Math.abs(d2.getTime() - d1.getTime());
@@ -279,10 +294,39 @@ export function getMonthDays(date: Date | string): Date[] {
 // Noms de jours et mois en français
 // ============================================================================
 
-export const WEEKDAY_NAMES_SHORT = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-export const WEEKDAY_NAMES_LONG = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+export const WEEKDAY_NAMES_SHORT = [
+    "Lun",
+    "Mar",
+    "Mer",
+    "Jeu",
+    "Ven",
+    "Sam",
+    "Dim",
+];
+export const WEEKDAY_NAMES_LONG = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche",
+];
 
-export const MONTH_NAMES_SHORT = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
+export const MONTH_NAMES_SHORT = [
+    "Jan",
+    "Fév",
+    "Mar",
+    "Avr",
+    "Mai",
+    "Juin",
+    "Juil",
+    "Août",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Déc",
+];
 export const MONTH_NAMES_LONG = [
     "Janvier",
     "Février",
@@ -314,5 +358,7 @@ export function getWeekdayName(date: Date | string, short = false): string {
     const d = typeof date === "string" ? new Date(date) : date;
     const day = d.getDay();
     const adjustedDay = day === 0 ? 6 : day - 1; // Ajuster pour lundi = 0
-    return short ? WEEKDAY_NAMES_SHORT[adjustedDay] : WEEKDAY_NAMES_LONG[adjustedDay];
+    return short
+        ? WEEKDAY_NAMES_SHORT[adjustedDay]
+        : WEEKDAY_NAMES_LONG[adjustedDay];
 }

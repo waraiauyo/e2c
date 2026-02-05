@@ -67,14 +67,19 @@ export default function BottomNavigation() {
                             {active && (
                                 <span className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[3px] bg-[#DEAA00] rounded-b-full" />
                             )}
-                            
+
                             <Icon
                                 className={cn(
                                     "h-5 w-5 transition-transform group-active:scale-95",
                                     active && "fill-[#005E84]/10 stroke-[2.5px]"
                                 )}
                             />
-                            <span className={cn("text-[10px] font-semibold tracking-wide", active ? "text-[#005E84]" : "")}>
+                            <span
+                                className={cn(
+                                    "text-[10px] font-semibold tracking-wide",
+                                    active ? "text-[#005E84]" : ""
+                                )}
+                            >
                                 {item.label}
                             </span>
                         </Link>
@@ -94,16 +99,32 @@ export default function BottomNavigation() {
                         <span className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[3px] bg-[#DEAA00] rounded-b-full" />
                     )}
 
-                    <Avatar className={cn("h-6 w-6 border-2 transition-colors", isActive("/profile") ? "border-[#005E84]" : "border-transparent")}>
+                    <Avatar
+                        className={cn(
+                            "h-6 w-6 border-2 transition-colors",
+                            isActive("/profile")
+                                ? "border-[#005E84]"
+                                : "border-transparent"
+                        )}
+                    >
                         <AvatarImage
                             src={profile?.avatar_url || undefined}
                             alt="Avatar"
                         />
                         <AvatarFallback className="text-[10px] bg-[#F4F4F4] text-[#005E84] font-bold">
-                            {profile ? getInitials() : <User className="h-3 w-3" />}
+                            {profile ? (
+                                getInitials()
+                            ) : (
+                                <User className="h-3 w-3" />
+                            )}
                         </AvatarFallback>
                     </Avatar>
-                    <span className={cn("text-[10px] font-semibold tracking-wide", isActive("/profile") ? "text-[#005E84]" : "")}>
+                    <span
+                        className={cn(
+                            "text-[10px] font-semibold tracking-wide",
+                            isActive("/profile") ? "text-[#005E84]" : ""
+                        )}
+                    >
                         Profil
                     </span>
                 </Link>

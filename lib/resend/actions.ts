@@ -46,7 +46,10 @@ export async function sendAccountCreatedNotification(
         });
 
         if (result.error) {
-            console.error("❌ Erreur envoi mail création compte:", result.error);
+            console.error(
+                "❌ Erreur envoi mail création compte:",
+                result.error
+            );
             return { success: false, error: result.error.message };
         }
 
@@ -62,7 +65,7 @@ export async function sendAccountCreatedNotification(
  */
 function formatTargetRoles(roles: TargetRole[]): string {
     if (roles.length === 3) return "Tous les rôles";
-    return roles.map(r => ROLE_LABELS[r]).join(", ");
+    return roles.map((r) => ROLE_LABELS[r]).join(", ");
 }
 
 /**

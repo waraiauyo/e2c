@@ -37,8 +37,8 @@ export default function PrivacyPolicyPage() {
                                 1. Introduction
                             </h2>
                             <p className="text-muted-foreground">
-                                E2C (Espace collaboratif du CLAS) s&apos;engage à
-                                protéger la vie privée de ses utilisateurs.
+                                E2C (Espace collaboratif du CLAS) s&apos;engage
+                                à protéger la vie privée de ses utilisateurs.
                                 Cette politique de confidentialité explique
                                 comment nous collectons, utilisons et protégeons
                                 vos données personnelles.
@@ -114,10 +114,10 @@ export default function PrivacyPolicyPage() {
                             </p>
                             <ul className="list-disc list-inside text-muted-foreground space-y-1">
                                 <li>Droit d&apos;accès à vos données</li>
+                                <li>Droit de rectification de vos données</li>
                                 <li>
-                                    Droit de rectification de vos données
+                                    Droit à l&apos;effacement de vos données
                                 </li>
-                                <li>Droit à l&apos;effacement de vos données</li>
                                 <li>Droit à la portabilité de vos données</li>
                                 <li>
                                     Droit d&apos;opposition au traitement de vos

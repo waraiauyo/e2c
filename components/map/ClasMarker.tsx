@@ -3,7 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/shadcn/badge";
 import { Button } from "@/components/shadcn/button";
-import { MapPin, Users, Clock, UserCheck, Globe, FolderKanban } from "lucide-react";
+import {
+    MapPin,
+    Users,
+    Clock,
+    UserCheck,
+    Globe,
+    FolderKanban,
+} from "lucide-react";
 import { LatLngExpression } from "leaflet";
 import type { GradeLevel } from "@/types/database";
 import "./leaflet-popup.css";
@@ -76,8 +83,7 @@ export const ClasMarker = ({ position, infos }: ClasMarkerProps) => {
                             {infos.description}
                         </p>
                     )}
-                    
-                    {/* Section Projet Actif - Mise à jour : Intitulé au-dessus, date retirée */}
+
                     {infos.activeProject && (
                         <div className="rounded-md border border-[#E2E8F0] bg-white p-2.5 shadow-sm">
                             <div className="flex items-center gap-3">

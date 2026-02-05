@@ -65,7 +65,9 @@ export function WeekView({
         if (!isMobile) return allWeekDays;
 
         // Trouver l'index du jour courant dans la semaine
-        const todayIndex = allWeekDays.findIndex((d) => isSameDay(d, currentDate));
+        const todayIndex = allWeekDays.findIndex((d) =>
+            isSameDay(d, currentDate)
+        );
         const centerIndex = todayIndex >= 0 ? todayIndex : 3; // Par défaut milieu de semaine
 
         // Calculer les indices pour 3 jours (1 avant, courant, 1 après)

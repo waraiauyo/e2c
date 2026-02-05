@@ -2,9 +2,21 @@
  * Utilitaires pour la manipulation d'événements
  */
 
-import type { Event, EventWithDetails, CalendarDay, CalendarWeek, CalendarMonth, TargetRole } from "@/lib/planning/types";
+import type {
+    Event,
+    CalendarDay,
+    CalendarWeek,
+    CalendarMonth,
+} from "@/lib/planning/types";
 import { getEventColor, ROLE_COLORS } from "@/lib/planning/types";
-import { isSameDay, startOfMonth, endOfMonth, getMonthDays, isToday, isWeekend } from "./dateUtils";
+import {
+    isSameDay,
+    startOfMonth,
+    endOfMonth,
+    getMonthDays,
+    isToday,
+    isWeekend,
+} from "./dateUtils";
 
 // ============================================================================
 // Tri et filtrage
@@ -13,7 +25,10 @@ import { isSameDay, startOfMonth, endOfMonth, getMonthDays, isToday, isWeekend }
 /**
  * Trie les événements par date de début
  */
-export function sortEventsByStartTime(events: Event[], ascending = true): Event[] {
+export function sortEventsByStartTime(
+    events: Event[],
+    ascending = true
+): Event[] {
     return [...events].sort((a, b) => {
         const dateA = new Date(a.start_time).getTime();
         const dateB = new Date(b.start_time).getTime();
@@ -42,13 +57,19 @@ export function groupEventsByDay(events: Event[]): Map<string, Event[]> {
  * Filtre les événements d'un jour spécifique
  */
 export function getEventsForDay(events: Event[], date: Date | string): Event[] {
-    return events.filter((event) => isSameDay(new Date(event.start_time), date));
+    return events.filter((event) =>
+        isSameDay(new Date(event.start_time), date)
+    );
 }
 
 /**
  * Filtre les événements d'une plage de dates
  */
-export function getEventsInRange(events: Event[], startDate: Date, endDate: Date): Event[] {
+export function getEventsInRange(
+    events: Event[],
+    startDate: Date,
+    endDate: Date
+): Event[] {
     const start = startDate.getTime();
     const end = endDate.getTime();
 
@@ -65,7 +86,10 @@ export function getEventsInRange(events: Event[], startDate: Date, endDate: Date
 /**
  * Génère la structure d'un mois de calendrier avec événements
  */
-export function generateCalendarMonth(date: Date, events: Event[]): CalendarMonth {
+export function generateCalendarMonth(
+    date: Date,
+    events: Event[]
+): CalendarMonth {
     const d = new Date(date);
     const year = d.getFullYear();
     const month = d.getMonth();
@@ -213,7 +237,9 @@ const ROLE_COLOR_CLASSES = {
  */
 function getEventColorClasses(event: Event) {
     const color = getEventColor(event.target_roles);
-    return ROLE_COLOR_CLASSES[color] || ROLE_COLOR_CLASSES[ROLE_COLORS.animator];
+    return (
+        ROLE_COLOR_CLASSES[color] || ROLE_COLOR_CLASSES[ROLE_COLORS.animator]
+    );
 }
 
 /**
@@ -256,13 +282,16 @@ export function searchEvents(events: Event[], query: string): Event[] {
 
     return events.filter((event) => {
         const titleMatch = event.title.toLowerCase().includes(lowerQuery);
-        const descriptionMatch = event.description?.toLowerCase().includes(lowerQuery);
-        const locationMatch = event.location?.toLowerCase().includes(lowerQuery);
+        const descriptionMatch = event.description
+            ?.toLowerCase()
+            .includes(lowerQuery);
+        const locationMatch = event.location
+            ?.toLowerCase()
+            .includes(lowerQuery);
 
         return titleMatch || descriptionMatch || locationMatch;
     });
 }
-
 
 // ============================================================================
 // Statistiques
@@ -272,17 +301,22 @@ export function searchEvents(events: Event[], query: string): Event[] {
  * Compte le nombre d'événements par statut
  */
 export function countEventsByStatus(events: Event[]): Record<string, number> {
-    return events.reduce((acc, event) => {
-        acc[event.status] = (acc[event.status] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
+    return events.reduce(
+        (acc, event) => {
+            acc[event.status] = (acc[event.status] || 0) + 1;
+            return acc;
+        },
+        {} as Record<string, number>
+    );
 }
 
 /**
  * Calcule le temps total d'événements en heures
  */
 export function getTotalEventDuration(events: Event[]): number {
-    return events.reduce((total, event) => {
-        return total + getEventDuration(event);
-    }, 0) / 60; // Convertir en heures
+    return (
+        events.reduce((total, event) => {
+            return total + getEventDuration(event);
+        }, 0) / 60
+    ); // Convertir en heures
 }

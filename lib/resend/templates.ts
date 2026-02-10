@@ -272,7 +272,7 @@ export function accountCreatedTemplate(
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
-            <a href="https://votre-url-de-production.com/login" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
                 Accéder à la plateforme
             </a>
         </div>

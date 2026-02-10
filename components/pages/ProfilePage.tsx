@@ -51,6 +51,7 @@ import {
     Phone,
     Lock,
     UserCircle,
+    Shield,
 } from "lucide-react";
 import { LoadingSpinner } from "@/components/shadcn/loading-spinner";
 
@@ -726,6 +727,20 @@ export default function ProfilePage() {
                     </Form>
                 </CardContent>
             </Card>
+
+            {/* Administration */}
+            {profile.account_type === "admin" && (
+                <div className="w-full max-w-4xl">
+                    <Button
+                        onClick={() => router.push("/admin")}
+                        variant="outline"
+                        className="w-full border-[#DEAA00] text-[#DEAA00] hover:bg-[#DEAA00]/10 hover:text-[#DEAA00]"
+                    >
+                        <Shield className="mr-2 h-4 w-4" />
+                        Panneau d&apos;administration
+                    </Button>
+                </div>
+            )}
 
             {/* Déconnexion */}
             <div className="w-full max-w-4xl">

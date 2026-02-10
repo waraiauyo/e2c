@@ -23,8 +23,8 @@ export default async function AdminLayout({
 
     // 3. Rendu du layout admin
     return (
-        <div className="flex min-h-screen flex-col">
-            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
+        <div className="flex h-full flex-col">
+            <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-muted/40 px-6">
                 <h1 className="font-semibold text-lg">E2C Administration</h1>
                 <nav className="ml-auto flex gap-4 text-sm">
                     <a href="/admin/users">Utilisateurs</a>
@@ -32,7 +32,7 @@ export default async function AdminLayout({
                     <a href="/">Retour au site</a>
                 </nav>
             </header>
-            <main className="flex-1 p-6">{children}</main>
+            <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </div>
     );
 }
